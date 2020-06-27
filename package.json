@@ -1,0 +1,11 @@
+{
+  "name": "debug_trainer",
+  "version": "1.0.0",
+  "description": "A tool to create errors so that you can practice debugging them",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Neurodynamic",
+  "license": "ISC"
+}
