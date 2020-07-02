@@ -1,8 +1,9 @@
 module Update exposing (update)
 
 import Actions exposing (Action(..))
+import Breakers.CaseSwap
 import Json.Encode as Encode
-import Model exposing (BreakPhase(..), Model(..), TrainerOptions)
+import Model exposing (BreakPhase(..), Mode(..), Model, TrainerOptions)
 import Ports
 
 
@@ -12,7 +13,8 @@ update { filepath } action model =
         ReceiveFileContents contents ->
             let
                 newContents =
-                    contents |> String.toLower
+                    contents
+                        |> Breakers.CaseSwap.run model.randomNumber
 
                 newFile =
                     Encode.object
@@ -20,7 +22,6 @@ update { filepath } action model =
                         , ( "contents", Encode.string newContents )
                         ]
             in
-            ( Break filepath WritingFile
+            ( { model | mode = Break filepath WritingFile }
             , Ports.writeFile newFile
             )
-

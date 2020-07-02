@@ -8,6 +8,7 @@ module.exports = function (program) {
         console.log(err)
         process.exit(1);
       }
+      
       program.ports.receiveFileContents.send(contents)
     });
 

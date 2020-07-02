@@ -20,8 +20,10 @@ programConfig =
 
 
 init : Flags -> TrainerOptions -> ( Model, Cmd Action )
-init flags { filepath } =
-    ( Model.Break filepath Model.ReadingFile
+init { randomNumber } { filepath } =
+    ( { randomNumber = randomNumber
+      , mode = Model.Break filepath Model.ReadingFile
+      }
     , Cmd.batch
         [ Ports.print ("Breaking " ++ filepath ++ "...")
         , Ports.readFile filepath
@@ -30,10 +32,10 @@ init flags { filepath } =
 
 
 type alias Flags =
-    Program.FlagsIncludingArgv {}
+    Program.FlagsIncludingArgv { randomNumber : Int }
 
 
-main : Program.StatefulProgram Model Action TrainerOptions {}
+main : Program.StatefulProgram Model Action TrainerOptions { randomNumber : Int }
 main =
     Program.stateful
         { printAndExitFailure = Ports.printAndExitFailure
