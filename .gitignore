@@ -5,6 +5,7 @@ documentation.json
 **/*.elm.js
 **/index.html
 
+zignore/
 # elm-package generated files
 elm-stuff
 

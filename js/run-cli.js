@@ -1,24 +1,27 @@
 const { Elm } = require('./elm.js');
 const readline = require('readline');
+const print = require('./ports/print.js');
+const printAndExitFailure = require('./ports/printAndExitFailure.js');
+const printAndExitSuccess = require('./ports/printAndExitSuccess.js');
+const readFile = require('./ports/readFile.js');
+const writeFile = require('./ports/writeFile.js');
 
 global.XMLHttpRequest = require("xhr2");
 
-module.exports = (name, opts) => {
-  const program = Elm[name].init({
+module.exports = (opts) => {
+  const program = Elm.Main.init({
     flags: { argv: process.argv, versionMessage: "1.2.3" }
   });
 
-  program.ports.print.subscribe(message => {
-    console.log(message)
-  });
-  program.ports.printAndExitFailure.subscribe(message => {
-    console.log(message);
-    process.exit(1);
-  });
-  program.ports.printAndExitSuccess.subscribe(message => {
-    console.log(message);
-    process.exit(0);
-  });
+  [
+    print,
+    printAndExitFailure,
+    printAndExitSuccess,
+    readFile,
+    writeFile,
+  ].forEach(function (portSetupFunction) {
+    portSetupFunction(program)
+  })
 
   if (opts && opts.stdin) {
     const rl = readline.createInterface({
