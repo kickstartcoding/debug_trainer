@@ -5,6 +5,8 @@ module Model exposing
     , TrainerOptions
     )
 
+import SavedData.Model
+
 
 type alias TrainerOptions =
     { filepath : String
@@ -13,6 +15,7 @@ type alias TrainerOptions =
 
 type alias Model =
     { randomNumber : Int
+    , savedData : SavedData.Model.Model
     , mode : Mode
     }
 

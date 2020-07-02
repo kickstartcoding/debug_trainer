@@ -1,4 +1,5 @@
 fs = require('fs')
+const savedData = require('../savedData.js')
 
 module.exports = function (program) {
   program.ports.writeFile.subscribe(fileData => {
@@ -8,8 +9,12 @@ module.exports = function (program) {
         console.log(err)
         process.exit(1);
       }
-      console.log('New contents written! Good luck debugging!');
-      process.exit(0);
+
+      console.log('New file contents written!');
+      savedData.save(fileData.dataToSave)
+
+      // console.log('Good luck debugging!');
+      // process.exit(0);
     });
   });
 }

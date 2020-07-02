@@ -2,9 +2,11 @@ module Update exposing (update)
 
 import Actions exposing (Action(..))
 import Breakers.CaseSwap
+import Codec
 import Json.Encode as Encode
 import Model exposing (BreakPhase(..), Mode(..), Model, TrainerOptions)
 import Ports
+import SavedData.Model
 
 
 update : TrainerOptions -> Action -> Model -> ( Model, Cmd Action )
@@ -17,19 +19,25 @@ update { filepath } action model =
                         |> Breakers.CaseSwap.run model.randomNumber
             in
             case maybeChange of
-                Just ( newContents, encodedChangeData ) ->
+                Just ( newContents, changeData ) ->
                     let
-                        newFile =
+                        newSavedData =
+                            SavedData.Model.pushChange
+                                { filepath = filepath
+                                , fileContent = contents
+                                , change = SavedData.Model.CaseSwap changeData
+                                }
+                                model.savedData
+
+                        writeFileData =
                             Encode.object
                                 [ ( "path", Encode.string filepath )
                                 , ( "contents", Encode.string newContents )
+                                , ( "dataToSave", Codec.encodeToValue SavedData.Model.codec newSavedData )
                                 ]
                     in
                     ( { model | mode = Break filepath WritingFile }
-                    , Cmd.batch
-                        [ Ports.writeFile newFile
-                        , Ports.writeFile newFile
-                        ]
+                    , Ports.writeFile writeFileData
                     )
 
                 Nothing ->

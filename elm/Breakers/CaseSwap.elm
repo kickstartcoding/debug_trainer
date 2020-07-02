@@ -12,7 +12,7 @@ import Utils.List
 import Utils.String as StrUtils
 
 
-run : Int -> String -> Maybe ( String, Value )
+run : Int -> String -> Maybe ( String, ChangeData )
 run randomNumber string =
     case Parsers.Generic.Parser.run string of
         Ok segments ->
@@ -22,7 +22,8 @@ run randomNumber string =
                         ( newSegments
                             |> List.map Segment.toString
                             |> String.join ""
-                        , Codec.encoder codec changeData
+                          -- , Codec.encoder codec changeData
+                        , changeData
                         )
                     )
 
