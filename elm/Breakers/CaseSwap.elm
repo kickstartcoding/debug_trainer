@@ -1,87 +1,50 @@
 module Breakers.CaseSwap exposing (run)
 
 import List.Extra as ListEx
-import Parsers.Generic exposing (Segment(..))
-import String.Extra as StrEx
+import Parsers.Generic.Parser
+import Parsers.Generic.Segment as Segment exposing (Segment(..))
+import Utils.List
+import Utils.String as StrUtils
 
 
 run : Int -> String -> String
 run randomNumber string =
-    case Parsers.Generic.run string of
+    case Parsers.Generic.Parser.run string of
         Ok segments ->
-            let
-                candidateWords =
-                    segments
-                        |> List.indexedMap Tuple.pair
-                        |> List.filterMap maybeWordCandidateFromSegment
-
-                candidateCount =
-                    List.length candidateWords
-
-                maybeSelectedWord =
-                    if candidateCount > 0 then
-                        let
-                            indexOfSelectedWord =
-                                modBy candidateCount randomNumber
-                        in
-                        ListEx.getAt indexOfSelectedWord candidateWords
-
-                    else
-                        Nothing
-            in
-            case maybeSelectedWord of
-                Just ( index, selectedWord ) ->
-                    let
-                        newWord =
-                            if StrEx.toTitleCase selectedWord == selectedWord then
-                                StrEx.decapitalize selectedWord
-
-                            else
-                                StrEx.toTitleCase selectedWord
-                    in
-                    segments
-                        |> ListEx.setAt index (Word newWord)
-                        |> mergeSegments
-
-                Nothing ->
-                    string
+            segments
+                |> changeOneWord randomNumber
+                |> List.map Segment.toString
+                |> String.join ""
 
         Err _ ->
             string
 
 
-mergeSegments : List Segment -> String
-mergeSegments segments =
+changeOneWord : Int -> List Segment -> List Segment
+changeOneWord randomNumber segments =
+    case chooseWordToChange randomNumber segments of
+        Just ( index, selectedWord ) ->
+            let
+                newWord =
+                    StrUtils.toggleTitleCase selectedWord
+            in
+            segments
+                |> ListEx.setAt index (Word newWord)
+
+        Nothing ->
+            -- Don't change anything if we can't find any
+            -- words to change
+            segments
+
+
+chooseWordToChange : Int -> List Segment -> Maybe ( Int, String )
+chooseWordToChange randomNumber segments =
     segments
-        |> List.map
-            (\segment ->
-                case segment of
-                    Word string ->
-                        string
-
-                    Whitespace string ->
-                        string
-
-                    Other string ->
-                        string
-            )
-        |> String.join ""
+        |> Segment.wordsWithIndicesWhere isCandidate
+        |> Utils.List.pickRandom randomNumber
 
 
-maybeWordCandidateFromSegment : ( Int, Segment ) -> Maybe ( Int, String )
-maybeWordCandidateFromSegment ( index, segment ) =
-    case segment of
-        Word word ->
-            if String.length word > 1 && not (isAllUpperCase word) then
-                Just ( index, word )
-
-            else
-                Nothing
-
-        _ ->
-            Nothing
-
-
-isAllUpperCase : String -> Bool
-isAllUpperCase string =
-    String.toUpper string == string
+isCandidate : String -> Bool
+isCandidate string =
+    StrUtils.isMoreThanOneCharacter string
+        && not (StrUtils.isAllCaps string)

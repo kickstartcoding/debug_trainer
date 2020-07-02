@@ -1,14 +1,9 @@
-module Parsers.Generic exposing (Segment(..), run)
+module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
+import Parsers.Generic.Segment exposing (Segment(..))
 import Parsers.Utils.Repeat as Repeat
 import Parsers.Utils.Whitespace as Whitespace
-
-
-type Segment
-    = Word String
-    | Whitespace String
-    | Other String
 
 
 run : String -> Result (List DeadEnd) (List Segment)
