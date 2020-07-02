@@ -4,7 +4,8 @@
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:elm && nexe debug_trainer --resources './js/**/*' --output build/debug_trainer",
+    "build": "npm run build:elm && npm run build:nexe",
+    "build:nexe": "nexe debug_trainer --resources './js/**/*' --output build/debug_trainer",
     "build:elm": "elm make elm/Main.elm --output=js/elm.js",
     "example": "npm run build:elm && ./debug_trainer zignore/testfile.txt",
     "test": "echo \"Error: no test specified\" && exit 1"
