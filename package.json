@@ -4,11 +4,15 @@
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
+    "build": "npm run build:elm && nexe debug_trainer.js",
+    "build:elm": "elm make elm/Main.elm --output=js/elm.js",
+    "example": "npm run build:elm && ./debug_trainer.js zignore/testfile.txt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Neurodynamic",
   "license": "ISC",
   "dependencies": {
+    "nexe": "^3.3.7",
     "xhr2": "^0.2.0"
   }
 }
