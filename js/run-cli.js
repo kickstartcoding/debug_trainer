@@ -24,22 +24,6 @@ module.exports = (opts) => {
   portFunctions.forEach(function (portSetupFunction) {
     portSetupFunction(program)
   })
-
-  if (opts && opts.stdin) {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-      terminal: false
-    })
-
-    rl.on('line', function (line) {
-      program.ports.onStdinLine.send(line)
-    })
-
-    rl.on('close', function (line) {
-      program.ports.onStdinClosed.send(null)
-    })
-  }
 }
 
 function getRandomInt(max) {
