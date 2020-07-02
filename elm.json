@@ -15,7 +15,8 @@
             "elm/parser": "1.1.0",
             "elm/regex": "1.0.0",
             "elm-community/list-extra": "8.0.0",
-            "elm-community/string-extra": "4.0.1"
+            "elm-community/string-extra": "4.0.1",
+            "miniBill/elm-codec": "2.0.0"
         },
         "indirect": {
             "elm/time": "1.0.0",

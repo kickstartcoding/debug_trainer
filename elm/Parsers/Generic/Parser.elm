@@ -18,17 +18,21 @@ segments =
 
 segment : Parser Segment
 segment =
-    oneOf
-        [ Repeat.oneOrMore wordCharacter
-            |> getChompedString
-            |> Parser.map Word
-        , Whitespace.oneOrMore
-            |> getChompedString
-            |> Parser.map Whitespace
-        , Repeat.oneOrMore otherCharacter
-            |> getChompedString
-            |> Parser.map Other
-        ]
+    getOffset
+        |> andThen
+            (\offset ->
+                oneOf
+                    [ Repeat.oneOrMore wordCharacter
+                        |> getChompedString
+                        |> Parser.map (Word offset)
+                    , Whitespace.oneOrMore
+                        |> getChompedString
+                        |> Parser.map (Whitespace offset)
+                    , Repeat.oneOrMore otherCharacter
+                        |> getChompedString
+                        |> Parser.map (Other offset)
+                    ]
+            )
 
 
 wordCharacter : Parser ()

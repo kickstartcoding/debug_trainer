@@ -1,5 +1,10 @@
-module Breakers.CaseSwap exposing (run)
+module Breakers.CaseSwap exposing
+    ( ChangeData
+    , codec
+    , run
+    )
 
+import Codec exposing (Codec, Value)
 import List.Extra as ListEx
 import Parsers.Generic.Parser
 import Parsers.Generic.Segment as Segment exposing (Segment(..))
@@ -7,37 +12,51 @@ import Utils.List
 import Utils.String as StrUtils
 
 
-run : Int -> String -> String
+run : Int -> String -> Maybe ( String, Value )
 run randomNumber string =
     case Parsers.Generic.Parser.run string of
         Ok segments ->
-            segments
-                |> changeOneWord randomNumber
-                |> List.map Segment.toString
-                |> String.join ""
+            changeOneWord randomNumber segments
+                |> Maybe.map
+                    (\( newSegments, changeData ) ->
+                        ( newSegments
+                            |> List.map Segment.toString
+                            |> String.join ""
+                        , Codec.encoder codec changeData
+                        )
+                    )
 
         Err _ ->
-            string
+            Nothing
 
 
-changeOneWord : Int -> List Segment -> List Segment
+changeOneWord : Int -> List Segment -> Maybe ( List Segment, ChangeData )
 changeOneWord randomNumber segments =
-    case chooseWordToChange randomNumber segments of
-        Just ( index, selectedWord ) ->
-            let
-                newWord =
-                    StrUtils.toggleTitleCase selectedWord
-            in
-            segments
-                |> ListEx.setAt index (Word newWord)
+    segments
+        |> chooseWordToChange randomNumber
+        |> Maybe.map
+            (\{ index, offset, content } ->
+                let
+                    newWord =
+                        StrUtils.toggleTitleCase content
+                in
+                ( ListEx.setAt index (Word offset newWord) segments
+                , { originalWord =
+                        { start = offset
+                        , end = offset + String.length content
+                        , content = content
+                        }
+                  , newWord =
+                        { start = offset
+                        , end = offset + String.length newWord
+                        , content = newWord
+                        }
+                  }
+                )
+            )
 
-        Nothing ->
-            -- Don't change anything if we can't find any
-            -- words to change
-            segments
 
-
-chooseWordToChange : Int -> List Segment -> Maybe ( Int, String )
+chooseWordToChange : Int -> List Segment -> Maybe { index : Int, offset : Int, content : String }
 chooseWordToChange randomNumber segments =
     segments
         |> Segment.wordsWithIndicesWhere isCandidate
@@ -48,3 +67,33 @@ isCandidate : String -> Bool
 isCandidate string =
     StrUtils.isMoreThanOneCharacter string
         && not (StrUtils.isAllCaps string)
+
+
+type alias ChangeData =
+    { originalWord : WordData
+    , newWord : WordData
+    }
+
+
+type alias WordData =
+    { start : Int
+    , end : Int
+    , content : String
+    }
+
+
+codec : Codec ChangeData
+codec =
+    Codec.object ChangeData
+        |> Codec.field "originalWord" .originalWord wordDataCodec
+        |> Codec.field "newWord" .newWord wordDataCodec
+        |> Codec.buildObject
+
+
+wordDataCodec : Codec WordData
+wordDataCodec =
+    Codec.object WordData
+        |> Codec.field "start" .start Codec.int
+        |> Codec.field "end" .end Codec.int
+        |> Codec.field "content" .content Codec.string
+        |> Codec.buildObject
