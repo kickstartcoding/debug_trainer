@@ -1,50 +1,109 @@
-module SavedData.Model exposing (Model, codec, init, pushChange, Change(..))
+module SavedData.Model exposing
+    ( Change(..)
+    , SavedData
+    , SavedDataError(..)
+    , decode
+    , encode
+    , fromFlag
+    , getChange
+    , init
+    , savedDataOrInit
+    , setChange
+    )
 
 import Breakers.CaseSwap as CaseSwap
-import Codec exposing (Codec, Value)
+import Codec exposing (Codec, Decoder, Value)
 import Dict exposing (Dict)
+import Json.Decode
+import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
 type Change
     = CaseSwap CaseSwap.ChangeData
 
 
-init : Model
+init : SavedData
 init =
     { changedFiles = Dict.empty }
 
 
-pushChange : { filepath : String, fileContent : String, change : Change } -> Model -> Model
-pushChange { filepath, fileContent, change } ({ changedFiles } as model) =
+savedDataOrInit : Result SavedDataError SavedData -> SavedData
+savedDataOrInit savedDataResult =
+    case savedDataResult of
+        Ok data ->
+            data
+
+        Err _ ->
+            init
+
+
+getChange : FilePath -> SavedData -> Maybe Change
+getChange filepath savedData =
+    Dict.get (FilePath.toString filepath) savedData.changedFiles
+        |> Maybe.map .change
+
+
+setChange : { filepath : FilePath, fileContent : String, change : Change } -> SavedData -> SavedData
+setChange { filepath, fileContent, change } ({ changedFiles } as model) =
     { model
         | changedFiles =
-            Dict.update filepath
+            Dict.update (FilePath.toString filepath)
                 (\maybeFileData ->
                     case maybeFileData of
                         Just fileData ->
-                            Just { fileData | changes = change :: fileData.changes }
+                            Just { fileData | change = change }
 
                         Nothing ->
-                            Just { originalContent = fileContent, changes = [ change ] }
+                            Just { originalContent = fileContent, change = change }
                 )
                 changedFiles
     }
 
 
-type alias Model =
+type alias SavedData =
     { changedFiles : Dict String FileData
     }
 
 
 type alias FileData =
     { originalContent : String
-    , changes : List Change
+    , change : Change
     }
 
 
-codec : Codec Model
+fromFlag : Maybe String -> Result SavedDataError SavedData
+fromFlag maybeDataString =
+    case maybeDataString of
+        Just string ->
+            case Codec.decodeString codec string of
+                Ok savedData ->
+                    Ok savedData
+
+                Err error ->
+                    Err (DecodingFailed (Json.Decode.errorToString error))
+
+        Nothing ->
+            Err FileMissing
+
+
+type SavedDataError
+    = FileMissing
+    | DecodingFailed String
+
+
+encode : SavedData -> Value
+encode savedData =
+    Codec.encodeToValue codec savedData
+
+
+decode : Decoder SavedData
+decode =
+    Codec.decoder codec
+
+
+codec : Codec SavedData
 codec =
-    Codec.object Model
+    Codec.object SavedData
         |> Codec.field "changedFiles" .changedFiles (Codec.dict fileDataCodec)
         |> Codec.buildObject
 
@@ -53,7 +112,7 @@ fileDataCodec : Codec FileData
 fileDataCodec =
     Codec.object FileData
         |> Codec.field "originalContent" .originalContent Codec.string
-        |> Codec.field "changes" .changes (Codec.list changeCodec)
+        |> Codec.field "change" .change changeCodec
         |> Codec.buildObject
 
 

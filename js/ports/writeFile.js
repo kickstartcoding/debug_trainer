@@ -1,16 +1,17 @@
 fs = require('fs')
 const savedData = require('../savedData.js')
+const {devLog} = require('../logging.js')
 
 module.exports = function (program) {
   program.ports.writeFile.subscribe(fileData => {
-    console.log(`Writing new contents of ${fileData.path}...`);
+    devLog(`Writing new contents of ${fileData.path}...`);
     fs.writeFile(fileData.path, fileData.contents, function (err) {
       if (err) {
-        console.log(err)
+        console.error(err)
         process.exit(1);
       }
 
-      console.log('New file contents written!');
+      devLog('New file contents written!');
       savedData.save(fileData.dataToSave)
 
       // console.log('Good luck debugging!');

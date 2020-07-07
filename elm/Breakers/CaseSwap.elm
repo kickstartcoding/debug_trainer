@@ -10,6 +10,7 @@ import Parsers.Generic.Parser
 import Parsers.Generic.Segment as Segment exposing (Segment(..))
 import Utils.List
 import Utils.String as StrUtils
+import Utils.Types.FilePath as FilePath
 
 
 run : Int -> String -> Maybe ( String, ChangeData )

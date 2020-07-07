@@ -1,32 +1,34 @@
 fs = require('fs')
 
 const homedir = require('os').homedir();
+const { devLog } = require('./logging.js')
 
-const saveDataFilePath = `${homedir}/.debug_trainer.json`
+const dataFilePath = `${homedir}/.debug_trainer.json`
 
 module.exports = {
+  dataFilePath: dataFilePath,
   load: function (program) {
-    console.log(`Loading data from ${saveDataFilePath}...`);
-    if (fs.existsSync(saveDataFilePath)) {
-      return fs.readFileSync(saveDataFilePath, 'utf8');
+    devLog(`Loading data from ${dataFilePath}...`);
+    if (fs.existsSync(dataFilePath)) {
+      return fs.readFileSync(dataFilePath, 'utf8');
     } else {
       return null
     }
   },
   save: function (saveDataContents) {
-    console.log(`Saving data to ${saveDataFilePath}...`);
-    if (!fs.existsSync(saveDataFilePath)) {
-      fs.closeSync(fs.openSync(saveDataFilePath, 'w'))
+    devLog(`Saving data to ${dataFilePath}...`);
+    if (!fs.existsSync(dataFilePath)) {
+      fs.closeSync(fs.openSync(dataFilePath, 'w'))
     }
     const contents = JSON.stringify(saveDataContents, null, "  ")
-    fs.writeFile(saveDataFilePath, contents, function (err) {
+    fs.writeFile(dataFilePath, contents, function (err) {
       // console.log('contents:', contents)
 
       if (err) {
-        console.log(err)
+        console.error(err)
         process.exit(1);
       }
-      console.log('Data successfully saved!');
+      devLog('Data successfully saved!');
 
       process.exit(0);
     });

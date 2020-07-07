@@ -1,14 +1,15 @@
 fs = require('fs')
+const { devLog } = require('../logging.js')
 
 module.exports = function (program) {
   program.ports.readFile.subscribe(filepath => {
-    console.log(`Reading contents of ${filepath}...`);
+    devLog(`Reading contents of ${filepath}...`);
     fs.readFile(filepath, 'utf8', function (err, contents) {
       if (err) {
-        console.log(err)
+        console.error(err)
         process.exit(1);
       }
-      
+
       program.ports.receiveFileContents.send(contents)
     });
 

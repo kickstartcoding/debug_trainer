@@ -4,13 +4,24 @@ import Actions exposing (Action(..))
 import Breakers.CaseSwap
 import Codec
 import Json.Encode as Encode
-import Model exposing (BreakPhase(..), Mode(..), Model, TrainerOptions)
+import Model exposing (Command(..), Model, Phase(..))
 import Ports
-import SavedData.Model
+import SavedData.Model as SavedData
+import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
-update : TrainerOptions -> Action -> Model -> ( Model, Cmd Action )
-update { filepath } action model =
+update : Command -> Action -> Model -> ( Model, Cmd Action )
+update command action model =
+    case command of
+        Break filepath _ ->
+            updateBreak filepath action model
+
+        Hint _ _ ->
+            ( model, Cmd.none )
+
+
+updateBreak : FilePath -> Action -> Model -> ( Model, Cmd Action )
+updateBreak filepath action model =
     case action of
         ReceiveFileContents contents ->
             let
@@ -21,22 +32,25 @@ update { filepath } action model =
             case maybeChange of
                 Just ( newContents, changeData ) ->
                     let
+                        oldSavedData =
+                            SavedData.savedDataOrInit model.savedDataResult
+
                         newSavedData =
-                            SavedData.Model.pushChange
+                            SavedData.setChange
                                 { filepath = filepath
                                 , fileContent = contents
-                                , change = SavedData.Model.CaseSwap changeData
+                                , change = SavedData.CaseSwap changeData
                                 }
-                                model.savedData
+                                oldSavedData
 
                         writeFileData =
                             Encode.object
-                                [ ( "path", Encode.string filepath )
+                                [ ( "path", FilePath.encode filepath )
                                 , ( "contents", Encode.string newContents )
-                                , ( "dataToSave", Codec.encodeToValue SavedData.Model.codec newSavedData )
+                                , ( "dataToSave", SavedData.encode newSavedData )
                                 ]
                     in
-                    ( { model | mode = Break filepath WritingFile }
+                    ( { model | command = Break filepath WritingFile }
                     , Ports.writeFile writeFileData
                     )
 
