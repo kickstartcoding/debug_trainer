@@ -1,5 +1,4 @@
 import fs from 'fs'
-// fs = require('fs')
 const { devLog } = require('../logging.js')
 
 export default function (program) {

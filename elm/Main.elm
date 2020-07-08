@@ -4,31 +4,34 @@ import Actions exposing (Action)
 import Cli.Option as Option
 import Cli.OptionsParser as OptionsParser
 import Cli.Program as Program
-import Model as Model exposing (Command(..), Flags, Model)
+import Model as Model exposing (CliOptions, Command(..), Flags, Model)
 import Ports
 import SavedData.Model as SavedData exposing (SavedDataError(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.LoggingStatus exposing (LoggingStatus)
 
 
-programConfig : Program.Config Command
+programConfig : Program.Config CliOptions
 programConfig =
     Program.config
         |> Program.add
             (OptionsParser.buildSubCommand "hint" Model.hintInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
+                |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.withDoc "Display a hint about the error that was introduced."
             )
         |> Program.add
             (OptionsParser.build Model.breakInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
+                |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.withDoc "Break the provided file in a random way."
             )
 
 
-init : Flags -> Command -> ( Model, Cmd Action )
-init { randomNumber, data, dataFilePath } command =
+init : Flags -> CliOptions -> ( Model, Cmd Action )
+init { randomNumber, data, dataFilePath } { command, loggingStatus } =
     let
         model =
             { randomNumber = randomNumber
@@ -147,7 +150,7 @@ errorCmds error dataFilePath =
 main :
     Program.StatefulProgram Model
         Action
-        Command
+        CliOptions
         { randomNumber : Int
         , dataFilePath : String
         , data : Maybe String

@@ -1,5 +1,4 @@
 import fs from 'fs'
-// fs = require('fs')
 import os from 'os'
 import { devLog } from './logging.js'
 

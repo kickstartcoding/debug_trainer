@@ -1,5 +1,6 @@
 module Model exposing
-    ( Command(..)
+    ( CliOptions
+    , Command(..)
     , Flags
     , Model
     , Phase(..)
@@ -11,6 +12,13 @@ module Model exposing
 import Cli.Program as Program
 import SavedData.Model exposing (SavedData, SavedDataError)
 import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.LoggingStatus as LoggingStatus exposing (LoggingStatus)
+
+
+type alias CliOptions =
+    { command : Command
+    , loggingStatus : LoggingStatus
+    }
 
 
 type alias Model =
@@ -39,14 +47,18 @@ type alias Flags =
         }
 
 
-breakInit : String -> Command
-breakInit filepathString =
-    Break (FilePath.fromString filepathString) ReadingFile
+breakInit : String -> Bool -> CliOptions
+breakInit filepathString loggingIsOn =
+    { command = Break (FilePath.fromString filepathString) ReadingFile
+    , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    }
 
 
-hintInit : String -> Command
-hintInit filepathString =
-    Hint (FilePath.fromString filepathString) ReadingFile
+hintInit : String -> Bool -> CliOptions
+hintInit filepathString loggingIsOn =
+    { command = Hint (FilePath.fromString filepathString) ReadingFile
+    , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    }
 
 
 filePathStringFromCommand : Command -> String
