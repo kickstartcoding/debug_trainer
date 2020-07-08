@@ -4,16 +4,21 @@
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:elm && npm run build:nexe",
-    "build:nexe": "nexe debug_trainer --resources './js/**/*' --output build/debug_trainer",
-    "build:elm": "elm make elm/Main.elm --output=js/elm.js",
-    "example": "npm run build:elm && ./debug_trainer zignore/testfile.txt",
+    "build:parcel": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
+    "build:nexe": "nexe dist/debug_trainer.js --output dist/debug_trainer",
+    "build": "npm run build:parcel && npm run build:nexe",
+    "watch": "parcel watch js/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Neurodynamic",
   "license": "ISC",
   "dependencies": {
-    "nexe": "^3.3.7",
     "xhr2": "^0.2.0"
+  },
+  "devDependencies": {
+    "elm-hot": "^1.1.4",
+    "nexe": "^3.3.7",
+    "node-elm-compiler": "^5.0.4",
+    "parcel-bundler": "^1.12.4"
   }
 }

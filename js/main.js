@@ -1,16 +1,16 @@
-const { Elm } = require('./elm.js')
-const readline = require('readline')
-const print = require('./ports/print.js')
-const printAndExitFailure = require('./ports/printAndExitFailure.js')
-const printAndExitSuccess = require('./ports/printAndExitSuccess.js')
-const readFile = require('./ports/readFile.js')
-const writeFile = require('./ports/writeFile.js')
-const savedData = require('./savedData.js')
-const { devLog } = require('./logging.js')
 
-global.XMLHttpRequest = require("xhr2")
+import { Elm } from '../elm/Main.elm'
+import print from './ports/print.js'
+import printAndExitFailure from './ports/printAndExitFailure.js'
+import printAndExitSuccess from './ports/printAndExitSuccess.js'
+import readFile from './ports/readFile.js'
+import writeFile from './ports/writeFile.js'
+import savedData from './savedData.js'
+import { devLog } from './logging.js'
 
-module.exports = (opts) => {
+run()
+
+function run() {
   const data = savedData.load()
   devLog('data:', data)
 

@@ -1,5 +1,7 @@
 # Distribution
 build/
+dist/
+.cache/
 documentation.json
 */elm.js
 **/*.elm.js
