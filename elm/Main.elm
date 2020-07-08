@@ -31,7 +31,7 @@ programConfig =
 
 
 init : Flags -> CliOptions -> ( Model, Cmd Action )
-init { randomNumber, data, dataFilePath } { command, loggingStatus } =
+init { randomNumber, data, dataFilePath } { command } =
     let
         model =
             { randomNumber = randomNumber
