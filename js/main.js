@@ -5,20 +5,20 @@ import printAndExitFailure from './ports/printAndExitFailure.js'
 import printAndExitSuccess from './ports/printAndExitSuccess.js'
 import readFile from './ports/readFile.js'
 import writeFile from './ports/writeFile.js'
-import savedData from './savedData.js'
+import * as SavedData from './savedData.js'
 import { devLog } from './logging.js'
 
 run()
 
 function run() {
-  const data = savedData.load()
+  const data = SavedData.load()
   devLog('data:', data)
 
   const program = Elm.Main.init({
     flags: {
       argv: process.argv,
       randomNumber: getRandomInt(1_000_000),
-      dataFilePath: savedData.dataFilePath,
+      dataFilePath: SavedData.dataFilePath,
       data: data,
       versionMessage: "1.2.3"
     }

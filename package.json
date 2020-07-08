@@ -7,14 +7,12 @@
     "build:parcel": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "build:nexe": "nexe dist/debug_trainer.js --output dist/debug_trainer",
     "build": "npm run build:parcel && npm run build:nexe",
-    "watch": "parcel watch js/main.js",
+    "dev": "parcel js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Neurodynamic",
   "license": "ISC",
-  "dependencies": {
-    "xhr2": "^0.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "elm-hot": "^1.1.4",
     "nexe": "^3.3.7",

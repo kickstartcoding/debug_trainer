@@ -1,4 +1,5 @@
 import fs from 'fs'
+// fs = require('fs')
 import savedData from '../savedData.js'
 import { devLog } from '../logging.js'
 

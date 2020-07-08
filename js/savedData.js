@@ -1,4 +1,5 @@
-fs = require('fs')
+import fs from 'fs'
+// fs = require('fs')
 import os from 'os'
 import { devLog } from './logging.js'
 
@@ -12,6 +13,7 @@ export function load(program) {
     return null
   }
 }
+
 export function save(saveDataContents) {
   devLog(`Saving data to ${dataFilePath}...`);
   if (!fs.existsSync(dataFilePath)) {
