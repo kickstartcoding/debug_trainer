@@ -1,9 +1,7 @@
 const loggingIsOn = false
 
-module.exports = {
-  devLog: function (logString) {
-    if (loggingIsOn) {
-      console.log(logString)
-    }
+export function devLog(logString) {
+  if (loggingIsOn) {
+    console.log(logString)
   }
 }

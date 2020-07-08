@@ -1,7 +1,7 @@
 fs = require('fs')
 const { devLog } = require('../logging.js')
 
-module.exports = function (program) {
+export default function (program) {
   program.ports.readFile.subscribe(filepath => {
     devLog(`Reading contents of ${filepath}...`);
     fs.readFile(filepath, 'utf8', function (err, contents) {

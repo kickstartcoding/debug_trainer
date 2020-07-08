@@ -1,4 +1,4 @@
-module.exports = function (program) {
+export default function (program) {
   program.ports.print.subscribe(message => {
     console.log(message)
   });

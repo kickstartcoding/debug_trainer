@@ -1,8 +1,8 @@
-fs = require('fs')
-const savedData = require('../savedData.js')
-const {devLog} = require('../logging.js')
+import fs from 'fs'
+import savedData from '../savedData.js'
+import { devLog } from '../logging.js'
 
-module.exports = function (program) {
+export default function (program) {
   program.ports.writeFile.subscribe(fileData => {
     devLog(`Writing new contents of ${fileData.path}...`);
     fs.writeFile(fileData.path, fileData.contents, function (err) {

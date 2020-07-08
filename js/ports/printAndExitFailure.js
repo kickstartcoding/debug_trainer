@@ -1,4 +1,4 @@
-module.exports = function (program) {
+export default function (program) {
   program.ports.printAndExitFailure.subscribe(message => {
     console.error(message);
     process.exit(1);
