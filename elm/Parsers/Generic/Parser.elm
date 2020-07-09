@@ -25,15 +25,15 @@ segment =
                     [ returnStatement
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content ReturnStatement)
-                    -- , Repeat.oneOrMore wordCharacter
-                    --     |> getChompedString
-                    --     |> Parser.map (\content -> Segment offset content Word)
-                    -- , Whitespace.oneOrMore
-                    --     |> getChompedString
-                    --     |> Parser.map (\content -> Segment offset content Whitespace)
-                    -- , Repeat.oneOrMore otherCharacter
-                    --     |> getChompedString
-                    --     |> Parser.map (\content -> Segment offset content Other)
+                    , Repeat.oneOrMore wordCharacter
+                        |> getChompedString
+                        |> Parser.map (\content -> Segment offset content Word)
+                    , Whitespace.oneOrMore
+                        |> getChompedString
+                        |> Parser.map (\content -> Segment offset content Whitespace)
+                    , Repeat.oneOrMore otherCharacter
+                        |> getChompedString
+                        |> Parser.map (\content -> Segment offset content Other)
                     ]
             )
 
@@ -43,7 +43,7 @@ returnStatement =
     succeed ()
         |. (backtrackable <|
                 succeed ()
-                    |. Whitespace.one
+                    |. Whitespace.oneOrMore
                     |. token "return"
            )
         |. Whitespace.one

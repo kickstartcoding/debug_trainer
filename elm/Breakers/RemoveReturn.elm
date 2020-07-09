@@ -13,7 +13,7 @@ run randomNumber segments =
         |> Breakers.Utils.chooseCandidate randomNumber isCandidate
         |> Maybe.map
             (\( index, { content, offset } ) ->
-                ( ListEx.setAt index (Segment offset "" ReturnStatement) segments
+                ( ListEx.setAt index (Segment offset (String.dropRight 7 content) ReturnStatement) segments
                     |> Breakers.Utils.segmentsToContent
                 , { replacementData =
                         { originalContent =
