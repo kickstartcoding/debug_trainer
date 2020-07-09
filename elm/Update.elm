@@ -36,9 +36,6 @@ updateBreak filepath action model =
                     case GenericParser.run contents of
                         Ok segments ->
                             let
-                                _ =
-                                    Debug.log "SEGMENTS" segments
-
                                 maybeBreakType =
                                     chooseBreakType segments model.randomNumbers
                             in
@@ -53,10 +50,6 @@ updateBreak filepath action model =
                                     Nothing
 
                         Err error ->
-                            let
-                                _ =
-                                    Debug.log "PARSE ERROR" error
-                            in
                             Nothing
             in
             case maybeChange of
