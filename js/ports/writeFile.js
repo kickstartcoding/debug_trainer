@@ -1,5 +1,5 @@
 import fs from 'fs'
-import savedData from '../savedData.js'
+import * as SavedData from '../savedData.js'
 import { devLog } from '../logging.js'
 
 export default function (program) {
@@ -12,7 +12,7 @@ export default function (program) {
       }
 
       devLog('New file contents written!');
-      savedData.save(fileData.dataToSave)
+      SavedData.save(fileData.dataToSave)
 
       // console.log('Good luck debugging!');
       // process.exit(0);

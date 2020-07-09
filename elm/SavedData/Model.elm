@@ -6,7 +6,9 @@ module SavedData.Model exposing
     , encode
     , fromFlag
     , getChange
+    , getFileData
     , init
+    , removeFileData
     , savedDataOrInit
     , setChange
     )
@@ -37,9 +39,20 @@ savedDataOrInit savedDataResult =
             init
 
 
+getFileData : FilePath -> SavedData -> Maybe FileData
+getFileData filepath savedData =
+    Dict.get (FilePath.toString filepath) savedData.changedFiles
+
+
+removeFileData : FilePath -> SavedData -> SavedData
+removeFileData filepath savedData =
+    { savedData | changedFiles = Dict.remove (FilePath.toString filepath) savedData.changedFiles }
+
+
 getChange : FilePath -> SavedData -> Maybe Change
 getChange filepath savedData =
-    Dict.get (FilePath.toString filepath) savedData.changedFiles
+    savedData
+        |> getFileData filepath
         |> Maybe.map .change
 
 

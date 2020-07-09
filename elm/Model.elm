@@ -7,6 +7,7 @@ module Model exposing
     , breakInit
     , filePathStringFromCommand
     , hintInit
+    , resetInit
     )
 
 import Cli.Program as Program
@@ -37,6 +38,7 @@ type Phase
 type Command
     = Break FilePath Phase
     | Hint FilePath Phase
+    | Reset FilePath
 
 
 type alias Flags =
@@ -61,6 +63,13 @@ hintInit filepathString loggingIsOn =
     }
 
 
+resetInit : String -> Bool -> CliOptions
+resetInit filepathString loggingIsOn =
+    { command = Reset (FilePath.fromString filepathString)
+    , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    }
+
+
 filePathStringFromCommand : Command -> String
 filePathStringFromCommand command =
     case command of
@@ -68,4 +77,7 @@ filePathStringFromCommand command =
             FilePath.toString filepath
 
         Hint filepath _ ->
+            FilePath.toString filepath
+
+        Reset filepath ->
             FilePath.toString filepath
