@@ -8,7 +8,7 @@ port module Ports exposing
     )
 
 import Json.Encode
-import SavedData.Model as SavedData exposing (SavedData)
+import Model.SavedData as SavedData exposing (SavedData)
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 

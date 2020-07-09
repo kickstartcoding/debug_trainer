@@ -16,7 +16,8 @@ function run() {
   const program = Elm.Main.init({
     flags: {
       argv: process.argv,
-      randomNumber: getRandomInt(1_000_000),
+      randomNumber1: getRandomInt(1_000_000),
+      randomNumber2: getRandomInt(1_000_000),
       dataFilePath: SavedData.dataFilePath,
       data: data,
       versionMessage: "1.2.3"

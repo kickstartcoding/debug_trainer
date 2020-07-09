@@ -11,7 +11,7 @@ module Model exposing
     )
 
 import Cli.Program as Program
-import SavedData.Model exposing (SavedData, SavedDataError)
+import Model.SavedData exposing (SavedData, SavedDataError)
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 import Utils.Types.LoggingStatus as LoggingStatus exposing (LoggingStatus)
 
@@ -23,7 +23,10 @@ type alias CliOptions =
 
 
 type alias Model =
-    { randomNumber : Int
+    { randomNumbers :
+        { breakTypeInt : Int
+        , segmentToBreakInt : Int
+        }
     , dataFilePath : FilePath
     , savedDataResult : Result SavedDataError SavedData
     , command : Command
@@ -43,7 +46,8 @@ type Command
 
 type alias Flags =
     Program.FlagsIncludingArgv
-        { randomNumber : Int
+        { randomNumber1 : Int
+        , randomNumber2 : Int
         , dataFilePath : String
         , data : Maybe String
         }

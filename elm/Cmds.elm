@@ -1,10 +1,10 @@
 module Cmds exposing (init)
 
 import Actions exposing (Action)
-import Json.Encode as Encode
 import Model exposing (Command(..), Model)
+import Model.SavedData as SavedData exposing (SavedDataError(..))
 import Ports
-import SavedData.Model as SavedData exposing (SavedDataError(..))
+import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
@@ -71,13 +71,21 @@ forHint filepath { savedDataResult, dataFilePath } =
         Ok data ->
             case SavedData.getChange filepath data of
                 Just change ->
-                    case change of
-                        SavedData.CaseSwap _ ->
+                    case change.breakType of
+                        CaseSwap ->
                             Ports.printAndExitSuccess
                                 ("\n\n"
                                     ++ "HINT: Somewhere in this file, debug_trainer changed a word from "
                                     ++ "starting with a capital letter to starting with "
                                     ++ "a lowercase letter or vice versa."
+                                    ++ "\n\n"
+                                )
+
+                        RemoveReturn ->
+                            Ports.printAndExitSuccess
+                                ("\n\n"
+                                    ++ "HINT: Somewhere in this file, debug_trainer removed "
+                                    ++ "a `return` keyword from a function."
                                     ++ "\n\n"
                                 )
 

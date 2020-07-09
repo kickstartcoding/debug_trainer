@@ -1,7 +1,7 @@
 module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
-import Parsers.Generic.Segment exposing (Segment(..))
+import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
 import Parsers.Utils.Repeat as Repeat
 import Parsers.Utils.Whitespace as Whitespace
 
@@ -22,17 +22,31 @@ segment =
         |> andThen
             (\offset ->
                 oneOf
-                    [ Repeat.oneOrMore wordCharacter
+                    [ returnStatement
                         |> getChompedString
-                        |> Parser.map (Word offset)
-                    , Whitespace.oneOrMore
-                        |> getChompedString
-                        |> Parser.map (Whitespace offset)
-                    , Repeat.oneOrMore otherCharacter
-                        |> getChompedString
-                        |> Parser.map (Other offset)
+                        |> Parser.map (\content -> Segment offset content ReturnStatement)
+                    -- , Repeat.oneOrMore wordCharacter
+                    --     |> getChompedString
+                    --     |> Parser.map (\content -> Segment offset content Word)
+                    -- , Whitespace.oneOrMore
+                    --     |> getChompedString
+                    --     |> Parser.map (\content -> Segment offset content Whitespace)
+                    -- , Repeat.oneOrMore otherCharacter
+                    --     |> getChompedString
+                    --     |> Parser.map (\content -> Segment offset content Other)
                     ]
             )
+
+
+returnStatement : Parser ()
+returnStatement =
+    succeed ()
+        |. (backtrackable <|
+                succeed ()
+                    |. Whitespace.one
+                    |. token "return"
+           )
+        |. Whitespace.one
 
 
 wordCharacter : Parser ()

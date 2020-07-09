@@ -1,5 +1,5 @@
-module SavedData.Model exposing
-    ( Change(..)
+module Model.SavedData exposing
+    ( Change
     , SavedData
     , SavedDataError(..)
     , decode
@@ -13,15 +13,18 @@ module SavedData.Model exposing
     , setChange
     )
 
-import Breakers.CaseSwap as CaseSwap
 import Codec exposing (Codec, Decoder, Value)
 import Dict exposing (Dict)
 import Json.Decode
+import Utils.Types.BreakType as BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.ReplacementData as ReplacementData exposing (ReplacementData)
 
 
-type Change
-    = CaseSwap CaseSwap.ChangeData
+type alias Change =
+    { replacementData : ReplacementData
+    , breakType : BreakType
+    }
 
 
 init : SavedData
@@ -131,11 +134,7 @@ fileDataCodec =
 
 changeCodec : Codec Change
 changeCodec =
-    Codec.custom
-        (\caseSwap change ->
-            case change of
-                CaseSwap changeData ->
-                    caseSwap changeData
-        )
-        |> Codec.variant1 "CaseSwap" CaseSwap CaseSwap.codec
-        |> Codec.buildCustom
+    Codec.object Change
+        |> Codec.field "replacementData" .replacementData ReplacementData.codec
+        |> Codec.field "breakType" .breakType BreakType.codec
+        |> Codec.buildObject

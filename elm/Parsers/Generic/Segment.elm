@@ -1,61 +1,62 @@
 module Parsers.Generic.Segment exposing
-    ( Segment(..)
-    , toString
-    , wordsWithIndicesWhere
+    ( Segment
+    , SegmentType(..)
+    , isOther
+    , isReturnStatement
+    , isWhitespace
+    , isWord
     )
 
 
-type Segment
-    = Word Int String
-    | Whitespace Int String
-    | Other Int String
+type SegmentType
+    = Word
+    | ReturnStatement
+    | Whitespace
+    | Other
 
 
-wordsWithIndicesWhere : (String -> Bool) -> List Segment -> List { index : Int, offset : Int, content : String }
-wordsWithIndicesWhere condition segmentList =
-    segmentList
-        |> List.indexedMap Tuple.pair
-        |> List.filter (Tuple.second >> isWordAnd condition)
-        |> List.map
-            (\( index, segment ) ->
-                { index = index
-                , offset = getOffset segment
-                , content = toString segment
-                }
-            )
+type alias Segment =
+    { offset : Int
+    , content : String
+    , segmentType : SegmentType
+    }
 
 
-isWordAnd : (String -> Bool) -> Segment -> Bool
-isWordAnd stringCondition segment =
-    case segment of
-        Word _ string ->
-            stringCondition string
+isWord : Segment -> Bool
+isWord segment =
+    case segment.segmentType of
+        Word ->
+            True
 
         _ ->
             False
 
 
-getOffset : Segment -> Int
-getOffset segment =
-    case segment of
-        Word offset _ ->
-            offset
+isReturnStatement : Segment -> Bool
+isReturnStatement segment =
+    case segment.segmentType of
+        ReturnStatement ->
+            True
 
-        Whitespace offset _ ->
-            offset
-
-        Other offset _ ->
-            offset
+        _ ->
+            False
 
 
-toString : Segment -> String
-toString segment =
-    case segment of
-        Word _ string ->
-            string
+isWhitespace : Segment -> Bool
+isWhitespace segment =
+    case segment.segmentType of
+        Whitespace ->
+            True
 
-        Whitespace _ string ->
-            string
+        _ ->
+            False
 
-        Other _ string ->
-            string
+
+isOther : Segment -> Bool
+isOther segment =
+    case segment.segmentType of
+        Other ->
+            True
+
+        _ ->
+            False

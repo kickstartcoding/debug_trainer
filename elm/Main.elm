@@ -6,8 +6,8 @@ import Cli.OptionsParser as OptionsParser
 import Cli.Program as Program
 import Cmds
 import Model as Model exposing (CliOptions, Command(..), Flags, Model)
+import Model.SavedData as SavedData exposing (SavedDataError(..))
 import Ports
-import SavedData.Model as SavedData exposing (SavedDataError(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import Utils.Types.FilePath as FilePath
@@ -37,10 +37,13 @@ programConfig =
 
 
 init : Flags -> CliOptions -> ( Model, Cmd Action )
-init { randomNumber, data, dataFilePath } { command } =
+init { randomNumber1, randomNumber2, data, dataFilePath } { command } =
     let
         model =
-            { randomNumber = randomNumber
+            { randomNumbers =
+                { breakTypeInt = randomNumber1
+                , segmentToBreakInt = randomNumber2
+                }
             , dataFilePath = FilePath.fromString dataFilePath
             , savedDataResult = SavedData.fromFlag data
             , command = command
@@ -55,7 +58,8 @@ main :
     Program.StatefulProgram Model
         Action
         CliOptions
-        { randomNumber : Int
+        { randomNumber1 : Int
+        , randomNumber2 : Int
         , dataFilePath : String
         , data : Maybe String
         }

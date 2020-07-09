@@ -1,10 +1,9 @@
-module Breakers.CaseSwap exposing (isCandidate, run)
+module Breakers.RemoveReturn exposing (isCandidate, run)
 
 import Breakers.Utils
 import List.Extra as ListEx
 import Model.SavedData exposing (Change)
 import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
-import Utils.String as StrUtils
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
@@ -14,11 +13,7 @@ run randomNumber segments =
         |> Breakers.Utils.chooseCandidate randomNumber isCandidate
         |> Maybe.map
             (\( index, { content, offset } ) ->
-                let
-                    newWord =
-                        StrUtils.toggleTitleCase content
-                in
-                ( ListEx.setAt index (Segment offset newWord Word) segments
+                ( ListEx.setAt index (Segment offset "" ReturnStatement) segments
                     |> Breakers.Utils.segmentsToContent
                 , { replacementData =
                         { originalContent =
@@ -28,19 +23,16 @@ run randomNumber segments =
                             }
                         , newContent =
                             { start = offset
-                            , end = offset + String.length newWord
-                            , content = newWord
+                            , end = offset + String.length ""
+                            , content = ""
                             }
                         }
-                  , breakType = CaseSwap
+                  , breakType = RemoveReturn
                   }
                 )
             )
 
 
 isCandidate : Segment -> Bool
-isCandidate { content, segmentType } =
-    segmentType
-        == Word
-        && StrUtils.isMoreThanOneCharacter content
-        && not (StrUtils.isAllCaps content)
+isCandidate { segmentType } =
+    segmentType == ReturnStatement
