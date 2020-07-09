@@ -10,6 +10,9 @@
     "dev": "parcel js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "debug_trainer": "bin/debug_trainer"
+  },
   "author": "Neurodynamic",
   "license": "ISC",
   "dependencies": {},
