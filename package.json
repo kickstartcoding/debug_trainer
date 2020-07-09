@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:parcel": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
-    "build:nexe": "nexe dist/debug_trainer.js --output dist/debug_trainer",
+    "build:nexe": "nexe dist/debug_trainer.js --output bin/debug_trainer",
     "build": "npm run build:parcel && npm run build:nexe",
     "dev": "parcel js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
