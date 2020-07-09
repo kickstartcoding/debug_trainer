@@ -1,7 +1,26 @@
-To build elm files:
+# Debug Trainer
+
+Randomly break your code and then use your debugging skills to fix it!
+
+## Installation
 
 ```
-elm make elm/Main.elm --output=js/elm.js
+npm install -g debug_trainer
 ```
 
-Reference example code: https://github.com/dillonkearns/elm-cli-options-parser/tree/master/examples
+## Usage:
+
+Randomly introduce an error into the specified file:
+```
+debug_trainer break <filepath>
+```
+
+Display a hint about the error that was introduced into the specified file:
+```
+debug_trainer hint <filepath>
+```
+
+Change the specified file back to its original, unbroken state:
+```
+debug_trainer reset <filepath>
+```
