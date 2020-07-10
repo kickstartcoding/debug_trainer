@@ -21,10 +21,26 @@ import Utils.Types.FilePath as FilePath exposing (FilePath)
 import Utils.Types.ReplacementData as ReplacementData exposing (ReplacementData)
 
 
+type alias SavedData =
+    { changedFiles : Dict String FileData
+    }
+
+
+type alias FileData =
+    { originalContent : String
+    , change : Change
+    }
+
+
 type alias Change =
     { replacementData : ReplacementData
     , breakType : BreakType
     }
+
+
+type SavedDataError
+    = FileMissing
+    | DecodingFailed String
 
 
 init : SavedData
@@ -76,17 +92,6 @@ setChange { filepath, fileContent, change } ({ changedFiles } as model) =
     }
 
 
-type alias SavedData =
-    { changedFiles : Dict String FileData
-    }
-
-
-type alias FileData =
-    { originalContent : String
-    , change : Change
-    }
-
-
 fromFlag : Maybe String -> Result SavedDataError SavedData
 fromFlag maybeDataString =
     case maybeDataString of
@@ -100,11 +105,6 @@ fromFlag maybeDataString =
 
         Nothing ->
             Err FileMissing
-
-
-type SavedDataError
-    = FileMissing
-    | DecodingFailed String
 
 
 encode : SavedData -> Value

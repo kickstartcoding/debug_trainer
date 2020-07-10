@@ -1,4 +1,4 @@
-module Breakers.CaseSwap exposing (isCandidate, run)
+module Breakers.CaseSwap exposing (run, validCandidateData)
 
 import Breakers.Utils
 import List.Extra as ListEx
@@ -11,7 +11,7 @@ import Utils.Types.BreakType exposing (BreakType(..))
 run : Int -> List Segment -> Maybe ( String, Change )
 run randomNumber segments =
     segments
-        |> Breakers.Utils.chooseCandidate randomNumber isCandidate
+        |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
         |> Maybe.map
             (\( index, { content, offset } ) ->
                 let
@@ -38,9 +38,15 @@ run randomNumber segments =
             )
 
 
-isCandidate : Segment -> Bool
-isCandidate { content, segmentType } =
-    segmentType
-        == Word
-        && StrUtils.isMoreThanOneCharacter content
-        && not (StrUtils.isAllCaps content)
+validCandidateData : Segment -> Maybe Segment
+validCandidateData ({ content, segmentType } as segment) =
+    if
+        segmentType
+            == Word
+            && StrUtils.isMoreThanOneCharacter content
+            && not (StrUtils.isAllCaps content)
+    then
+        Just segment
+
+    else
+        Nothing

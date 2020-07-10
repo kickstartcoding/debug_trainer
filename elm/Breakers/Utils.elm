@@ -15,15 +15,19 @@ segmentsToContent segments =
         |> List.foldr (++) ""
 
 
-chooseCandidate : Int -> (Segment -> Bool) -> List Segment -> Maybe ( Int, Segment )
-chooseCandidate randomNumber isCandidate segments =
+chooseCandidate : Int -> (Segment -> Maybe candidateData) -> List Segment -> Maybe ( Int, candidateData )
+chooseCandidate randomNumber mapValidCandidate segments =
     segments
-        |> candidates isCandidate
+        |> candidates mapValidCandidate
         |> Utils.List.pickRandom randomNumber
 
 
-candidates : (Segment -> Bool) -> List Segment -> List ( Int, Segment )
-candidates isCandidate segments =
+candidates : (Segment -> Maybe candidateData) -> List Segment -> List ( Int, candidateData )
+candidates mapValidCandidate segments =
     segments
         |> List.indexedMap Tuple.pair
-        |> List.filter (Tuple.second >> isCandidate)
+        |> List.filterMap
+            (\( index, segment ) ->
+                mapValidCandidate segment
+                    |> Maybe.map (\data -> ( index, data ))
+            )

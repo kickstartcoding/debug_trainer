@@ -2,6 +2,7 @@ module Update exposing (update)
 
 import Actions exposing (Action(..))
 import Breakers.CaseSwap as CaseSwap
+import Breakers.ChangeFunctionArgs as ChangeFunctionArgs
 import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
 import Model exposing (CliOptions, Command(..), Model, Phase(..))
@@ -46,6 +47,9 @@ updateBreak filepath action model =
                                 Just RemoveReturn ->
                                     RemoveReturn.run model.randomNumbers.segmentToBreakInt segments
 
+                                Just ChangeFunctionArgs ->
+                                    ChangeFunctionArgs.run model.randomNumbers.segmentToBreakInt segments
+
                                 _ ->
                                     Nothing
 
@@ -85,19 +89,27 @@ chooseBreakType segments { breakTypeInt } =
     let
         caseSwapCandidateCount =
             segments
-                |> Breakers.Utils.candidates CaseSwap.isCandidate
+                |> Breakers.Utils.candidates CaseSwap.validCandidateData
                 |> List.length
 
         returnStatementCandidateCount =
             segments
-                |> Breakers.Utils.candidates RemoveReturn.isCandidate
+                |> Breakers.Utils.candidates RemoveReturn.validCandidateData
+                |> List.length
+
+        functionDeclarationCandidateCount =
+            segments
+                |> Breakers.Utils.candidates ChangeFunctionArgs.validCandidateData
                 |> List.length
 
         totalCandidateCount =
-            caseSwapCandidateCount + returnStatementCandidateCount
+            caseSwapCandidateCount + returnStatementCandidateCount + functionDeclarationCandidateCount
 
         viableBreakTypePossibilities =
-            [ ( CaseSwap, caseSwapCandidateCount ), ( RemoveReturn, returnStatementCandidateCount ) ]
+            [ ( CaseSwap, caseSwapCandidateCount )
+            , ( RemoveReturn, returnStatementCandidateCount )
+            , ( ChangeFunctionArgs, functionDeclarationCandidateCount )
+            ]
                 |> List.filter (\( _, count ) -> count > 0)
 
         totalViableBreakTypes =

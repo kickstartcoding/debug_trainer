@@ -1,6 +1,9 @@
 module Parsers.Generic.Segment exposing
-    ( Segment
+    ( FunctionDeclarationData
+    , Segment
     , SegmentType(..)
+    , functionDeclarationDataToString
+    , isFunctionDeclaration
     , isOther
     , isReturnStatement
     , isWhitespace
@@ -11,8 +14,22 @@ module Parsers.Generic.Segment exposing
 type SegmentType
     = Word
     | ReturnStatement
+    | FunctionDeclaration FunctionDeclarationData
     | Whitespace
     | Other
+
+
+type alias FunctionDeclarationData =
+    { precedingWhitespace : String
+    , declarationWord : String
+    , name : String
+    , arguments : List String
+    }
+
+
+functionDeclarationDataToString : FunctionDeclarationData -> String
+functionDeclarationDataToString { precedingWhitespace, declarationWord, name, arguments } =
+    precedingWhitespace ++ declarationWord ++ name ++ "(" ++ String.join ", " arguments ++ ")"
 
 
 type alias Segment =
@@ -36,6 +53,16 @@ isReturnStatement : Segment -> Bool
 isReturnStatement segment =
     case segment.segmentType of
         ReturnStatement ->
+            True
+
+        _ ->
+            False
+
+
+isFunctionDeclaration : Segment -> Bool
+isFunctionDeclaration segment =
+    case segment.segmentType of
+        FunctionDeclaration _ ->
             True
 
         _ ->

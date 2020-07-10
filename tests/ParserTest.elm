@@ -1,10 +1,10 @@
-module Example exposing (..)
+module ParserTest exposing (..)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Parser exposing (DeadEnd)
 import Parsers.Generic.Parser as GenericParser
-import Parsers.Generic.Segment exposing (Segment, SegmentType(..), isReturnStatement)
+import Parsers.Generic.Segment exposing (FunctionDeclarationData, Segment, SegmentType(..), isReturnStatement)
 import Test exposing (..)
 import TestHelp
 
@@ -45,5 +45,20 @@ suite =
                     " return"
                     [ { content = " ", offset = 0, segmentType = Whitespace }
                     , { content = "return", offset = 1, segmentType = Word }
+                    ]
+        , test "detects functions" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    " function hello(arg1, arg2)"
+                    [ { content = " function hello(arg1, arg2)"
+                      , offset = 0
+                      , segmentType =
+                            FunctionDeclaration
+                                { precedingWhitespace = " "
+                                , declarationWord = "function "
+                                , name = "hello"
+                                , arguments = [ "arg1", "arg2" ]
+                                }
+                      }
                     ]
         ]

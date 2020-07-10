@@ -1,7 +1,7 @@
 module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
-import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
+import Parsers.Generic.Segment exposing (FunctionDeclarationData, Segment, SegmentType(..))
 import Parsers.Utils.Repeat as Repeat
 import Parsers.Utils.Whitespace as Whitespace
 
@@ -25,7 +25,14 @@ segment =
                     [ returnStatement
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content ReturnStatement)
-                    , Repeat.oneOrMore wordCharacter
+                    , functionDeclarationWithContent
+                        |> Parser.map
+                            (\( content, data ) ->
+                                Segment offset
+                                    content
+                                    (FunctionDeclaration data)
+                            )
+                    , word
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content Word)
                     , Whitespace.oneOrMore
@@ -47,6 +54,42 @@ returnStatement =
                     |. token "return"
            )
         |. Whitespace.one
+
+
+functionDeclarationWithContent : Parser ( String, FunctionDeclarationData )
+functionDeclarationWithContent =
+    getChompedString functionDeclaration
+        |> andThen
+            (\string ->
+                case Parser.run functionDeclaration string of
+                    Ok validFunctionDeclaration ->
+                        succeed ( string, validFunctionDeclaration )
+
+                    Err _ ->
+                        Parser.problem
+                            ("Script error: parsed function declaration successfully once "
+                                ++ "and then failed just after with the same content???"
+                            )
+            )
+
+
+functionDeclaration : Parser FunctionDeclarationData
+functionDeclaration =
+    backtrackable <|
+        succeed FunctionDeclarationData
+            |= getChompedString Whitespace.oneOrMore
+            |= (getChompedString <| oneOf [ token "function ", token "def " ])
+            |= (getChompedString <| word)
+            |. token "("
+            |= Repeat.zeroOrMoreWithSeparator
+                Repeat.commaSeparator
+                word
+            |. token ")"
+
+
+word : Parser String
+word =
+    getChompedString <| Repeat.oneOrMore wordCharacter
 
 
 wordCharacter : Parser ()

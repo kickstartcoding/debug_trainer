@@ -89,6 +89,14 @@ forHint filepath { savedDataResult, dataFilePath } =
                                     ++ "\n\n"
                                 )
 
+                        ChangeFunctionArgs ->
+                            Ports.printAndExitSuccess
+                                ("\n\n"
+                                    ++ "HINT: Somewhere in this file, debug_trainer changed "
+                                    ++ "the arguments to a function."
+                                    ++ "\n\n"
+                                )
+
                 Nothing ->
                     Ports.printAndExitFailure
                         ("\n\n"
