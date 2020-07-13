@@ -21,7 +21,7 @@ function run() {
       dataFilePath: SavedData.dataFilePath,
       workingDirectory: process.cwd(),
       data: data,
-      versionMessage: "1.2.3"
+      versionMessage: "2.0.0"
     }
   })
 
