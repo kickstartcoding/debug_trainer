@@ -19,6 +19,7 @@ function run() {
       randomNumber1: getRandomInt(1_000_000),
       randomNumber2: getRandomInt(1_000_000),
       dataFilePath: SavedData.dataFilePath,
+      workingDirectory: process.cwd(),
       data: data,
       versionMessage: "1.2.3"
     }

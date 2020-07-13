@@ -12,7 +12,7 @@ import Parsers.Generic.Segment exposing (Segment)
 import Ports
 import Utils.List
 import Utils.Types.BreakType exposing (BreakType(..))
-import Utils.Types.FilePath exposing (FilePath)
+import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
 update : CliOptions -> Action -> Model -> ( Model, Cmd Action )
@@ -64,7 +64,7 @@ updateBreak filepath action model =
 
                         newSavedData =
                             SavedData.setChange
-                                { filepath = filepath
+                                { filepath = FilePath.fullPath model.workingDirectory filepath
                                 , fileContent = contents
                                 , change = replacementData
                                 }

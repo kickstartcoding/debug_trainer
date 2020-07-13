@@ -22,10 +22,10 @@ init ({ command } as model) =
 
 
 forBreak : FilePath -> Model -> Cmd Action
-forBreak filepath { savedDataResult, dataFilePath } =
+forBreak filepath { savedDataResult, dataFilePath, workingDirectory } =
     case savedDataResult of
         Ok data ->
-            case SavedData.getChange filepath data of
+            case SavedData.getChange (FilePath.fullPath workingDirectory filepath) data of
                 Just _ ->
                     Ports.printAndExitSuccess
                         ("\n\n"
@@ -66,10 +66,10 @@ forBreak filepath { savedDataResult, dataFilePath } =
 
 
 forHint : FilePath -> Model -> Cmd Action
-forHint filepath { savedDataResult, dataFilePath } =
+forHint filepath { savedDataResult, dataFilePath, workingDirectory } =
     case savedDataResult of
         Ok data ->
-            case SavedData.getChange filepath data of
+            case SavedData.getChange (FilePath.fullPath workingDirectory filepath) data of
                 Just change ->
                     case change.breakType of
                         CaseSwap ->

@@ -37,13 +37,14 @@ programConfig =
 
 
 init : Flags -> CliOptions -> ( Model, Cmd Action )
-init { randomNumber1, randomNumber2, data, dataFilePath } { command } =
+init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { command } =
     let
         model =
             { randomNumbers =
                 { breakTypeInt = randomNumber1
                 , segmentToBreakInt = randomNumber2
                 }
+            , workingDirectory = workingDirectory
             , dataFilePath = FilePath.fromString dataFilePath
             , savedDataResult = SavedData.fromFlag data
             , command = command
@@ -60,6 +61,7 @@ main :
         CliOptions
         { randomNumber1 : Int
         , randomNumber2 : Int
+        , workingDirectory : String
         , dataFilePath : String
         , data : Maybe String
         }

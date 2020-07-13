@@ -28,6 +28,7 @@ type alias Model =
         , segmentToBreakInt : Int
         }
     , dataFilePath : FilePath
+    , workingDirectory : String
     , savedDataResult : Result SavedDataError SavedData
     , command : Command
     }
@@ -48,6 +49,7 @@ type alias Flags =
     Program.FlagsIncludingArgv
         { randomNumber1 : Int
         , randomNumber2 : Int
+        , workingDirectory : String
         , dataFilePath : String
         , data : Maybe String
         }
