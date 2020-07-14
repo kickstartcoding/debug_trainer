@@ -1,12 +1,10 @@
 {
   "name": "debug_trainer",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
-    "build:parcel": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
-    "build:nexe": "nexe dist/debug_trainer.js --output bin/debug_trainer",
-    "build": "npm run build:parcel && npm run build:nexe",
+    "build": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "dev": "parcel js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,7 +16,6 @@
   "dependencies": {},
   "devDependencies": {
     "elm-hot": "^1.1.4",
-    "nexe": "^3.3.7",
     "node-elm-compiler": "^5.0.4",
     "parcel-bundler": "^1.12.4"
   }
