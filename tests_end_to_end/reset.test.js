@@ -12,11 +12,11 @@ describe('reset command', () => {
 
   test("resets file to original state", () => {
     createTestFileWithContent('Test')
-
     runBreakCommand()
+
     expect(readTestFile()).toEqual('test')
-    const output = runResetCommand()
-    console.log('output:', output)
+
+    runResetCommand()
 
     expect(readTestFile()).toEqual('Test')
   })

@@ -17,7 +17,7 @@ export function runResetCommand() {
 }
 
 function runCommand(command) {
-  return execSync(`node ./bin/debug_trainer ${command} --test --log`).toString()
+  return execSync(`node ./bin/debug_trainer ${command} --test`).toString()
 }
 
 export function createTestFileWithContent(content) {
