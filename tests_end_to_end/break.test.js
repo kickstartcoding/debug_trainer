@@ -1,28 +1,36 @@
-import fs from 'fs'
-import Main from '../js/main.js'
+import {
+  runBreakCommand,
+  createTestFileWithContent,
+  readTestFile,
+  clearSaveFile
+} from './testHelpers.js'
 
-describe('break command', () => {
-  describe('case swapping', () => {
-    beforeEach(() => {
-      createCaseSwapExampleFile()
-      process.argv[2] == 'case_swap_test_file.txt'
-      process.argv[3] == 'break'
-      Main.run()
+describe("break command", () => {
+  describe("case swapping", () => {
+    // beforeEach(() => {  })
+    afterEach(() => { clearSaveFile() })
+
+    test("lowercases a title case word", () => {
+      createTestFileWithContent('Test')
+      runBreakCommand()
+
+      expect(readTestFile()).toEqual('test')
     })
 
-    test('breaks file', () => {
-      const content = "fs.readFileSync('case_swap_test_file.txt', 'utf8')"
+    test("uppercases a lower case word", () => {
+      createTestFileWithContent('test')
+      runBreakCommand()
 
-      expect(content).toEqual('Test')
+      expect(readTestFile()).toEqual('Test')
+    })
+
+    test("will not break same file twice", () => {
+      createTestFileWithContent('test')
+      runBreakCommand()
+      const output = runBreakCommand()
+
+      expect(readTestFile()).toEqual('Test')
+      expect(output).toEqual(expect.stringContaining('has already had a change introduced'))
     })
   })
 })
-
-function createCaseSwapExampleFile() {
-  fs.writeFileSync("case_swap_test_file.txt", "test", function (err) {
-    if (err) {
-      console.error(err)
-      process.exit(1)
-    }
-  })
-}

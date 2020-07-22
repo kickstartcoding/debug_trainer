@@ -21,16 +21,23 @@ init filepath { savedDataResult, dataFilePath } =
                         }
 
                 Nothing ->
-                    Ports.printAndExitFailure
-                        ("\n\n"
-                            ++ "debug_trainer has no record of "
-                            ++ FilePath.toString filepath
-                            ++ " being changed. Either it has never been changed or "
-                            ++ "the changes that were made have been reverted."
-                            ++ "\n\n"
-                        )
+                    Ports.printAndExitSuccess
+                        (noRecordOfChangeMessage filepath)
+
+        Err FileMissing ->
+            Ports.printAndExitSuccess
+                (noRecordOfChangeMessage filepath)
 
         Err error ->
             error
                 |> SavedData.errorMessage dataFilePath
                 |> Ports.printAndExitFailure
+
+
+noRecordOfChangeMessage : FilePath -> String
+noRecordOfChangeMessage filepath =
+    "\n\n"
+        ++ "debug_trainer has no record of "
+        ++ FilePath.toString filepath
+        ++ " being changed. Either it has never been changed or the changes that were made have been reverted"
+        ++ "\n\n"

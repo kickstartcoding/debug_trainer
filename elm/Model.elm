@@ -18,6 +18,7 @@ import Utils.Types.LoggingStatus as LoggingStatus exposing (LoggingStatus)
 type alias CliOptions =
     { command : Command
     , loggingStatus : LoggingStatus
+    , isInTestMode : Bool
     }
 
 
@@ -49,24 +50,27 @@ type alias Flags =
         }
 
 
-breakInit : String -> Bool -> CliOptions
-breakInit filepathString loggingIsOn =
+breakInit : String -> Bool -> Bool -> CliOptions
+breakInit filepathString loggingIsOn isInTestMode =
     { command = Break (FilePath.fromString filepathString)
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    , isInTestMode = isInTestMode
     }
 
 
-hintInit : String -> Bool -> CliOptions
-hintInit filepathString loggingIsOn =
+hintInit : String -> Bool -> Bool -> CliOptions
+hintInit filepathString loggingIsOn isInTestMode =
     { command = Hint (FilePath.fromString filepathString)
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    , isInTestMode = isInTestMode
     }
 
 
-resetInit : String -> Bool -> CliOptions
-resetInit filepathString loggingIsOn =
+resetInit : String -> Bool -> Bool -> CliOptions
+resetInit filepathString loggingIsOn isInTestMode =
     { command = Reset (FilePath.fromString filepathString)
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    , isInTestMode = isInTestMode
     }
 
 
