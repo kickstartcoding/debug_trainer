@@ -7,10 +7,9 @@ import writeFile from './ports/writeFile.js'
 import * as SavedData from './savedData.js'
 import { devLog } from './logging.js'
 
-run()
-
-function run() {
+export function run() {
   const data = SavedData.load()
+  devLog('process.argv:', process.argv)
   devLog('data:', data)
 
   const program = Elm.Main.init({
