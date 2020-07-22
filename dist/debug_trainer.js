@@ -7982,7 +7982,7 @@ function run() {
       dataFilePath: SavedData.dataFilePath,
       workingDirectory: process.cwd(),
       data: data,
-      versionMessage: "3.0.0"
+      versionMessage: "3.0.1"
     }
   });
 
