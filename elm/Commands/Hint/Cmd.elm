@@ -12,7 +12,13 @@ init : FilePath -> Model -> Cmd Action
 init filepath { savedDataResult, dataFilePath, workingDirectory } =
     case savedDataResult of
         Ok data ->
-            case SavedData.getChange (FilePath.fullPath workingDirectory filepath) data of
+            case
+                SavedData.getChange
+                    { filepath = filepath
+                    , workingDirectory = workingDirectory
+                    }
+                    data
+            of
                 Just change ->
                     case change.breakType of
                         CaseSwap ->

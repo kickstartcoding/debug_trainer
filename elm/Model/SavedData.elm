@@ -18,7 +18,7 @@ import Codec exposing (Codec, Decoder, Value)
 import Dict exposing (Dict)
 import Json.Decode
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
-import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.FilePath as FilePath exposing (FilePath, fullPath)
 import Utils.Types.ReplacementData as ReplacementData exposing (ReplacementData)
 
 
@@ -60,28 +60,40 @@ savedDataOrInit savedDataResult =
             init
 
 
-getFileData : FilePath -> SavedData -> Maybe FileData
-getFileData filepath savedData =
-    Dict.get (FilePath.toString filepath) savedData.changedFiles
+getFileData : { filepath : FilePath, workingDirectory : String } -> SavedData -> Maybe FileData
+getFileData { filepath, workingDirectory } savedData =
+    Dict.get (fullPathString workingDirectory filepath) savedData.changedFiles
 
 
-removeFileData : FilePath -> SavedData -> SavedData
-removeFileData filepath savedData =
-    { savedData | changedFiles = Dict.remove (FilePath.toString filepath) savedData.changedFiles }
+removeFileData : { filepath : FilePath, workingDirectory : String } -> SavedData -> SavedData
+removeFileData { filepath, workingDirectory } savedData =
+    { savedData
+        | changedFiles =
+            Dict.remove
+                (fullPathString workingDirectory filepath)
+                savedData.changedFiles
+    }
 
 
-getChange : FilePath -> SavedData -> Maybe Change
-getChange filepath savedData =
+getChange : { filepath : FilePath, workingDirectory : String } -> SavedData -> Maybe Change
+getChange config savedData =
     savedData
-        |> getFileData filepath
+        |> getFileData config
         |> Maybe.map .change
 
 
-setChange : { filepath : FilePath, fileContent : String, change : Change } -> SavedData -> SavedData
-setChange { filepath, fileContent, change } ({ changedFiles } as model) =
+setChange :
+    { filepath : FilePath
+    , workingDirectory : String
+    , fileContent : String
+    , change : Change
+    }
+    -> SavedData
+    -> SavedData
+setChange { filepath, workingDirectory, fileContent, change } ({ changedFiles } as model) =
     { model
         | changedFiles =
-            Dict.update (FilePath.toString filepath)
+            Dict.update (fullPathString workingDirectory filepath)
                 (\maybeFileData ->
                     case maybeFileData of
                         Just fileData ->
@@ -136,6 +148,12 @@ errorMessage dataFilePath error =
                 ++ FilePath.toString dataFilePath
                 ++ " and then running debug_trainer again."
                 ++ "\n\n"
+
+
+fullPathString : String -> FilePath -> String
+fullPathString workingDirectory filepath =
+    FilePath.fullPath workingDirectory filepath
+        |> FilePath.toString
 
 
 encode : SavedData -> Value

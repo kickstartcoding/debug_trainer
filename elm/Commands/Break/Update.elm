@@ -51,7 +51,8 @@ update filepath action model =
 
                         newSavedData =
                             SavedData.setChange
-                                { filepath = FilePath.fullPath model.workingDirectory filepath
+                                { filepath = filepath
+                                , workingDirectory = model.workingDirectory
                                 , fileContent = contents
                                 , change = replacementData
                                 }

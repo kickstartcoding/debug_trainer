@@ -3733,11 +3733,18 @@ var $author$project$Utils$Types$FilePath$fullPath = F2(
 			workingDirectory + ('/' + A2($elm$core$String$dropLeft, 2, filepath))) : (A2($elm$core$String$startsWith, '../', filepath) ? $author$project$Utils$Types$FilePath$FilePath(
 			A2($author$project$Utils$Types$FilePath$walkTree, workingDirectory, filepath)) : $author$project$Utils$Types$FilePath$FilePath(workingDirectory + ('/' + filepath))));
 	});
+var $author$project$Model$SavedData$fullPathString = F2(
+	function (workingDirectory, filepath) {
+		return $author$project$Utils$Types$FilePath$toString(
+			A2($author$project$Utils$Types$FilePath$fullPath, workingDirectory, filepath));
+	});
 var $author$project$Model$SavedData$getFileData = F2(
-	function (filepath, savedData) {
+	function (_v0, savedData) {
+		var filepath = _v0.filepath;
+		var workingDirectory = _v0.workingDirectory;
 		return A2(
 			$elm$core$Dict$get,
-			$author$project$Utils$Types$FilePath$toString(filepath),
+			A2($author$project$Model$SavedData$fullPathString, workingDirectory, filepath),
 			savedData.changedFiles);
 	});
 var $elm$core$Maybe$map = F2(
@@ -3751,13 +3758,13 @@ var $elm$core$Maybe$map = F2(
 		}
 	});
 var $author$project$Model$SavedData$getChange = F2(
-	function (filepath, savedData) {
+	function (config, savedData) {
 		return A2(
 			$elm$core$Maybe$map,
 			function ($) {
 				return $.change;
 			},
-			A2($author$project$Model$SavedData$getFileData, filepath, savedData));
+			A2($author$project$Model$SavedData$getFileData, config, savedData));
 	});
 var $author$project$Ports$print = _Platform_outgoingPort('print', $elm$json$Json$Encode$string);
 var $author$project$Ports$printAndExitFailure = _Platform_outgoingPort('printAndExitFailure', $elm$json$Json$Encode$string);
@@ -3772,7 +3779,7 @@ var $author$project$Commands$Break$Cmd$init = F2(
 			var data = savedDataResult.a;
 			var _v2 = A2(
 				$author$project$Model$SavedData$getChange,
-				A2($author$project$Utils$Types$FilePath$fullPath, workingDirectory, filepath),
+				{filepath: filepath, workingDirectory: workingDirectory},
 				data);
 			if (_v2.$ === 'Just') {
 				return $author$project$Ports$printAndExitSuccess(
@@ -3814,7 +3821,7 @@ var $author$project$Commands$Hint$Cmd$init = F2(
 			var data = savedDataResult.a;
 			var _v2 = A2(
 				$author$project$Model$SavedData$getChange,
-				A2($author$project$Utils$Types$FilePath$fullPath, workingDirectory, filepath),
+				{filepath: filepath, workingDirectory: workingDirectory},
 				data);
 			if (_v2.$ === 'Just') {
 				var change = _v2.a;
@@ -4200,13 +4207,15 @@ var $elm$core$Dict$remove = F2(
 		}
 	});
 var $author$project$Model$SavedData$removeFileData = F2(
-	function (filepath, savedData) {
+	function (_v0, savedData) {
+		var filepath = _v0.filepath;
+		var workingDirectory = _v0.workingDirectory;
 		return _Utils_update(
 			savedData,
 			{
 				changedFiles: A2(
 					$elm$core$Dict$remove,
-					$author$project$Utils$Types$FilePath$toString(filepath),
+					A2($author$project$Model$SavedData$fullPathString, workingDirectory, filepath),
 					savedData.changedFiles)
 			});
 	});
@@ -4258,15 +4267,22 @@ var $author$project$Commands$Reset$Cmd$init = F2(
 	function (filepath, _v0) {
 		var savedDataResult = _v0.savedDataResult;
 		var dataFilePath = _v0.dataFilePath;
+		var workingDirectory = _v0.workingDirectory;
 		if (savedDataResult.$ === 'Ok') {
 			var data = savedDataResult.a;
-			var _v2 = A2($author$project$Model$SavedData$getFileData, filepath, data);
+			var _v2 = A2(
+				$author$project$Model$SavedData$getFileData,
+				{filepath: filepath, workingDirectory: workingDirectory},
+				data);
 			if (_v2.$ === 'Just') {
 				var originalContent = _v2.a.originalContent;
 				return $author$project$Ports$writeFileWith(
 					{
 						contents: originalContent,
-						dataToSave: A2($author$project$Model$SavedData$removeFileData, filepath, data),
+						dataToSave: A2(
+							$author$project$Model$SavedData$removeFileData,
+							{filepath: filepath, workingDirectory: workingDirectory},
+							data),
 						path: filepath
 					});
 			} else {
@@ -7578,6 +7594,7 @@ var $elm$core$Dict$update = F3(
 var $author$project$Model$SavedData$setChange = F2(
 	function (_v0, model) {
 		var filepath = _v0.filepath;
+		var workingDirectory = _v0.workingDirectory;
 		var fileContent = _v0.fileContent;
 		var change = _v0.change;
 		var changedFiles = model.changedFiles;
@@ -7586,7 +7603,7 @@ var $author$project$Model$SavedData$setChange = F2(
 			{
 				changedFiles: A3(
 					$elm$core$Dict$update,
-					$author$project$Utils$Types$FilePath$toString(filepath),
+					A2($author$project$Model$SavedData$fullPathString, workingDirectory, filepath),
 					function (maybeFileData) {
 						if (maybeFileData.$ === 'Just') {
 							var fileData = maybeFileData.a;
@@ -7637,11 +7654,7 @@ var $author$project$Commands$Break$Update$update = F3(
 			var oldSavedData = $author$project$Model$SavedData$savedDataOrInit(model.savedDataResult);
 			var newSavedData = A2(
 				$author$project$Model$SavedData$setChange,
-				{
-					change: replacementData,
-					fileContent: contents,
-					filepath: A2($author$project$Utils$Types$FilePath$fullPath, model.workingDirectory, filepath)
-				},
+				{change: replacementData, fileContent: contents, filepath: filepath, workingDirectory: model.workingDirectory},
 				oldSavedData);
 			return _Utils_Tuple2(
 				_Utils_update(

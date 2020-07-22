@@ -9,15 +9,26 @@ import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
 init : FilePath -> Model -> Cmd Action
-init filepath { savedDataResult, dataFilePath } =
+init filepath { savedDataResult, dataFilePath, workingDirectory } =
     case savedDataResult of
         Ok data ->
-            case SavedData.getFileData filepath data of
+            case
+                SavedData.getFileData
+                    { filepath = filepath
+                    , workingDirectory = workingDirectory
+                    }
+                    data
+            of
                 Just { originalContent } ->
                     Ports.writeFileWith
                         { path = filepath
                         , contents = originalContent
-                        , dataToSave = SavedData.removeFileData filepath data
+                        , dataToSave =
+                            SavedData.removeFileData
+                                { filepath = filepath
+                                , workingDirectory = workingDirectory
+                                }
+                                data
                         }
 
                 Nothing ->
