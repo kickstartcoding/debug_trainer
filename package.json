@@ -7,7 +7,7 @@
     "build": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "dev": "parcel js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "build-tests": "parcel build tests_end_to_end/src/* --out-dir tests_end_to_end/compiled",
-    "test": "elm-test && jest tests_end_to_end/compiled"
+    "test": "elm-test && jest"
   },
   "bin": {
     "debug_trainer": "bin/debug_trainer"
