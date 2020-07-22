@@ -3783,7 +3783,7 @@ var $author$project$Commands$Break$Cmd$init = F2(
 				data);
 			if (_v2.$ === 'Just') {
 				return $author$project$Ports$printAndExitSuccess(
-					'\n\n' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' has already has a change introduced to it. ' + ('Try fixing that change before breaking it again. ' + ('To get a hint, run:\n\ndebug_trainer hint ' + ($author$project$Utils$Types$FilePath$toString(filepath) + '\n\n'))))));
+					'\n\n' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' has already had a change introduced to it. ' + ('Try fixing that change before breaking it again. ' + ('To get a hint, run:\n\ndebug_trainer hint ' + ($author$project$Utils$Types$FilePath$toString(filepath) + '\n\n'))))));
 			} else {
 				return $elm$core$Platform$Cmd$batch(
 					_List_fromArray(
@@ -3812,6 +3812,9 @@ var $author$project$Commands$Break$Cmd$init = F2(
 			}
 		}
 	});
+var $author$project$Commands$Hint$Cmd$noRecordOfChangeMessage = function (filepath) {
+	return '\n\n' + ('debug_trainer has no record of ' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' being changed. Either it has never been changed or the changes that were made have been reverted' + '\n\n')));
+};
 var $author$project$Commands$Hint$Cmd$init = F2(
 	function (filepath, _v0) {
 		var savedDataResult = _v0.savedDataResult;
@@ -3835,15 +3838,24 @@ var $author$project$Commands$Hint$Cmd$init = F2(
 						return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer changed ' + ('the arguments to a function.' + '\n\n')));
 				}
 			} else {
-				return $author$project$Ports$printAndExitFailure(
-					'\n\n' + ('debug_trainer has no record of ' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' being changed.' + '\n\n'))));
+				return $author$project$Ports$printAndExitSuccess(
+					$author$project$Commands$Hint$Cmd$noRecordOfChangeMessage(filepath));
 			}
 		} else {
-			var error = savedDataResult.a;
-			return $author$project$Ports$printAndExitFailure(
-				A2($author$project$Model$SavedData$errorMessage, dataFilePath, error));
+			if (savedDataResult.a.$ === 'FileMissing') {
+				var _v4 = savedDataResult.a;
+				return $author$project$Ports$printAndExitSuccess(
+					$author$project$Commands$Hint$Cmd$noRecordOfChangeMessage(filepath));
+			} else {
+				var error = savedDataResult.a;
+				return $author$project$Ports$printAndExitFailure(
+					A2($author$project$Model$SavedData$errorMessage, dataFilePath, error));
+			}
 		}
 	});
+var $author$project$Commands$Reset$Cmd$noRecordOfChangeMessage = function (filepath) {
+	return '\n\n' + ('debug_trainer has no record of ' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' being changed. Either it has never been changed or the changes that were made have been reverted' + '\n\n')));
+};
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
 	while (true) {
@@ -4286,13 +4298,19 @@ var $author$project$Commands$Reset$Cmd$init = F2(
 						path: filepath
 					});
 			} else {
-				return $author$project$Ports$printAndExitFailure(
-					'\n\n' + ('debug_trainer has no record of ' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' being changed. Either it has never been changed or ' + ('the changes that were made have been reverted.' + '\n\n')))));
+				return $author$project$Ports$printAndExitSuccess(
+					$author$project$Commands$Reset$Cmd$noRecordOfChangeMessage(filepath));
 			}
 		} else {
-			var error = savedDataResult.a;
-			return $author$project$Ports$printAndExitFailure(
-				A2($author$project$Model$SavedData$errorMessage, dataFilePath, error));
+			if (savedDataResult.a.$ === 'FileMissing') {
+				var _v3 = savedDataResult.a;
+				return $author$project$Ports$printAndExitSuccess(
+					$author$project$Commands$Reset$Cmd$noRecordOfChangeMessage(filepath));
+			} else {
+				var error = savedDataResult.a;
+				return $author$project$Ports$printAndExitFailure(
+					A2($author$project$Model$SavedData$errorMessage, dataFilePath, error));
+			}
 		}
 	});
 var $author$project$Main$init = F2(
@@ -4363,11 +4381,12 @@ var $author$project$Utils$Types$LoggingStatus$LoggingOn = {$: 'LoggingOn'};
 var $author$project$Utils$Types$LoggingStatus$fromBool = function (bool) {
 	return bool ? $author$project$Utils$Types$LoggingStatus$LoggingOn : $author$project$Utils$Types$LoggingStatus$LoggingOff;
 };
-var $author$project$Model$breakInit = F2(
-	function (filepathString, loggingIsOn) {
+var $author$project$Model$breakInit = F3(
+	function (filepathString, loggingIsOn, isInTestMode) {
 		return {
 			command: $author$project$Model$Break(
 				$author$project$Utils$Types$FilePath$fromString(filepathString)),
+			isInTestMode: isInTestMode,
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
@@ -4468,11 +4487,12 @@ var $dillonkearns$elm_cli_options_parser$Cli$Option$flag = function (flagName) {
 var $author$project$Model$Hint = function (a) {
 	return {$: 'Hint', a: a};
 };
-var $author$project$Model$hintInit = F2(
-	function (filepathString, loggingIsOn) {
+var $author$project$Model$hintInit = F3(
+	function (filepathString, loggingIsOn, isInTestMode) {
 		return {
 			command: $author$project$Model$Hint(
 				$author$project$Utils$Types$FilePath$fromString(filepathString)),
+			isInTestMode: isInTestMode,
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
@@ -4535,11 +4555,12 @@ var $dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg = func
 var $author$project$Model$Reset = function (a) {
 	return {$: 'Reset', a: a};
 };
-var $author$project$Model$resetInit = F2(
-	function (filepathString, loggingIsOn) {
+var $author$project$Model$resetInit = F3(
+	function (filepathString, loggingIsOn, isInTestMode) {
 		return {
 			command: $author$project$Model$Reset(
 				$author$project$Utils$Types$FilePath$fromString(filepathString)),
+			isInTestMode: isInTestMode,
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
@@ -4755,11 +4776,14 @@ var $author$project$Main$programConfig = A2(
 		'Change the specified file back to its original, unbroken state.',
 		A2(
 			$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-			$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+			$dillonkearns$elm_cli_options_parser$Cli$Option$flag('test'),
 			A2(
 				$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-				$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
-				A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'reset', $author$project$Model$resetInit)))),
+				$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+				A2(
+					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+					$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
+					A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'reset', $author$project$Model$resetInit))))),
 	A2(
 		$dillonkearns$elm_cli_options_parser$Cli$Program$add,
 		A2(
@@ -4767,11 +4791,14 @@ var $author$project$Main$programConfig = A2(
 			'Display a hint about the error that was introduced into the specified file.',
 			A2(
 				$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-				$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+				$dillonkearns$elm_cli_options_parser$Cli$Option$flag('test'),
 				A2(
 					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-					$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
-					A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'hint', $author$project$Model$hintInit)))),
+					$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+					A2(
+						$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+						$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
+						A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'hint', $author$project$Model$hintInit))))),
 		A2(
 			$dillonkearns$elm_cli_options_parser$Cli$Program$add,
 			A2(
@@ -4779,11 +4806,14 @@ var $author$project$Main$programConfig = A2(
 				'Randomly introduce an error into the specified file.',
 				A2(
 					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-					$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+					$dillonkearns$elm_cli_options_parser$Cli$Option$flag('test'),
 					A2(
 						$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-						$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
-						A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'break', $author$project$Model$breakInit)))),
+						$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+						A2(
+							$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+							$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
+							A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'break', $author$project$Model$breakInit))))),
 			$dillonkearns$elm_cli_options_parser$Cli$Program$config)));
 var $dillonkearns$elm_cli_options_parser$Cli$Program$ShowSystemMessage = {$: 'ShowSystemMessage'};
 var $dillonkearns$elm_cli_options_parser$Cli$Program$UserModel = F2(
@@ -7856,7 +7886,66 @@ function _default(program) {
     });
   });
 }
-},{"../logging.js":"logging.js"}],"savedData.js":[function(require,module,exports) {
+},{"../logging.js":"logging.js"}],"../tests_end_to_end/testHelpers.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.runBreakCommand = runBreakCommand;
+exports.runHintCommand = runHintCommand;
+exports.runResetCommand = runResetCommand;
+exports.createTestFileWithContent = createTestFileWithContent;
+exports.readTestFile = readTestFile;
+exports.clearSaveFile = clearSaveFile;
+exports.dataFileName = exports.testFileName = void 0;
+
+var _fs = _interopRequireDefault(require("fs"));
+
+var _child_process = require("child_process");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const testFileName = "testfile.txt";
+exports.testFileName = testFileName;
+const dataFileName = "debug_trainer_test_save_file.json";
+exports.dataFileName = dataFileName;
+
+function runBreakCommand() {
+  return runCommand(`break ${testFileName}`);
+}
+
+function runHintCommand() {
+  return runCommand(`hint ${testFileName}`);
+}
+
+function runResetCommand() {
+  return runCommand(`reset ${testFileName}`);
+}
+
+function runCommand(command) {
+  return (0, _child_process.execSync)(`node ./bin/debug_trainer ${command} --test --log`).toString();
+}
+
+function createTestFileWithContent(content) {
+  _fs.default.writeFileSync(testFileName, content, function (err) {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+  });
+}
+
+function readTestFile() {
+  return _fs.default.readFileSync(testFileName, 'utf8');
+}
+
+function clearSaveFile() {
+  if (_fs.default.existsSync(dataFileName)) {
+    _fs.default.unlinkSync(dataFileName);
+  }
+}
+},{}],"savedData.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7872,9 +7961,15 @@ var _os = _interopRequireDefault(require("os"));
 
 var _logging = require("./logging.js");
 
+var TestHelpers = _interopRequireWildcard(require("../tests_end_to_end/testHelpers.js"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const dataFilePath = `${_os.default.homedir()}/.debug_trainer.json`;
+const dataFilePath = process.argv.includes('--test') ? TestHelpers.dataFileName : `${_os.default.homedir()}/.debug_trainer.json`;
 exports.dataFilePath = dataFilePath;
 
 function load(program) {
@@ -7907,7 +8002,7 @@ function save(saveDataContents) {
     process.exit(0);
   });
 }
-},{"./logging.js":"logging.js"}],"ports/writeFile.js":[function(require,module,exports) {
+},{"./logging.js":"logging.js","../tests_end_to_end/testHelpers.js":"../tests_end_to_end/testHelpers.js"}],"ports/writeFile.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7946,6 +8041,11 @@ function _default(program) {
 },{"../savedData.js":"savedData.js","../logging.js":"logging.js"}],"main.js":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.run = run;
+
 var _Main = require("../elm/Main.elm");
 
 var _print = _interopRequireDefault(require("./ports/print.js"));
@@ -7968,10 +8068,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-run();
-
 function run() {
   const data = SavedData.load();
+  (0, _logging.devLog)('process.argv:', process.argv);
   (0, _logging.devLog)('data:', data);
 
   const program = _Main.Elm.Main.init({

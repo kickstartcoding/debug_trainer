@@ -23,7 +23,7 @@ init filepath { savedDataResult, dataFilePath, workingDirectory } =
                     Ports.printAndExitSuccess
                         ("\n\n"
                             ++ FilePath.toString filepath
-                            ++ " has already has a change introduced to it. "
+                            ++ " has already had a change introduced to it. "
                             ++ "Try fixing that change before breaking it again. "
                             ++ "To get a hint, run:\n\ndebug_trainer hint "
                             ++ FilePath.toString filepath

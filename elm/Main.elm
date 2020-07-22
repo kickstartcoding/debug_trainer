@@ -22,18 +22,21 @@ programConfig =
             (OptionsParser.buildSubCommand "break" Model.breakInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
                 |> OptionsParser.withDoc "Randomly introduce an error into the specified file."
             )
         |> Program.add
             (OptionsParser.buildSubCommand "hint" Model.hintInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
                 |> OptionsParser.withDoc "Display a hint about the error that was introduced into the specified file."
             )
         |> Program.add
             (OptionsParser.buildSubCommand "reset" Model.resetInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
                 |> OptionsParser.withDoc "Change the specified file back to its original, unbroken state."
             )
 
