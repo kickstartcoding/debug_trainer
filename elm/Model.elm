@@ -3,7 +3,6 @@ module Model exposing
     , Command(..)
     , Flags
     , Model
-    , Phase(..)
     , breakInit
     , filePathStringFromCommand
     , hintInit
@@ -34,14 +33,9 @@ type alias Model =
     }
 
 
-type Phase
-    = ReadingFile
-    | WritingFile
-
-
 type Command
-    = Break FilePath Phase
-    | Hint FilePath Phase
+    = Break FilePath
+    | Hint FilePath
     | Reset FilePath
 
 
@@ -57,14 +51,14 @@ type alias Flags =
 
 breakInit : String -> Bool -> CliOptions
 breakInit filepathString loggingIsOn =
-    { command = Break (FilePath.fromString filepathString) ReadingFile
+    { command = Break (FilePath.fromString filepathString)
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     }
 
 
 hintInit : String -> Bool -> CliOptions
 hintInit filepathString loggingIsOn =
-    { command = Hint (FilePath.fromString filepathString) ReadingFile
+    { command = Hint (FilePath.fromString filepathString)
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     }
 
@@ -79,10 +73,10 @@ resetInit filepathString loggingIsOn =
 filePathStringFromCommand : Command -> String
 filePathStringFromCommand command =
     case command of
-        Break filepath _ ->
+        Break filepath ->
             FilePath.toString filepath
 
-        Hint filepath _ ->
+        Hint filepath ->
             FilePath.toString filepath
 
         Reset filepath ->

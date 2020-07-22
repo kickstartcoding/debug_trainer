@@ -4,7 +4,9 @@ import Actions exposing (Action)
 import Cli.Option as Option
 import Cli.OptionsParser as OptionsParser
 import Cli.Program as Program
-import Cmds
+import Commands.Break.Cmd
+import Commands.Hint.Cmd
+import Commands.Reset.Cmd
 import Model as Model exposing (CliOptions, Command(..), Flags, Model)
 import Model.SavedData as SavedData exposing (SavedDataError(..))
 import Ports
@@ -51,7 +53,15 @@ init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { co
             }
     in
     ( model
-    , Cmds.init model
+    , case command of
+        Break filepath ->
+            Commands.Break.Cmd.init filepath model
+
+        Hint filepath ->
+            Commands.Hint.Cmd.init filepath model
+
+        Reset filepath ->
+            Commands.Reset.Cmd.init filepath model
     )
 
 

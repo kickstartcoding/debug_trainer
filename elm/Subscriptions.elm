@@ -1,11 +1,21 @@
 module Subscriptions exposing (subscriptions)
 
+-- import Commands.Break.Actions
+
 import Actions exposing (Action(..))
-import Model exposing (Model)
+import Commands.Break.Subscriptions
+import Model exposing (Command(..), Model)
 import Ports
 
 
 subscriptions : Model -> Sub Action
-subscriptions model =
-    Sub.batch
-        [ Ports.receiveFileContents ReceiveFileContents ]
+subscriptions ({ command } as model) =
+    case command of
+        Break filename ->
+            Sub.map (BreakAction filename) (Commands.Break.Subscriptions.subscriptions model)
+
+        Hint _ ->
+            Sub.none
+
+        Reset _ ->
+            Sub.none

@@ -4,6 +4,7 @@ module Model.SavedData exposing
     , SavedDataError(..)
     , decode
     , encode
+    , errorMessage
     , fromFlag
     , getChange
     , getFileData
@@ -29,6 +30,7 @@ type alias SavedData =
 type alias FileData =
     { originalContent : String
     , change : Change
+    , hintsGiven : Int
     }
 
 
@@ -86,7 +88,11 @@ setChange { filepath, fileContent, change } ({ changedFiles } as model) =
                             Just { fileData | change = change }
 
                         Nothing ->
-                            Just { originalContent = fileContent, change = change }
+                            Just
+                                { originalContent = fileContent
+                                , change = change
+                                , hintsGiven = 0
+                                }
                 )
                 changedFiles
     }
@@ -105,6 +111,31 @@ fromFlag maybeDataString =
 
         Nothing ->
             Err FileMissing
+
+
+errorMessage : FilePath -> SavedDataError -> String
+errorMessage dataFilePath error =
+    case error of
+        FileMissing ->
+            "\n\n"
+                ++ "Could not find any save data at "
+                ++ FilePath.toString dataFilePath
+                ++ ". That file is where debug_trainer stores data on what files it has changed."
+                ++ " Without it, this feature won't work."
+                ++ "\n\n"
+
+        DecodingFailed reason ->
+            "\n\n"
+                ++ "Unable to parse the saved data file at "
+                ++ FilePath.toString dataFilePath
+                ++ ". Here is the error it gave:\n\n"
+                ++ reason
+                ++ "\n\nThe save file at "
+                ++ FilePath.toString dataFilePath
+                ++ " may be broken. If this error persists, try deleting "
+                ++ FilePath.toString dataFilePath
+                ++ " and then running debug_trainer again."
+                ++ "\n\n"
 
 
 encode : SavedData -> Value
@@ -129,6 +160,7 @@ fileDataCodec =
     Codec.object FileData
         |> Codec.field "originalContent" .originalContent Codec.string
         |> Codec.field "change" .change changeCodec
+        |> Codec.field "hintsGiven" .hintsGiven Codec.int
         |> Codec.buildObject
 
 

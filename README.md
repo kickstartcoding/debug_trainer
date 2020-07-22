@@ -25,6 +25,10 @@ Change the specified file back to its original, unbroken state:
 debug_trainer reset <filepath>
 ```
 
+## General to-do
+
+- Add end-to-end tests
+
 ## Possible future features:
 
 - Command to revert file to broken state, without any user changes made while debugging

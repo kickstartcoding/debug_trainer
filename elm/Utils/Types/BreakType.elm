@@ -17,29 +17,6 @@ type BreakType
     | ChangeFunctionArgs
 
 
-
--- toString : BreakType -> String
--- toString breakType =
---     case breakType of
---         CaseSwap ->
---             "CaseSwap"
---         RemoveReturn ->
---             "RemoveReturn"
---         ChangeFunctionArgs ->
---             "ChangeFunctionArgs"
--- fromString : String -> BreakType
--- fromString string =
---     case string of
---         "CaseSwap" ->
---             CaseSwap
---         "RemoveReturn" ->
---             RemoveReturn
---         "ChangeFunctionArgs" ->
---             ChangeFunctionArgs
---         _ ->
---             CaseSwap
-
-
 encode : BreakType -> Value
 encode =
     Codec.encoder codec
