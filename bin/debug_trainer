@@ -1,3 +1,21 @@
 #!/usr/bin/env node
 
-require("../dist/debug_trainer").run();
+// We disable the elm dev mode warning so it doesn't mess with
+// the output from when we run our tests
+const warnOriginal = console.warn
+
+if (process.argv.includes('--test')) {
+  const debugModeWarning = "Compiled in DEBUG mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets."
+
+  console.warn = function (...args) {
+    if (args[0] === debugModeWarning) {
+      return
+    } else {
+      warnOriginal(args)
+    }
+  }
+}
+
+require("../dist/debug_trainer").run()
+
+console.warn = warnOriginal
