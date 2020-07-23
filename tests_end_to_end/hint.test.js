@@ -17,6 +17,7 @@ describe("hint command", () => {
 
     expect(output).toEqual(expect.stringContaining('HINT: Somewhere in this file, debug_trainer changed a word from starting with a capital letter to starting with a lowercase letter or vice versa.'))
   })
+
   test("does not give a hint for an UNBROKEN file", () => {
     createTestFileWithContent('whatever')
     const output = runHintCommand()
