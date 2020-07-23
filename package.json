@@ -4,10 +4,10 @@
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
-    "dev": "parcel js/main.js --target node --bundle-node-modules --out-file debug_trainer.js",
+    "build": "parcel build js/run.js --target node --bundle-node-modules --out-file debug_trainer.js",
+    "dev": "parcel js/run.js --target node --bundle-node-modules --out-file debug_trainer.js",
     "build-tests": "parcel build tests_end_to_end/src/* --out-dir tests_end_to_end/compiled",
-    "test": "elm-test && jest"
+    "test": "elm-test && jest --runInBand"
   },
   "bin": {
     "debug_trainer": "bin/debug_trainer"

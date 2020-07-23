@@ -1,4 +1,3 @@
-import { Elm } from '../elm/Main.elm'
 import print from './ports/print.js'
 import printAndExitFailure from './ports/printAndExitFailure.js'
 import printAndExitSuccess from './ports/printAndExitSuccess.js'
@@ -7,7 +6,18 @@ import writeFile from './ports/writeFile.js'
 import * as SavedData from './savedData.js'
 import { devLog } from './logging.js'
 
-export function run() {
+/*
+Why pass in this Elm variable this way instead of importing
+directly?
+
+Passing in the Elm object here is a trick we need to do so that
+the Elm code will work with both Parcel for production and Jest
+for testing. Parcel compiles from run.js, which compiles Elm
+with an `import` statement. Jest compiles it from run_test.js,
+which compiles it by calling functions from node-elm-compiler
+directly. It's weird but it works.
+*/
+export function run(Elm) {
   const data = SavedData.load()
   devLog('process.argv:', process.argv)
   devLog('data:', data)

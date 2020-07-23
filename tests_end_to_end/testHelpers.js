@@ -1,23 +1,31 @@
 import fs from 'fs'
 import { execSync } from 'child_process'
+import run from '../js/runTest.js'
 
 export const testFileName = "testfile.txt"
 export const dataFileName = "debug_trainer_test_save_file.json"
 
 export function runBreakCommand() {
-  return runCommand(`break ${testFileName}`)
+  return runCommand(["break", testFileName])
 }
 
-export function runHintCommand() {
-  return runCommand(`hint ${testFileName}`)
+export function runHintCommand(hintNumber) {
+  if (hintNumber) {
+    return runCommand(["hint", "--hintNumber", "2", testFileName])
+  } else {
+    return runCommand(["hint", testFileName])
+  }
 }
 
 export function runResetCommand() {
-  return runCommand(`reset ${testFileName}`)
+  return runCommand(["reset", testFileName])
 }
 
-function runCommand(command) {
-  return execSync(`node ./bin/debug_trainer ${command} --test`).toString()
+function runCommand(commands) {
+  process.argv = ["node", "./bin/debug_trainer"].concat(commands).concat(["--test"])
+
+  return run()
+  // return execSync(`node ./bin/debug_trainer ${command} --test`).toString()
 }
 
 export function createTestFileWithContent(content) {

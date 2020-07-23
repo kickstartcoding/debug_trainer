@@ -8,8 +8,8 @@ import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
-init : FilePath -> Model -> Cmd Action
-init filepath { savedDataResult, dataFilePath, workingDirectory } =
+init : FilePath -> Int -> Model -> Cmd Action
+init filepath hintNumber { savedDataResult, dataFilePath, workingDirectory } =
     case savedDataResult of
         Ok data ->
             case

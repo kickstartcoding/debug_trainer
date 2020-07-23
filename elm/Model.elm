@@ -4,7 +4,6 @@ module Model exposing
     , Flags
     , Model
     , breakInit
-    , filePathStringFromCommand
     , hintInit
     , resetInit
     )
@@ -36,7 +35,7 @@ type alias Model =
 
 type Command
     = Break FilePath
-    | Hint FilePath
+    | Hint FilePath Int
     | Reset FilePath
 
 
@@ -58,10 +57,27 @@ breakInit filepathString loggingIsOn isInTestMode =
     }
 
 
-hintInit : String -> Bool -> Bool -> CliOptions
-hintInit filepathString loggingIsOn isInTestMode =
-    { command = Hint (FilePath.fromString filepathString)
-    , loggingStatus = LoggingStatus.fromBool loggingIsOn
+hintInit : Maybe String -> String -> Bool -> Bool -> CliOptions
+hintInit maybeHintNumberString filepathString loggingIsOn isInTestMode =
+    let
+        hintNumber =
+            case maybeHintNumberString of
+                Just hintNumberString ->
+                    hintNumberString
+                        |> String.toInt
+                        |> Maybe.withDefault 1
+
+                Nothing ->
+                    1
+
+        filepath =
+            FilePath.fromString filepathString
+
+        loggingStatus =
+            LoggingStatus.fromBool loggingIsOn
+    in
+    { command = Hint filepath hintNumber
+    , loggingStatus = loggingStatus
     , isInTestMode = isInTestMode
     }
 
@@ -72,16 +88,3 @@ resetInit filepathString loggingIsOn isInTestMode =
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     , isInTestMode = isInTestMode
     }
-
-
-filePathStringFromCommand : Command -> String
-filePathStringFromCommand command =
-    case command of
-        Break filepath ->
-            FilePath.toString filepath
-
-        Hint filepath ->
-            FilePath.toString filepath
-
-        Reset filepath ->
-            FilePath.toString filepath
