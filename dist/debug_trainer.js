@@ -3815,8 +3815,8 @@ var $author$project$Commands$Break$Cmd$init = F2(
 var $author$project$Commands$Hint$Cmd$noRecordOfChangeMessage = function (filepath) {
 	return '\n\n' + ('debug_trainer has no record of ' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' being changed. Either it has never been changed or the changes that were made have been reverted' + '\n\n')));
 };
-var $author$project$Commands$Hint$Cmd$init = F2(
-	function (filepath, _v0) {
+var $author$project$Commands$Hint$Cmd$init = F3(
+	function (filepath, hintNumber, _v0) {
 		var savedDataResult = _v0.savedDataResult;
 		var dataFilePath = _v0.dataFilePath;
 		var workingDirectory = _v0.workingDirectory;
@@ -4337,7 +4337,8 @@ var $author$project$Main$init = F2(
 						return A2($author$project$Commands$Break$Cmd$init, filepath, model);
 					case 'Hint':
 						var filepath = command.a;
-						return A2($author$project$Commands$Hint$Cmd$init, filepath, model);
+						var hintNumber = command.b;
+						return A3($author$project$Commands$Hint$Cmd$init, filepath, hintNumber, model);
 					default:
 						var filepath = command.a;
 						return A2($author$project$Commands$Reset$Cmd$init, filepath, model);
@@ -4484,20 +4485,106 @@ var $dillonkearns$elm_cli_options_parser$Cli$Option$flag = function (flagName) {
 		},
 		A2($dillonkearns$elm_cli_options_parser$Cli$UsageSpec$flag, flagName, $dillonkearns$elm_cli_options_parser$Occurences$Optional));
 };
-var $author$project$Model$Hint = function (a) {
-	return {$: 'Hint', a: a};
-};
-var $author$project$Model$hintInit = F3(
-	function (filepathString, loggingIsOn, isInTestMode) {
+var $author$project$Model$Hint = F2(
+	function (a, b) {
+		return {$: 'Hint', a: a, b: b};
+	});
+var $elm$core$String$toInt = _String_toInt;
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Model$hintInit = F4(
+	function (maybeHintNumberString, filepathString, loggingIsOn, isInTestMode) {
+		var hintNumber = function () {
+			if (maybeHintNumberString.$ === 'Just') {
+				var hintNumberString = maybeHintNumberString.a;
+				return A2(
+					$elm$core$Maybe$withDefault,
+					1,
+					$elm$core$String$toInt(hintNumberString));
+			} else {
+				return 1;
+			}
+		}();
 		return {
-			command: $author$project$Model$Hint(
-				$author$project$Utils$Types$FilePath$fromString(filepathString)),
+			command: A2(
+				$author$project$Model$Hint,
+				$author$project$Utils$Types$FilePath$fromString(filepathString),
+				hintNumber),
 			isInTestMode: isInTestMode,
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
 var $dillonkearns$elm_cli_options_parser$Cli$Decode$MatchError = function (a) {
 	return {$: 'MatchError', a: a};
+};
+var $elm_community$list_extra$List$Extra$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			if (!list.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var first = list.a;
+				var rest = list.b;
+				if (predicate(first)) {
+					return $elm$core$Maybe$Just(first);
+				} else {
+					var $temp$predicate = predicate,
+						$temp$list = rest;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue find;
+				}
+			}
+		}
+	});
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$KeywordArg = function (a) {
+	return {$: 'KeywordArg', a: a};
+};
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$keywordArg = F2(
+	function (keywordArgName, occurences) {
+		return A3(
+			$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$FlagOrKeywordArg,
+			$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$KeywordArg(keywordArgName),
+			$elm$core$Maybe$Nothing,
+			occurences);
+	});
+var $dillonkearns$elm_cli_options_parser$Cli$Option$optionalKeywordArg = function (optionName) {
+	return A2(
+		$dillonkearns$elm_cli_options_parser$Cli$Option$buildOption,
+		function (_v0) {
+			var operands = _v0.operands;
+			var options = _v0.options;
+			var _v1 = A2(
+				$elm_community$list_extra$List$Extra$find,
+				function (_v2) {
+					var thisOptionName = _v2.a;
+					var optionKind = _v2.b;
+					return _Utils_eq(thisOptionName, optionName);
+				},
+				options);
+			if (_v1.$ === 'Nothing') {
+				return $elm$core$Result$Ok($elm$core$Maybe$Nothing);
+			} else {
+				if (_v1.a.b.$ === 'KeywordArg') {
+					var _v3 = _v1.a;
+					var optionArg = _v3.b.a;
+					return $elm$core$Result$Ok(
+						$elm$core$Maybe$Just(optionArg));
+				} else {
+					return $elm$core$Result$Err(
+						$dillonkearns$elm_cli_options_parser$Cli$Decode$MatchError('Expected option ' + (optionName + ' to have arg but found none.')));
+				}
+			}
+		},
+		A2($dillonkearns$elm_cli_options_parser$Cli$UsageSpec$keywordArg, optionName, $dillonkearns$elm_cli_options_parser$Occurences$Optional));
 };
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -4798,7 +4885,10 @@ var $author$project$Main$programConfig = A2(
 					A2(
 						$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
 						$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
-						A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'hint', $author$project$Model$hintInit))))),
+						A2(
+							$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+							$dillonkearns$elm_cli_options_parser$Cli$Option$optionalKeywordArg('hint-number'),
+							A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'hint', $author$project$Model$hintInit)))))),
 		A2(
 			$dillonkearns$elm_cli_options_parser$Cli$Program$add,
 			A2(
@@ -4888,15 +4978,6 @@ var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$optionSynopsis = F3(
 					}
 				}
 			}());
-	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
 	});
 var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$synopsis = F2(
 	function (programName, _v0) {
@@ -5889,27 +5970,6 @@ var $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$expectedPositionalArg
 var $dillonkearns$elm_cli_options_parser$Cli$Decode$UnexpectedOptions = function (a) {
 	return {$: 'UnexpectedOptions', a: a};
 };
-var $elm_community$list_extra$List$Extra$find = F2(
-	function (predicate, list) {
-		find:
-		while (true) {
-			if (!list.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var first = list.a;
-				var rest = list.b;
-				if (predicate(first)) {
-					return $elm$core$Maybe$Just(first);
-				} else {
-					var $temp$predicate = predicate,
-						$temp$list = rest;
-					predicate = $temp$predicate;
-					list = $temp$list;
-					continue find;
-				}
-			}
-		}
-	});
 var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$optionName = function (option) {
 	if (option.$ === 'Flag') {
 		var flagName = option.a;
@@ -7915,8 +7975,12 @@ function runBreakCommand() {
   return runCommand(`break ${testFileName}`);
 }
 
-function runHintCommand() {
-  return runCommand(`hint ${testFileName}`);
+function runHintCommand(hintNumber) {
+  if (hintNumber) {
+    return runCommand(`hint --hint-number ${hintNumber} ${testFileName}`);
+  } else {
+    return runCommand(`hint ${testFileName}`);
+  }
 }
 
 function runResetCommand() {

@@ -18,6 +18,14 @@ describe("hint command", () => {
     expect(output).toEqual(expect.stringContaining('HINT: Somewhere in this file, debug_trainer changed a word from starting with a capital letter to starting with a lowercase letter or vice versa.'))
   })
 
+  test("gives a better hint when `--hint-number 2` flag is passed", () => {
+    createTestFileWithContent('Test')
+    runBreakCommand()
+    const output = runHintCommand(2)
+
+    expect(output).toEqual(expect.stringContaining('HINT: The change that was introduced to this file was on line 1 of the original file.'))
+  })
+
   test("does not give a hint for an UNBROKEN file", () => {
     createTestFileWithContent('whatever')
     const output = runHintCommand()
