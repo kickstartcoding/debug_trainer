@@ -7924,7 +7924,7 @@ function runResetCommand() {
 }
 
 function runCommand(command) {
-  return (0, _child_process.execSync)(`node ./bin/debug_trainer ${command} --test --log`).toString();
+  return (0, _child_process.execSync)(`node ./bin/debug_trainer ${command} --test`).toString();
 }
 
 function createTestFileWithContent(content) {
@@ -8081,7 +8081,7 @@ function run() {
       dataFilePath: SavedData.dataFilePath,
       workingDirectory: process.cwd(),
       data: data,
-      versionMessage: "3.0.1"
+      versionMessage: "3.0.2"
     }
   });
 
