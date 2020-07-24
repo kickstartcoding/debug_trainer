@@ -38,5 +38,4 @@ debug_trainer reset <filepath>
 ## Possible future error possibilities to introduce:
 
 - underscore vs hyphen swap
-- open or closing paren/bracket deletion or addition
 - messing with presence of the `this` keyword in JavaScript, `self` in Python, `@`-variables in Ruby, etc.
