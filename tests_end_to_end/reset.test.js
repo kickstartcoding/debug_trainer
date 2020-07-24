@@ -3,12 +3,12 @@ import {
   runResetCommand,
   createTestFileWithContent,
   readTestFile,
+  clearTestFile,
   clearSaveFile
 } from './testHelpers.js'
 
 describe('reset command', () => {
-  // beforeEach(() => {  })
-  afterEach(() => { clearSaveFile() })
+  afterEach(() => { clearSaveFile(); clearTestFile() })
 
   test("resets file to original state", () => {
     createTestFileWithContent('Test')

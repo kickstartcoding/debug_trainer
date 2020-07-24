@@ -42,3 +42,9 @@ export function clearSaveFile() {
     fs.unlinkSync(dataFileName)
   }
 }
+
+export function clearTestFile() {
+  if (fs.existsSync(testFileName)) {
+    fs.unlinkSync(testFileName)
+  }
+}

@@ -3,12 +3,12 @@ import {
   runHintCommand,
   createTestFileWithContent,
   readTestFile,
+  clearTestFile,
   clearSaveFile
 } from './testHelpers.js'
 
 describe("hint command", () => {
-  // beforeEach(() => {  })
-  afterEach(() => { clearSaveFile() })
+  afterEach(() => { clearSaveFile(); clearTestFile() })
 
   test("gives a hint for a broken file", () => {
     createTestFileWithContent('Test')

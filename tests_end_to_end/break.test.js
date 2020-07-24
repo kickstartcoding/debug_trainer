@@ -2,11 +2,12 @@ import {
   runBreakCommand,
   createTestFileWithContent,
   readTestFile,
+  clearTestFile,
   clearSaveFile
 } from './testHelpers.js'
 
 describe("break command", () => {
-  afterEach(() => { clearSaveFile() })
+  afterEach(() => { clearSaveFile(); clearTestFile() })
 
   describe("case swapping", () => {
     test("lowercases a title case word", () => {
@@ -49,7 +50,7 @@ describe("break command", () => {
 
       expect(readTestFile()).toEqual(' function functionName() ')
     })
-    
+
     test("adds 'num' argument to no-argument function declaration", () => {
       createTestFileWithContent(' function functionName() ')
       runBreakCommand()

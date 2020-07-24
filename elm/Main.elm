@@ -27,7 +27,6 @@ programConfig =
             )
         |> Program.add
             (OptionsParser.buildSubCommand "hint" Model.hintInit
-                -- |> OptionsParser.withOptionalPositionalArg (Option.optionalPositionalArg "hint-number")
                 |> OptionsParser.with (Option.optionalKeywordArg "hint-number")
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")

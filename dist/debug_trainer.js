@@ -7995,6 +7995,7 @@ exports.runResetCommand = runResetCommand;
 exports.createTestFileWithContent = createTestFileWithContent;
 exports.readTestFile = readTestFile;
 exports.clearSaveFile = clearSaveFile;
+exports.clearTestFile = clearTestFile;
 exports.dataFileName = exports.testFileName = void 0;
 
 var _fs = _interopRequireDefault(require("fs"));
@@ -8044,6 +8045,12 @@ function readTestFile() {
 function clearSaveFile() {
   if (_fs.default.existsSync(dataFileName)) {
     _fs.default.unlinkSync(dataFileName);
+  }
+}
+
+function clearTestFile() {
+  if (_fs.default.existsSync(testFileName)) {
+    _fs.default.unlinkSync(testFileName);
   }
 }
 },{}],"savedData.js":[function(require,module,exports) {
