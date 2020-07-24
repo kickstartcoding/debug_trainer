@@ -22,4 +22,14 @@ optional =
 
 isValidWhiteSpace : Char -> Bool
 isValidWhiteSpace char =
-    char == ' ' || char == '\n' || char == '\u{000D}' || char == '\t'
+    char
+        == ' '
+        || char
+        == '\n'
+        || char
+        == '\t'
+
+
+
+-- || char
+-- == '\u{000D}'

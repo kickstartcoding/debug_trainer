@@ -38,7 +38,7 @@ export function clearSaveFile(): void {
   }
 }
 
-export function clearTestFile() {
+export function clearTestFile(): void {
   if (fs.existsSync(testFileName)) {
     fs.unlinkSync(testFileName)
   }

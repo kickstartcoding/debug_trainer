@@ -6,18 +6,18 @@ import Breakers.RemoveParenthesis as RemoveParenthesis
 import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
-import Model exposing (Command(..), Model)
+import Model exposing (Command(..), FileSaveStatus, Model)
 import Model.SavedData as SavedData
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)
 import Ports
 import Utils.List
 import Utils.Types.BreakType exposing (BreakType(..))
-import Utils.Types.FilePath exposing (FilePath)
+import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
-run : FilePath -> String -> Model -> ( Model, Cmd Action )
-run filepath fileContent model =
+run : FilePath -> FileSaveStatus -> String -> Model -> ( Model, Cmd Action )
+run filepath fileSaveStatus fileContent model =
     let
         maybeChange =
             case GenericParser.run fileContent of
@@ -60,12 +60,17 @@ run filepath fileContent model =
                         }
                         oldSavedData
             in
-            ( { model | command = Break filepath }
-            , Ports.writeFileWith
-                { path = filepath
-                , contents = newContents
-                , dataToSave = newSavedData
-                }
+            ( { model | command = Break filepath fileSaveStatus }
+            , Cmd.batch
+                [ Ports.writeFile
+                    { path = FilePath.toString filepath
+                    , content = newContents
+                    }
+                , Ports.writeFile
+                    { path = FilePath.toString model.dataFilePath
+                    , content = SavedData.encode newSavedData
+                    }
+                ]
             )
 
         Nothing ->

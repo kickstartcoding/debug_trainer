@@ -6,35 +6,70 @@ import Commands.Explain.Update
 import Commands.Hint.Update
 import Commands.Reset.Update
 import Model exposing (CliOptions, Command(..), Model)
+import Ports
 
 
 update : CliOptions -> Action -> Model -> ( Model, Cmd Action )
-update _ action model =
-    case action of
-        BreakAction filepath subAction ->
+update _ action ({ command } as model) =
+    case ( command, action ) of
+        ( Break filepath fileSaveStatus, BreakAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Break.Update.update filepath subAction model
+                    Commands.Break.Update.update filepath fileSaveStatus subAction model
             in
-            ( newModel, Cmd.map (BreakAction filepath) cmd )
+            ( newModel, Cmd.map BreakAction cmd )
 
-        HintAction filepath subAction ->
+        ( Hint filepath hintNumber, HintAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Hint.Update.update filepath subAction model
+                    Commands.Hint.Update.update filepath hintNumber subAction model
             in
-            ( newModel, Cmd.map (HintAction filepath) cmd )
+            ( newModel, Cmd.map HintAction cmd )
 
-        ExplainAction filepath subAction ->
+        ( Explain filepath, ExplainAction subAction ) ->
             let
                 ( newModel, cmd ) =
                     Commands.Explain.Update.update filepath subAction model
             in
-            ( newModel, Cmd.map (ExplainAction filepath) cmd )
+            ( newModel, Cmd.map ExplainAction cmd )
 
-        ResetAction filepath subAction ->
+        ( Reset filepath fileSaveStatus, ResetAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Reset.Update.update filepath subAction model
+                    Commands.Reset.Update.update filepath fileSaveStatus subAction model
             in
-            ( newModel, Cmd.map (ResetAction filepath) cmd )
+            ( newModel, Cmd.map ResetAction cmd )
+
+        ( _, _ ) ->
+            ( model
+            , Ports.printAndExitFailure
+                "Encountered a bug in the program: mismatched command and action."
+            )
+
+
+
+-- case action of
+--     BreakAction filepath fileSaveStatus subAction ->
+--         let
+--             ( newModel, cmd ) =
+--                 Commands.Break.Update.update filepath  subAction model
+--         in
+--         ( newModel, Cmd.map (BreakAction filepath fileSaveStatus) cmd )
+--     HintAction filepath subAction ->
+--         let
+--             ( newModel, cmd ) =
+--                 Commands.Hint.Update.update filepath subAction model
+--         in
+--         ( newModel, Cmd.map (HintAction filepath) cmd )
+--     ExplainAction filepath subAction ->
+--         let
+--             ( newModel, cmd ) =
+--                 Commands.Explain.Update.update filepath subAction model
+--         in
+--         ( newModel, Cmd.map (ExplainAction filepath) cmd )
+--     ResetAction filepath subAction ->
+--         let
+--             ( newModel, cmd ) =
+--                 Commands.Reset.Update.update filepath subAction model
+--         in
+--         ( newModel, Cmd.map (ResetAction filepath) cmd )

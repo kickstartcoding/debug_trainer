@@ -5,6 +5,7 @@ import printAndExitFailure from './ports/printAndExitFailure'
 import printAndExitSuccess from './ports/printAndExitSuccess'
 import readFile from './ports/readFile'
 import writeFile from './ports/writeFile'
+import exitSuccess from './ports/exitSuccess'
 import * as SavedData from './savedData'
 import { devLog } from './logging'
 
@@ -29,6 +30,7 @@ export function run(): void {
     print,
     printAndExitFailure,
     printAndExitSuccess,
+    exitSuccess,
     readFile,
     writeFile
   ]

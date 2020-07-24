@@ -157,9 +157,9 @@ fullPathString workingDirectory filepath =
         |> FilePath.toString
 
 
-encode : SavedData -> Value
+encode : SavedData -> String
 encode savedData =
-    Codec.encodeToValue codec savedData
+    Codec.encodeToString 0 codec savedData
 
 
 decode : Decoder SavedData

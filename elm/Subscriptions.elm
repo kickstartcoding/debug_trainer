@@ -8,8 +8,8 @@ import Model exposing (Command(..), Model)
 subscriptions : Model -> Sub Action
 subscriptions ({ command } as model) =
     case command of
-        Break filename ->
-            Sub.map (BreakAction filename) (Commands.Break.Subscriptions.subscriptions model)
+        Break _ _ ->
+            Sub.map BreakAction (Commands.Break.Subscriptions.subscriptions model)
 
         Hint _ _ ->
             Sub.none
@@ -17,5 +17,5 @@ subscriptions ({ command } as model) =
         Explain _ ->
             Sub.none
 
-        Reset _ ->
+        Reset _ _ ->
             Sub.none

@@ -66,8 +66,8 @@ init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { co
     in
     ( model
     , case command of
-        Break filepath ->
-            Commands.Break.Cmd.init filepath model
+        Break filepath fileSaveStatus ->
+            Commands.Break.Cmd.init filepath fileSaveStatus model
 
         Hint filepath hintNumber ->
             Commands.Hint.Cmd.init filepath hintNumber model
@@ -75,8 +75,8 @@ init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { co
         Explain filepath ->
             Commands.Explain.Cmd.init filepath model
 
-        Reset filepath ->
-            Commands.Reset.Cmd.init filepath model
+        Reset filepath fileSaveStatus ->
+            Commands.Reset.Cmd.init filepath fileSaveStatus model
     )
 
 

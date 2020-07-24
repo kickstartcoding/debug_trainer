@@ -1,8 +1,10 @@
 module Model exposing
     ( CliOptions
     , Command(..)
+    , FileSaveStatus
     , Flags
     , Model
+    , allSavesComplete
     , breakInit
     , explainInit
     , filePathStringFromCommand
@@ -42,8 +44,20 @@ type Command
     | Reset FilePath FileSaveStatus
 
 
+initFileSaveStatus : FileSaveStatus
+initFileSaveStatus =
+    { targetFileSaved = False, saveDataSaved = False }
+
+
+allSavesComplete : FileSaveStatus -> Bool
+allSavesComplete { targetFileSaved, saveDataSaved } =
+    targetFileSaved && saveDataSaved
+
+
 type alias FileSaveStatus =
-    { fileSaved : Bool, saveDataSaved : Bool }
+    { targetFileSaved : Bool
+    , saveDataSaved : Bool
+    }
 
 
 type alias Flags =
@@ -58,7 +72,7 @@ type alias Flags =
 
 breakInit : String -> Bool -> Bool -> CliOptions
 breakInit filepathString loggingIsOn isInTestMode =
-    { command = Break (FilePath.fromString filepathString)
+    { command = Break (FilePath.fromString filepathString) initFileSaveStatus
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     , isInTestMode = isInTestMode
     }
@@ -92,7 +106,7 @@ explainInit filepathString loggingIsOn isInTestMode =
 
 resetInit : String -> Bool -> Bool -> CliOptions
 resetInit filepathString loggingIsOn isInTestMode =
-    { command = Reset (FilePath.fromString filepathString)
+    { command = Reset (FilePath.fromString filepathString) initFileSaveStatus
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     , isInTestMode = isInTestMode
     }
@@ -101,7 +115,7 @@ resetInit filepathString loggingIsOn isInTestMode =
 filePathStringFromCommand : Command -> String
 filePathStringFromCommand command =
     case command of
-        Break filepath ->
+        Break filepath _ ->
             FilePath.toString filepath
 
         Hint filepath _ ->
@@ -110,5 +124,5 @@ filePathStringFromCommand command =
         Explain filepath ->
             FilePath.toString filepath
 
-        Reset filepath ->
+        Reset filepath _ ->
             FilePath.toString filepath

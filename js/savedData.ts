@@ -14,28 +14,3 @@ export function load(): string | null {
     return null
   }
 }
-
-export function save(saveDataContents) {
-  devLog(`Saving data to ${dataFilePath}...`);
-  createFileIfAbsent(dataFilePath)
-
-  const contents = JSON.stringify(saveDataContents, null, "  ")
-  fs.writeFile(dataFilePath, contents, function (err) {
-    devLog('Saved data contents:', contents)
-
-    if (err) {
-      console.error(err)
-      process.exit(1);
-    }
-    devLog('Data successfully saved!');
-
-    process.exit(0);
-  });
-}
-
-function createFileIfAbsent(filepath) {
-  if (!fs.existsSync(filepath)) {
-    fs.closeSync(fs.openSync(filepath, 'w'))
-  }
-
-}

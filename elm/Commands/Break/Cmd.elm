@@ -1,7 +1,7 @@
 module Commands.Break.Cmd exposing (init)
 
 import Actions exposing (Action)
-import Model exposing (Command(..), Model)
+import Model exposing (Command(..), FileSaveStatus, Model)
 import Model.SavedData exposing (SavedDataError(..))
 import Ports
 import Utils.Cmd as Cmd
@@ -9,8 +9,8 @@ import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
-init : FilePath -> Model -> Cmd Action
-init filepath model =
+init : FilePath -> FileSaveStatus -> Model -> Cmd Action
+init filepath fileSaveStatus model =
     Cmd.fromFileData
         { filepath = filepath
         , model = model

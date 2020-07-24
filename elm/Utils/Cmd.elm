@@ -1,11 +1,20 @@
-module Utils.Cmd exposing (fromFileData)
+module Utils.Cmd exposing (exitIfAllSavesAreComplete, fromFileData)
 
 import Actions exposing (Action)
-import Model exposing (Command(..), Model)
+import Model exposing (Command(..), FileSaveStatus, Model)
 import Model.SavedData as SavedData exposing (FileData, SavedData, SavedDataError(..))
 import Ports
 import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath exposing (FilePath)
+
+
+exitIfAllSavesAreComplete : FileSaveStatus -> Cmd action
+exitIfAllSavesAreComplete fileSaveStatus =
+    if Model.allSavesComplete fileSaveStatus then
+        Ports.exitSuccess ()
+
+    else
+        Cmd.none
 
 
 fromFileData :
