@@ -4,46 +4,19 @@ import Actions exposing (Action)
 import Model exposing (Command(..), Model)
 import Model.SavedData as SavedData exposing (FileData, SavedDataError(..))
 import Ports
+import Utils.Cmd
 import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
-import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.FilePath exposing (FilePath)
 
 
 init : FilePath -> Int -> Model -> Cmd Action
-init filepath hintNumber { savedDataResult, dataFilePath, workingDirectory } =
-    case savedDataResult of
-        Ok data ->
-            case
-                SavedData.getFileData
-                    { filepath = filepath
-                    , workingDirectory = workingDirectory
-                    }
-                    data
-            of
-                Just fileData ->
-                    printHint fileData hintNumber
-
-                Nothing ->
-                    Ports.printAndExitSuccess
-                        (noRecordOfChangeMessage filepath)
-
-        Err FileMissing ->
-            Ports.printAndExitSuccess
-                (noRecordOfChangeMessage filepath)
-
-        Err error ->
-            error
-                |> SavedData.errorMessage dataFilePath
-                |> Ports.printAndExitFailure
-
-
-noRecordOfChangeMessage : FilePath -> String
-noRecordOfChangeMessage filepath =
-    "\n\n"
-        ++ "debug_trainer has no record of "
-        ++ FilePath.toString filepath
-        ++ " being changed. Either it has never been changed or the changes that were made have been reverted"
-        ++ "\n\n"
+init filepath hintNumber model =
+    Utils.Cmd.fromFileData filepath
+        model
+        (\_ fileData ->
+            printHint fileData hintNumber
+        )
 
 
 printHint : FileData -> Int -> Cmd Action

@@ -5,6 +5,7 @@ import Cli.Option as Option
 import Cli.OptionsParser as OptionsParser
 import Cli.Program as Program
 import Commands.Break.Cmd
+import Commands.Explain.Cmd
 import Commands.Hint.Cmd
 import Commands.Reset.Cmd
 import Model as Model exposing (CliOptions, Command(..), Flags, Model)
@@ -34,6 +35,13 @@ programConfig =
                 |> OptionsParser.withDoc "Display a hint about the error that was introduced into the specified file."
             )
         |> Program.add
+            (OptionsParser.buildSubCommand "explain" Model.explainInit
+                |> OptionsParser.with (Option.requiredPositionalArg "filepath")
+                |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
+                |> OptionsParser.withDoc "Explain the specific change that was made in the specified file."
+            )
+        |> Program.add
             (OptionsParser.buildSubCommand "reset" Model.resetInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
@@ -61,8 +69,11 @@ init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { co
         Break filepath ->
             Commands.Break.Cmd.init filepath model
 
-        Hint filepath hintNumber->
+        Hint filepath hintNumber ->
             Commands.Hint.Cmd.init filepath hintNumber model
+
+        Explain filepath ->
+            Commands.Explain.Cmd.init filepath model
 
         Reset filepath ->
             Commands.Reset.Cmd.init filepath model

@@ -14,5 +14,8 @@ subscriptions ({ command } as model) =
         Hint _ _ ->
             Sub.none
 
+        Explain _ ->
+            Sub.none
+
         Reset _ ->
             Sub.none

@@ -4,6 +4,7 @@ module Model exposing
     , Flags
     , Model
     , breakInit
+    , explainInit
     , filePathStringFromCommand
     , hintInit
     , resetInit
@@ -37,6 +38,7 @@ type alias Model =
 type Command
     = Break FilePath
     | Hint FilePath Int
+    | Explain FilePath
     | Reset FilePath
 
 
@@ -76,6 +78,14 @@ hintInit maybeHintNumberString filepathString loggingIsOn isInTestMode =
     }
 
 
+explainInit : String -> Bool -> Bool -> CliOptions
+explainInit filepathString loggingIsOn isInTestMode =
+    { command = Explain (FilePath.fromString filepathString)
+    , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    , isInTestMode = isInTestMode
+    }
+
+
 resetInit : String -> Bool -> Bool -> CliOptions
 resetInit filepathString loggingIsOn isInTestMode =
     { command = Reset (FilePath.fromString filepathString)
@@ -91,6 +101,9 @@ filePathStringFromCommand command =
             FilePath.toString filepath
 
         Hint filepath _ ->
+            FilePath.toString filepath
+
+        Explain filepath ->
             FilePath.toString filepath
 
         Reset filepath ->

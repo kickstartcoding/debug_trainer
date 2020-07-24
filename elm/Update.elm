@@ -2,6 +2,7 @@ module Update exposing (update)
 
 import Actions exposing (Action(..))
 import Commands.Break.Update
+import Commands.Explain.Update
 import Commands.Hint.Update
 import Commands.Reset.Update
 import Model exposing (CliOptions, Command(..), Model)
@@ -23,6 +24,13 @@ update _ action model =
                     Commands.Hint.Update.update filepath subAction model
             in
             ( newModel, Cmd.map (HintAction filepath) cmd )
+
+        ExplainAction filepath subAction ->
+            let
+                ( newModel, cmd ) =
+                    Commands.Explain.Update.update filepath subAction model
+            in
+            ( newModel, Cmd.map (ExplainAction filepath) cmd )
 
         ResetAction filepath subAction ->
             let
