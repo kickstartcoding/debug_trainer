@@ -1,6 +1,6 @@
 {
   "name": "debug_trainer",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
