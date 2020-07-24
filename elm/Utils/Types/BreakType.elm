@@ -2,10 +2,7 @@ module Utils.Types.BreakType exposing
     ( BreakType(..)
     , codec
     , decode
-    ,  encode
-       -- , fromString
-       -- , toString
-
+    , encode
     )
 
 import Codec exposing (Codec, Decoder, Value)
@@ -14,6 +11,7 @@ import Codec exposing (Codec, Decoder, Value)
 type BreakType
     = CaseSwap
     | RemoveReturn
+    | RemoveParenthesis
     | ChangeFunctionArgs
 
 
@@ -30,7 +28,7 @@ decode =
 codec : Codec BreakType
 codec =
     Codec.custom
-        (\caseSwap removeReturn changeFunctionArgs value ->
+        (\caseSwap removeReturn removeParenthesis changeFunctionArgs value ->
             case value of
                 CaseSwap ->
                     caseSwap
@@ -38,10 +36,14 @@ codec =
                 RemoveReturn ->
                     removeReturn
 
+                RemoveParenthesis ->
+                    removeParenthesis
+
                 ChangeFunctionArgs ->
                     changeFunctionArgs
         )
         |> Codec.variant0 "CaseSwap" CaseSwap
         |> Codec.variant0 "RemoveReturn" RemoveReturn
+        |> Codec.variant0 "RemoveParenthesis" RemoveParenthesis
         |> Codec.variant0 "ChangeFunctionArgs" ChangeFunctionArgs
         |> Codec.buildCustom

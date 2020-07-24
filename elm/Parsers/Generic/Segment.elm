@@ -3,17 +3,13 @@ module Parsers.Generic.Segment exposing
     , Segment
     , SegmentType(..)
     , functionDeclarationDataToString
-    , isFunctionDeclaration
-    , isOther
-    , isReturnStatement
-    , isWhitespace
-    , isWord
     )
 
 
 type SegmentType
     = Word
     | ReturnStatement
+    | ParenthesisOrBracket
     | FunctionDeclaration FunctionDeclarationData
     | Whitespace
     | Other
@@ -37,53 +33,3 @@ type alias Segment =
     , content : String
     , segmentType : SegmentType
     }
-
-
-isWord : Segment -> Bool
-isWord segment =
-    case segment.segmentType of
-        Word ->
-            True
-
-        _ ->
-            False
-
-
-isReturnStatement : Segment -> Bool
-isReturnStatement segment =
-    case segment.segmentType of
-        ReturnStatement ->
-            True
-
-        _ ->
-            False
-
-
-isFunctionDeclaration : Segment -> Bool
-isFunctionDeclaration segment =
-    case segment.segmentType of
-        FunctionDeclaration _ ->
-            True
-
-        _ ->
-            False
-
-
-isWhitespace : Segment -> Bool
-isWhitespace segment =
-    case segment.segmentType of
-        Whitespace ->
-            True
-
-        _ ->
-            False
-
-
-isOther : Segment -> Bool
-isOther segment =
-    case segment.segmentType of
-        Other ->
-            True
-
-        _ ->
-            False

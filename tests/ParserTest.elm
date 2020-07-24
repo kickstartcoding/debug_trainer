@@ -4,7 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Parser exposing (DeadEnd)
 import Parsers.Generic.Parser as GenericParser
-import Parsers.Generic.Segment exposing (FunctionDeclarationData, Segment, SegmentType(..), isReturnStatement)
+import Parsers.Generic.Segment exposing (FunctionDeclarationData, Segment, SegmentType(..))
 import Test exposing (..)
 import TestHelp
 
@@ -45,6 +45,20 @@ suite =
                     " return"
                     [ { content = " ", offset = 0, segmentType = Whitespace }
                     , { content = "return", offset = 1, segmentType = Word }
+                    ]
+        , test "detects parentheses at the start of a line" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "\n ) abc"
+                    [ { content = "\n ) ", offset = 0, segmentType = ParenthesisOrBracket }
+                    , { content = "abc", offset = 4, segmentType = Word }
+                    ]
+        , test "detects parentheses at the end of a line" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "abc ) \n"
+                    [ { content = "abc", offset = 0, segmentType = Word }
+                    , { content = " ) \n", offset = 3, segmentType = ParenthesisOrBracket }
                     ]
         , test "detects functions" <|
             \_ ->

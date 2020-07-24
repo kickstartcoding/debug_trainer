@@ -43,6 +43,24 @@ describe("break command", () => {
     })
   })
 
+  describe("parenthesis/bracket removal", () => {
+    for (const bracketThingy of ["(", ")", "{", "}", "[", "]"]) {
+      test(`removes a ${bracketThingy} from the beginning of a line`, () => {
+        createTestFileWithContent(`\n${bracketThingy}`)
+        runBreakCommand()
+
+        expect(readTestFile()).toEqual("\n")
+      })
+
+      test(`removes a ${bracketThingy} from the end of a line`, () => {
+        createTestFileWithContent(`${bracketThingy}\n`)
+        runBreakCommand()
+
+        expect(readTestFile()).toEqual("\n")
+      })
+    }
+  })
+
   describe("function args fuckery", () => {
     test("removes arg from single argument function declaration", () => {
       createTestFileWithContent(' function functionName(arg1) ')

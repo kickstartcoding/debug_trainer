@@ -32,6 +32,9 @@ segment =
                                     content
                                     (FunctionDeclaration data)
                             )
+                    , parenthesisOrBracketAtStartOrEndOfLine
+                        |> getChompedString
+                        |> Parser.map (\content -> Segment offset content ParenthesisOrBracket)
                     , word
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content Word)
@@ -54,6 +57,37 @@ returnStatement =
                     |. token "return"
            )
         |. Whitespace.one
+
+
+parenthesisOrBracketAtStartOrEndOfLine : Parser ()
+parenthesisOrBracketAtStartOrEndOfLine =
+    succeed ()
+        |. oneOf
+            [ backtrackable <|
+                succeed ()
+                    |. token "\n"
+                    |. Repeat.zeroOrMore (token " ")
+                    |. parenthesisOrBracket
+                    |. Repeat.zeroOrMore (token " ")
+            , backtrackable <|
+                succeed ()
+                    |. Repeat.zeroOrMore (token " ")
+                    |. parenthesisOrBracket
+                    |. Repeat.zeroOrMore (token " ")
+                    |. token "\n"
+            ]
+
+
+parenthesisOrBracket : Parser ()
+parenthesisOrBracket =
+    oneOf
+        [ token "{"
+        , token "}"
+        , token "("
+        , token ")"
+        , token "["
+        , token "]"
+        ]
 
 
 functionDeclarationWithContent : Parser ( String, FunctionDeclarationData )

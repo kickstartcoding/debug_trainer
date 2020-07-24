@@ -2,17 +2,18 @@ module Commands.Break.Update exposing (update)
 
 import Breakers.CaseSwap as CaseSwap
 import Breakers.ChangeFunctionArgs as ChangeFunctionArgs
+import Breakers.RemoveParenthesis as RemoveParenthesis
 import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
-import Model exposing (CliOptions, Command(..), Model)
+import Model exposing (Command(..), Model)
 import Model.SavedData as SavedData
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)
 import Ports
 import Utils.List
 import Utils.Types.BreakType exposing (BreakType(..))
-import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.FilePath exposing (FilePath)
 
 
 update : FilePath -> Action -> Model -> ( Model, Cmd Action )
@@ -33,6 +34,9 @@ update filepath action model =
 
                                 Just RemoveReturn ->
                                     RemoveReturn.run model.randomNumbers.segmentToBreakInt segments
+
+                                Just RemoveParenthesis ->
+                                    RemoveParenthesis.run model.randomNumbers.segmentToBreakInt segments
 
                                 Just ChangeFunctionArgs ->
                                     ChangeFunctionArgs.run model.randomNumbers.segmentToBreakInt segments
@@ -85,17 +89,26 @@ chooseBreakType segments { breakTypeInt } =
                 |> Breakers.Utils.candidates RemoveReturn.validCandidateData
                 |> List.length
 
+        parenthesisCandidateCount =
+            segments
+                |> Breakers.Utils.candidates RemoveParenthesis.validCandidateData
+                |> List.length
+
         functionDeclarationCandidateCount =
             segments
                 |> Breakers.Utils.candidates ChangeFunctionArgs.validCandidateData
                 |> List.length
 
         totalCandidateCount =
-            caseSwapCandidateCount + returnStatementCandidateCount + functionDeclarationCandidateCount
+            caseSwapCandidateCount
+                + returnStatementCandidateCount
+                + parenthesisCandidateCount
+                + functionDeclarationCandidateCount
 
         viableBreakTypePossibilities =
             [ ( CaseSwap, caseSwapCandidateCount )
             , ( RemoveReturn, returnStatementCandidateCount )
+            , ( RemoveParenthesis, parenthesisCandidateCount )
             , ( ChangeFunctionArgs, functionDeclarationCandidateCount )
             ]
                 |> List.filter (\( _, count ) -> count > 0)

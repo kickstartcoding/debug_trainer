@@ -59,6 +59,14 @@ printFirstHint { change } =
                     ++ "\n\n"
                 )
 
+        RemoveParenthesis ->
+            Ports.printAndExitSuccess
+                ("\n\n"
+                    ++ "HINT: Somewhere in this file, debug_trainer removed "
+                    ++ "an opening or closing parenthesis or bracket."
+                    ++ "\n\n"
+                )
+
         ChangeFunctionArgs ->
             Ports.printAndExitSuccess
                 ("\n\n"
