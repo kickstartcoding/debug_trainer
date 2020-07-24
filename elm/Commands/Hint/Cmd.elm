@@ -56,7 +56,7 @@ printHint fileData hintNumber =
             printSecondHint fileData
 
         otherHintNumber ->
-            Ports.printAndExitFailure
+            Ports.printAndExitSuccess
                 ("\n\n"
                     ++ "You asked for hint number "
                     ++ String.fromInt otherHintNumber
