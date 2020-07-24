@@ -31,14 +31,14 @@ programConfig =
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.with (Option.flag "test")
-                |> OptionsParser.withDoc "Display a hint about the error that was introduced into the specified file."
+                |> OptionsParser.withDoc "Display a hint that explains what type of error was introduced into the specified file."
             )
         |> Program.add
             (OptionsParser.buildSubCommand "line-hint" (Model.hintInit LineNumber)
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.with (Option.flag "test")
-                |> OptionsParser.withDoc "Display a hint about the error that was introduced into the specified file."
+                |> OptionsParser.withDoc "Display a hint that tells you the line number where the error was introduced into the specified file."
             )
         -- |> Program.add
         --     (OptionsParser.buildSubCommand "explain" Model.explainInit
