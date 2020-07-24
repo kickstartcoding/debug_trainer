@@ -4,7 +4,7 @@ import {
   readTestFile,
   clearTestFile,
   clearSaveFile
-} from './testHelpers.js'
+} from './testHelpers'
 
 describe("break command", () => {
   afterEach(() => { clearSaveFile(); clearTestFile() })

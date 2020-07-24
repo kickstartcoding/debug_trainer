@@ -1,15 +1,16 @@
+// @ts-ignore
 import { Elm } from '../elm/Main.elm'
-import print from './ports/print.js'
-import printAndExitFailure from './ports/printAndExitFailure.js'
-import printAndExitSuccess from './ports/printAndExitSuccess.js'
-import readFile from './ports/readFile.js'
-import writeFile from './ports/writeFile.js'
-import * as SavedData from './savedData.js'
-import { devLog } from './logging.js'
+import print from './ports/print'
+import printAndExitFailure from './ports/printAndExitFailure'
+import printAndExitSuccess from './ports/printAndExitSuccess'
+import readFile from './ports/readFile'
+import writeFile from './ports/writeFile'
+import * as SavedData from './savedData'
+import { devLog } from './logging'
 
-export function run() {
-  const data = SavedData.load()
-  devLog('process.argv:', process.argv)
+export function run(): void {
+  const data: string = SavedData.load()
+  devLog('process.argv:', ...process.argv)
   devLog('data:', data)
 
   const program = Elm.Main.init({
@@ -24,7 +25,7 @@ export function run() {
     }
   })
 
-  const portFunctions = [
+  const portFunctions: ((arg0: any) => any)[] = [
     print,
     printAndExitFailure,
     printAndExitSuccess,
@@ -37,6 +38,6 @@ export function run() {
   })
 }
 
-function getRandomInt(max) {
+function getRandomInt(max: number): number {
   return Math.floor(Math.random() * Math.floor(max))
 }

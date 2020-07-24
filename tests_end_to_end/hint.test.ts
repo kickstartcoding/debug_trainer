@@ -5,7 +5,7 @@ import {
   readTestFile,
   clearTestFile,
   clearSaveFile
-} from './testHelpers.js'
+} from './testHelpers'
 
 describe("hint command", () => {
   afterEach(() => { clearSaveFile(); clearTestFile() })
