@@ -2,4 +2,5 @@ module Commands.Break.Actions exposing (Action(..))
 
 
 type Action
-    = ReceiveFileContents String
+    = SuccessfulFileRead { path : String, content : String }
+    | SuccessfulFileWrite { path : String, content : String }

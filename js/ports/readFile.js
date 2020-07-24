@@ -10,7 +10,7 @@ export default function (program) {
         process.exit(1);
       }
 
-      program.ports.receiveFileContents.send(contents)
+      program.ports.successfulFileRead.send({ path: filepath, contents: contents })
     });
 
   });

@@ -3,7 +3,8 @@ port module Ports exposing
     , printAndExitFailure
     , printAndExitSuccess
     , readFile
-    , receiveFileContents
+    , successfulFileRead
+    , successfulFileWrite
     , writeFileWith
     )
 
@@ -31,7 +32,10 @@ writeFileWith { path, contents, dataToSave } =
 port writeFile : Json.Encode.Value -> Cmd action
 
 
-port receiveFileContents : (String -> action) -> Sub action
+port successfulFileWrite : ({ path : String, content : String } -> action) -> Sub action
+
+
+port successfulFileRead : ({ path : String, content : String } -> action) -> Sub action
 
 
 port printAndExitFailure : String -> Cmd action

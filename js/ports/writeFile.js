@@ -12,10 +12,8 @@ export default function (program) {
       }
 
       devLog('New file contents written!');
-      SavedData.save(fileData.dataToSave)
-
-      // console.log('Good luck debugging!');
-      // process.exit(0);
+      // SavedData.save(fileData.dataToSave)
+      program.ports.successfulFileWrite.send(fileData)
     });
   });
 }

@@ -36,10 +36,14 @@ type alias Model =
 
 
 type Command
-    = Break FilePath
+    = Break FilePath FileSaveStatus
     | Hint FilePath Int
     | Explain FilePath
-    | Reset FilePath
+    | Reset FilePath FileSaveStatus
+
+
+type alias FileSaveStatus =
+    { fileSaved : Bool, saveDataSaved : Bool }
 
 
 type alias Flags =

@@ -17,12 +17,11 @@ export function load(program) {
 
 export function save(saveDataContents) {
   devLog(`Saving data to ${dataFilePath}...`);
-  if (!fs.existsSync(dataFilePath)) {
-    fs.closeSync(fs.openSync(dataFilePath, 'w'))
-  }
+  createFileIfAbsent(dataFilePath)
+
   const contents = JSON.stringify(saveDataContents, null, "  ")
   fs.writeFile(dataFilePath, contents, function (err) {
-    // console.log('contents:', contents)
+    devLog('Saved data contents:', contents)
 
     if (err) {
       console.error(err)
@@ -32,4 +31,11 @@ export function save(saveDataContents) {
 
     process.exit(0);
   });
+}
+
+function createFileIfAbsent(filepath) {
+  if (!fs.existsSync(filepath)) {
+    fs.closeSync(fs.openSync(filepath, 'w'))
+  }
+
 }
