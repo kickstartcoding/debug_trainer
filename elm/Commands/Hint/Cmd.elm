@@ -2,21 +2,25 @@ module Commands.Hint.Cmd exposing (init)
 
 import Actions exposing (Action)
 import Model exposing (Command(..), Model)
-import Model.SavedData as SavedData exposing (FileData, SavedDataError(..))
+import Model.SavedData exposing (FileData, SavedDataError(..))
 import Ports
-import Utils.Cmd
+import Utils.Cmd as Cmd
 import Utils.FileContent as FileContent
+import Utils.Messages as Messages
 import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath exposing (FilePath)
 
 
 init : FilePath -> Int -> Model -> Cmd Action
 init filepath hintNumber model =
-    Utils.Cmd.fromFileData filepath
-        model
-        (\_ fileData ->
-            printHint fileData hintNumber
-        )
+    Cmd.fromFileData
+        { filepath = filepath
+        , model = model
+        , dataPresentCmdFunc = \_ fileData -> printHint fileData hintNumber
+        , dataAbsentCmd =
+            Ports.printAndExitSuccess
+                (Messages.noRecordOfChangeMessage filepath)
+        }
 
 
 printHint : FileData -> Int -> Cmd Action
