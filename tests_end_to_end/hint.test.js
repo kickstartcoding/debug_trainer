@@ -23,7 +23,7 @@ describe("hint command", () => {
     runBreakCommand()
     const output = runHintCommand(2)
 
-    expect(output).toEqual(expect.stringContaining('HINT: The change that was introduced to this file was on line 1 of the original file.'))
+    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 1 of the original file.'))
   })
 
   test("does not give a hint for an UNBROKEN file", () => {

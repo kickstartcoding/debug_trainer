@@ -3815,6 +3815,52 @@ var $author$project$Commands$Break$Cmd$init = F2(
 var $author$project$Commands$Hint$Cmd$noRecordOfChangeMessage = function (filepath) {
 	return '\n\n' + ('debug_trainer has no record of ' + ($author$project$Utils$Types$FilePath$toString(filepath) + (' being changed. Either it has never been changed or the changes that were made have been reverted' + '\n\n')));
 };
+var $author$project$Commands$Hint$Cmd$printFirstHint = function (_v0) {
+	var change = _v0.change;
+	var _v1 = change.breakType;
+	switch (_v1.$) {
+		case 'CaseSwap':
+			return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer changed a word from ' + ('starting with a capital letter to starting with ' + ('a lowercase letter or vice versa.' + '\n\n'))));
+		case 'RemoveReturn':
+			return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer removed ' + ('a `return` keyword from a function.' + '\n\n')));
+		default:
+			return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer changed ' + ('the arguments to a function.' + '\n\n')));
+	}
+};
+var $elm$core$String$indexes = _String_indexes;
+var $elm$core$String$left = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3($elm$core$String$slice, 0, n, string);
+	});
+var $author$project$Utils$FileContent$rowFromOffset = F2(
+	function (offset, source) {
+		var newlinesCount = $elm$core$List$length(
+			A2(
+				$elm$core$String$indexes,
+				'\n',
+				A2($elm$core$String$left, offset, source)));
+		return newlinesCount + 1;
+	});
+var $author$project$Commands$Hint$Cmd$printSecondHint = function (_v0) {
+	var change = _v0.change;
+	var originalContent = _v0.originalContent;
+	var lineOfChange = A2($author$project$Utils$FileContent$rowFromOffset, change.replacementData.originalContent.start, originalContent);
+	return $author$project$Ports$printAndExitSuccess(
+		'\n\n' + ('HINT: The line where the change was made was line ' + ($elm$core$String$fromInt(lineOfChange) + (' of the original file.' + '\n\n'))));
+};
+var $author$project$Commands$Hint$Cmd$printHint = F2(
+	function (fileData, hintNumber) {
+		switch (hintNumber) {
+			case 1:
+				return $author$project$Commands$Hint$Cmd$printFirstHint(fileData);
+			case 2:
+				return $author$project$Commands$Hint$Cmd$printSecondHint(fileData);
+			default:
+				var otherHintNumber = hintNumber;
+				return $author$project$Ports$printAndExitFailure(
+					'\n\n' + ('You asked for hint number ' + ($elm$core$String$fromInt(otherHintNumber) + (', but you have to choose either hint ' + ('1 or 2.' + '\n\n')))));
+		}
+	});
 var $author$project$Commands$Hint$Cmd$init = F3(
 	function (filepath, hintNumber, _v0) {
 		var savedDataResult = _v0.savedDataResult;
@@ -3823,27 +3869,19 @@ var $author$project$Commands$Hint$Cmd$init = F3(
 		if (savedDataResult.$ === 'Ok') {
 			var data = savedDataResult.a;
 			var _v2 = A2(
-				$author$project$Model$SavedData$getChange,
+				$author$project$Model$SavedData$getFileData,
 				{filepath: filepath, workingDirectory: workingDirectory},
 				data);
 			if (_v2.$ === 'Just') {
-				var change = _v2.a;
-				var _v3 = change.breakType;
-				switch (_v3.$) {
-					case 'CaseSwap':
-						return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer changed a word from ' + ('starting with a capital letter to starting with ' + ('a lowercase letter or vice versa.' + '\n\n'))));
-					case 'RemoveReturn':
-						return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer removed ' + ('a `return` keyword from a function.' + '\n\n')));
-					default:
-						return $author$project$Ports$printAndExitSuccess('\n\n' + ('HINT: Somewhere in this file, debug_trainer changed ' + ('the arguments to a function.' + '\n\n')));
-				}
+				var fileData = _v2.a;
+				return A2($author$project$Commands$Hint$Cmd$printHint, fileData, hintNumber);
 			} else {
 				return $author$project$Ports$printAndExitSuccess(
 					$author$project$Commands$Hint$Cmd$noRecordOfChangeMessage(filepath));
 			}
 		} else {
 			if (savedDataResult.a.$ === 'FileMissing') {
-				var _v4 = savedDataResult.a;
+				var _v3 = savedDataResult.a;
 				return $author$project$Ports$printAndExitSuccess(
 					$author$project$Commands$Hint$Cmd$noRecordOfChangeMessage(filepath));
 			} else {
@@ -5109,7 +5147,6 @@ var $dillonkearns$elm_cli_options_parser$Fuzzy$ConfigModel = F4(
 		return {addPenalty: addPenalty, insertPenalty: insertPenalty, movePenalty: movePenalty, removePenalty: removePenalty};
 	});
 var $dillonkearns$elm_cli_options_parser$Fuzzy$defaultConfig = A4($dillonkearns$elm_cli_options_parser$Fuzzy$ConfigModel, 10, 1000, 10000, 1);
-var $elm$core$String$indexes = _String_indexes;
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;

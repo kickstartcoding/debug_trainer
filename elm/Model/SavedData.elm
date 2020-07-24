@@ -1,5 +1,6 @@
 module Model.SavedData exposing
     ( Change
+    , FileData
     , SavedData
     , SavedDataError(..)
     , decode
