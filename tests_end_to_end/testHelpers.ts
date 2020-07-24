@@ -1,14 +1,14 @@
 import fs from 'fs'
 import { execSync } from 'child_process'
 
-export const testFileName = "testfile.txt"
-export const dataFileName = "debug_trainer_test_save_file.json"
+export const testFileName: string = "testfile.txt"
+export const dataFileName: string = "debug_trainer_test_save_file.json"
 
-export function runBreakCommand() {
+export function runBreakCommand(): string {
   return runCommand(`break ${testFileName}`)
 }
 
-export function runHintCommand(hintNumber) {
+export function runHintCommand(hintNumber: number): string {
   if (hintNumber) {
     return runCommand(`hint --hint-number ${hintNumber} ${testFileName}`)
   } else {
@@ -16,28 +16,23 @@ export function runHintCommand(hintNumber) {
   }
 }
 
-export function runResetCommand() {
+export function runResetCommand(): string {
   return runCommand(`reset ${testFileName}`)
 }
 
-function runCommand(command) {
+function runCommand(command: string): string {
   return execSync(`node ./bin/debug_trainer ${command} --test`).toString()
 }
 
-export function createTestFileWithContent(content) {
-  fs.writeFileSync(testFileName, content, function (err) {
-    if (err) {
-      console.error(err)
-      process.exit(1)
-    }
-  })
+export function createTestFileWithContent(content: string): void {
+  fs.writeFileSync(testFileName, content)
 }
 
-export function readTestFile() {
+export function readTestFile(): string {
   return fs.readFileSync(testFileName, 'utf8')
 }
 
-export function clearSaveFile() {
+export function clearSaveFile(): void {
   if (fs.existsSync(dataFileName)) {
     fs.unlinkSync(dataFileName)
   }

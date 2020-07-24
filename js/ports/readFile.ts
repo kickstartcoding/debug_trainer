@@ -1,17 +1,16 @@
 import fs from 'fs'
-const { devLog } = require('../logging.js')
+const { devLog } = require('../logging')
 
-export default function (program) {
+export default function (program): void {
   program.ports.readFile.subscribe(filepath => {
-    devLog(`Reading contents of ${filepath}...`);
+    devLog(`Reading contents of ${filepath}...`)
     fs.readFile(filepath, 'utf8', function (err, contents) {
       if (err) {
         console.error(err)
-        process.exit(1);
+        process.exit(1)
       }
 
       program.ports.receiveFileContents.send(contents)
-    });
-
-  });
+    })
+  })
 }

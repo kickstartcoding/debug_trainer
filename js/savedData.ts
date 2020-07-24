@@ -1,12 +1,12 @@
 import fs from 'fs'
 import os from 'os'
-import { devLog } from './logging.js'
-import * as TestHelpers from '../tests_end_to_end/testHelpers.js'
+import { devLog } from './logging'
+import * as TestHelpers from '../tests_end_to_end/testHelpers'
 
-export const dataFilePath = process.argv.includes('--test') ?
+export const dataFilePath: string = process.argv.includes('--test') ?
   TestHelpers.dataFileName : `${os.homedir()}/.debug_trainer.json`
 
-export function load(program) {
+export function load(): string | null {
   devLog(`Loading data from ${dataFilePath}...`);
   if (fs.existsSync(dataFilePath)) {
     return fs.readFileSync(dataFilePath, 'utf8');
