@@ -3,6 +3,7 @@ module Model exposing
     , Command(..)
     , FileSaveStatus
     , Flags
+    , HintType(..)
     , Model
     , allSavesComplete
     , breakInit
@@ -39,9 +40,14 @@ type alias Model =
 
 type Command
     = Break FilePath FileSaveStatus
-    | Hint FilePath Int
+    | Hint FilePath HintType
     | Explain FilePath
     | Reset FilePath FileSaveStatus
+
+
+type HintType
+    = ErrorDescription
+    | LineNumber
 
 
 initFileSaveStatus : FileSaveStatus
@@ -78,19 +84,9 @@ breakInit filepathString loggingIsOn isInTestMode =
     }
 
 
-hintInit : Maybe String -> String -> Bool -> Bool -> CliOptions
-hintInit maybeHintNumberString filepathString loggingIsOn isInTestMode =
-    let
-        hintNumber =
-            case maybeHintNumberString of
-                Just hintNumberString ->
-                    String.toInt hintNumberString
-                        |> Maybe.withDefault 1
-
-                Nothing ->
-                    1
-    in
-    { command = Hint (FilePath.fromString filepathString) hintNumber
+hintInit : HintType -> String -> Bool -> Bool -> CliOptions
+hintInit hintType filepathString loggingIsOn isInTestMode =
+    { command = Hint (FilePath.fromString filepathString) hintType
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     , isInTestMode = isInTestMode
     }

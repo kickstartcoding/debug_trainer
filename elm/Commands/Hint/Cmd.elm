@@ -1,7 +1,8 @@
 module Commands.Hint.Cmd exposing (init)
 
 import Actions exposing (Action)
-import Model exposing (Command(..), Model)
+import Http exposing (Error)
+import Model exposing (Command(..), HintType(..), Model)
 import Model.SavedData exposing (FileData, SavedDataError(..))
 import Ports
 import Utils.Cmd as Cmd
@@ -11,40 +12,30 @@ import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath exposing (FilePath)
 
 
-init : FilePath -> Int -> Model -> Cmd Action
-init filepath hintNumber model =
+init : FilePath -> HintType -> Model -> Cmd Action
+init filepath hintType model =
     Cmd.fromFileData
         { filepath = filepath
         , model = model
-        , dataPresentCmdFunc = \_ fileData -> printHint fileData hintNumber
+        , dataPresentCmdFunc = \_ fileData -> printHint fileData hintType
         , dataAbsentCmd =
             Ports.printAndExitSuccess
                 (Messages.noRecordOfChangeMessage filepath)
         }
 
 
-printHint : FileData -> Int -> Cmd Action
-printHint fileData hintNumber =
-    case hintNumber of
-        1 ->
-            printFirstHint fileData
+printHint : FileData -> HintType -> Cmd Action
+printHint fileData hintType =
+    case hintType of
+        ErrorDescription ->
+            printErrorDescriptionHint fileData
 
-        2 ->
-            printSecondHint fileData
-
-        otherHintNumber ->
-            Ports.printAndExitSuccess
-                ("\n\n"
-                    ++ "You asked for hint number "
-                    ++ String.fromInt otherHintNumber
-                    ++ ", but you have to choose either hint "
-                    ++ "1 or 2."
-                    ++ "\n\n"
-                )
+        LineNumber ->
+            printLineNumberHint fileData
 
 
-printFirstHint : FileData -> Cmd Action
-printFirstHint { change } =
+printErrorDescriptionHint : FileData -> Cmd Action
+printErrorDescriptionHint { change } =
     case change.breakType of
         CaseSwap ->
             Ports.printAndExitSuccess
@@ -80,8 +71,8 @@ printFirstHint { change } =
                 )
 
 
-printSecondHint : FileData -> Cmd Action
-printSecondHint { change, originalContent } =
+printLineNumberHint : FileData -> Cmd Action
+printLineNumberHint { change, originalContent } =
     let
         lineOfChange =
             FileContent.rowFromOffset

@@ -3829,7 +3829,7 @@ var $author$project$Commands$Explain$Cmd$init = F2(
 				model: model
 			});
 	});
-var $author$project$Commands$Hint$Cmd$printFirstHint = function (_v0) {
+var $author$project$Commands$Hint$Cmd$printErrorDescriptionHint = function (_v0) {
 	var change = _v0.change;
 	var _v1 = change.breakType;
 	switch (_v1.$) {
@@ -3857,7 +3857,7 @@ var $author$project$Utils$FileContent$rowFromOffset = F2(
 				A2($elm$core$String$left, offset, source)));
 		return newlinesCount + 1;
 	});
-var $author$project$Commands$Hint$Cmd$printSecondHint = function (_v0) {
+var $author$project$Commands$Hint$Cmd$printLineNumberHint = function (_v0) {
 	var change = _v0.change;
 	var originalContent = _v0.originalContent;
 	var lineOfChange = A2($author$project$Utils$FileContent$rowFromOffset, change.replacementData.originalContent.start, originalContent);
@@ -3865,27 +3865,22 @@ var $author$project$Commands$Hint$Cmd$printSecondHint = function (_v0) {
 		'\n\n' + ('HINT: The line where the change was made was line ' + ($elm$core$String$fromInt(lineOfChange) + (' of the original file.' + '\n\n'))));
 };
 var $author$project$Commands$Hint$Cmd$printHint = F2(
-	function (fileData, hintNumber) {
-		switch (hintNumber) {
-			case 1:
-				return $author$project$Commands$Hint$Cmd$printFirstHint(fileData);
-			case 2:
-				return $author$project$Commands$Hint$Cmd$printSecondHint(fileData);
-			default:
-				var otherHintNumber = hintNumber;
-				return $author$project$Ports$printAndExitSuccess(
-					'\n\n' + ('You asked for hint number ' + ($elm$core$String$fromInt(otherHintNumber) + (', but you have to choose either hint ' + ('1 or 2.' + '\n\n')))));
+	function (fileData, hintType) {
+		if (hintType.$ === 'ErrorDescription') {
+			return $author$project$Commands$Hint$Cmd$printErrorDescriptionHint(fileData);
+		} else {
+			return $author$project$Commands$Hint$Cmd$printLineNumberHint(fileData);
 		}
 	});
 var $author$project$Commands$Hint$Cmd$init = F3(
-	function (filepath, hintNumber, model) {
+	function (filepath, hintType, model) {
 		return $author$project$Utils$Cmd$fromFileData(
 			{
 				dataAbsentCmd: $author$project$Ports$printAndExitSuccess(
 					$author$project$Utils$Messages$noRecordOfChangeMessage(filepath)),
 				dataPresentCmdFunc: F2(
 					function (_v0, fileData) {
-						return A2($author$project$Commands$Hint$Cmd$printHint, fileData, hintNumber);
+						return A2($author$project$Commands$Hint$Cmd$printHint, fileData, hintType);
 					}),
 				filepath: filepath,
 				model: model
@@ -4353,8 +4348,8 @@ var $author$project$Main$init = F2(
 						return A3($author$project$Commands$Break$Cmd$init, filepath, fileSaveStatus, model);
 					case 'Hint':
 						var filepath = command.a;
-						var hintNumber = command.b;
-						return A3($author$project$Commands$Hint$Cmd$init, filepath, hintNumber, model);
+						var hintType = command.b;
+						return A3($author$project$Commands$Hint$Cmd$init, filepath, hintType, model);
 					case 'Explain':
 						var filepath = command.a;
 						return A2($author$project$Commands$Explain$Cmd$init, filepath, model);
@@ -4368,6 +4363,8 @@ var $author$project$Main$init = F2(
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $elm$json$Json$Decode$null = _Json_decodeNull;
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $author$project$Model$ErrorDescription = {$: 'ErrorDescription'};
+var $author$project$Model$LineNumber = {$: 'LineNumber'};
 var $dillonkearns$elm_cli_options_parser$Cli$Program$Config = function (a) {
 	return {$: 'Config', a: a};
 };
@@ -4513,102 +4510,19 @@ var $author$project$Model$Hint = F2(
 	function (a, b) {
 		return {$: 'Hint', a: a, b: b};
 	});
-var $elm$core$String$toInt = _String_toInt;
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Model$hintInit = F4(
-	function (maybeHintNumberString, filepathString, loggingIsOn, isInTestMode) {
-		var hintNumber = function () {
-			if (maybeHintNumberString.$ === 'Just') {
-				var hintNumberString = maybeHintNumberString.a;
-				return A2(
-					$elm$core$Maybe$withDefault,
-					1,
-					$elm$core$String$toInt(hintNumberString));
-			} else {
-				return 1;
-			}
-		}();
+	function (hintType, filepathString, loggingIsOn, isInTestMode) {
 		return {
 			command: A2(
 				$author$project$Model$Hint,
 				$author$project$Utils$Types$FilePath$fromString(filepathString),
-				hintNumber),
+				hintType),
 			isInTestMode: isInTestMode,
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
 var $dillonkearns$elm_cli_options_parser$Cli$Decode$MatchError = function (a) {
 	return {$: 'MatchError', a: a};
-};
-var $elm_community$list_extra$List$Extra$find = F2(
-	function (predicate, list) {
-		find:
-		while (true) {
-			if (!list.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var first = list.a;
-				var rest = list.b;
-				if (predicate(first)) {
-					return $elm$core$Maybe$Just(first);
-				} else {
-					var $temp$predicate = predicate,
-						$temp$list = rest;
-					predicate = $temp$predicate;
-					list = $temp$list;
-					continue find;
-				}
-			}
-		}
-	});
-var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$KeywordArg = function (a) {
-	return {$: 'KeywordArg', a: a};
-};
-var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$keywordArg = F2(
-	function (keywordArgName, occurences) {
-		return A3(
-			$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$FlagOrKeywordArg,
-			$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$KeywordArg(keywordArgName),
-			$elm$core$Maybe$Nothing,
-			occurences);
-	});
-var $dillonkearns$elm_cli_options_parser$Cli$Option$optionalKeywordArg = function (optionName) {
-	return A2(
-		$dillonkearns$elm_cli_options_parser$Cli$Option$buildOption,
-		function (_v0) {
-			var operands = _v0.operands;
-			var options = _v0.options;
-			var _v1 = A2(
-				$elm_community$list_extra$List$Extra$find,
-				function (_v2) {
-					var thisOptionName = _v2.a;
-					var optionKind = _v2.b;
-					return _Utils_eq(thisOptionName, optionName);
-				},
-				options);
-			if (_v1.$ === 'Nothing') {
-				return $elm$core$Result$Ok($elm$core$Maybe$Nothing);
-			} else {
-				if (_v1.a.b.$ === 'KeywordArg') {
-					var _v3 = _v1.a;
-					var optionArg = _v3.b.a;
-					return $elm$core$Result$Ok(
-						$elm$core$Maybe$Just(optionArg));
-				} else {
-					return $elm$core$Result$Err(
-						$dillonkearns$elm_cli_options_parser$Cli$Decode$MatchError('Expected option ' + (optionName + ' to have arg but found none.')));
-				}
-			}
-		},
-		A2($dillonkearns$elm_cli_options_parser$Cli$UsageSpec$keywordArg, optionName, $dillonkearns$elm_cli_options_parser$Occurences$Optional));
 };
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -4913,14 +4827,14 @@ var $author$project$Main$programConfig = A2(
 						$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
 						$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
 						A2(
-							$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-							$dillonkearns$elm_cli_options_parser$Cli$Option$optionalKeywordArg('hint-number'),
-							A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'hint', $author$project$Model$hintInit)))))),
+							$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand,
+							'line-hint',
+							$author$project$Model$hintInit($author$project$Model$LineNumber)))))),
 		A2(
 			$dillonkearns$elm_cli_options_parser$Cli$Program$add,
 			A2(
 				$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withDoc,
-				'Randomly introduce an error into the specified file.',
+				'Display a hint about the error that was introduced into the specified file.',
 				A2(
 					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
 					$dillonkearns$elm_cli_options_parser$Cli$Option$flag('test'),
@@ -4930,8 +4844,26 @@ var $author$project$Main$programConfig = A2(
 						A2(
 							$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
 							$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
-							A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'break', $author$project$Model$breakInit))))),
-			$dillonkearns$elm_cli_options_parser$Cli$Program$config)));
+							A2(
+								$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand,
+								'error-type-hint',
+								$author$project$Model$hintInit($author$project$Model$ErrorDescription)))))),
+			A2(
+				$dillonkearns$elm_cli_options_parser$Cli$Program$add,
+				A2(
+					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withDoc,
+					'Randomly introduce an error into the specified file.',
+					A2(
+						$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+						$dillonkearns$elm_cli_options_parser$Cli$Option$flag('test'),
+						A2(
+							$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+							$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
+							A2(
+								$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
+								$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
+								A2($dillonkearns$elm_cli_options_parser$Cli$OptionsParser$buildSubCommand, 'break', $author$project$Model$breakInit))))),
+				$dillonkearns$elm_cli_options_parser$Cli$Program$config))));
 var $dillonkearns$elm_cli_options_parser$Cli$Program$ShowSystemMessage = {$: 'ShowSystemMessage'};
 var $dillonkearns$elm_cli_options_parser$Cli$Program$UserModel = F2(
 	function (a, b) {
@@ -5015,6 +4947,15 @@ var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$optionSynopsis = F3(
 					}
 				}
 			}());
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
 var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$synopsis = F2(
 	function (programName, _v0) {
@@ -6001,6 +5942,27 @@ var $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$expectedPositionalArg
 var $dillonkearns$elm_cli_options_parser$Cli$Decode$UnexpectedOptions = function (a) {
 	return {$: 'UnexpectedOptions', a: a};
 };
+var $elm_community$list_extra$List$Extra$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			if (!list.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var first = list.a;
+				var rest = list.b;
+				if (predicate(first)) {
+					return $elm$core$Maybe$Just(first);
+				} else {
+					var $temp$predicate = predicate,
+						$temp$list = rest;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue find;
+				}
+			}
+		}
+	});
 var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$optionName = function (option) {
 	if (option.$ === 'Flag') {
 		var flagName = option.a;
@@ -8011,9 +7973,40 @@ var $author$project$Commands$Hint$Update$update = F4(
 	function (_v0, _v1, action, model) {
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
+var $author$project$Commands$Reset$Update$confirmSaveDataFileWrite = F3(
+	function (targetFilepath, fileSaveStatus, model) {
+		var newFileSaveStatus = _Utils_update(
+			fileSaveStatus,
+			{saveDataSaved: true});
+		var newModel = _Utils_update(
+			model,
+			{
+				command: A2($author$project$Model$Reset, targetFilepath, newFileSaveStatus)
+			});
+		return _Utils_Tuple2(
+			newModel,
+			$author$project$Utils$Cmd$exitIfAllSavesAreComplete(newFileSaveStatus));
+	});
+var $author$project$Commands$Reset$Update$confirmTargetFileWrite = F3(
+	function (targetFilepath, fileSaveStatus, model) {
+		var newFileSaveStatus = _Utils_update(
+			fileSaveStatus,
+			{targetFileSaved: true});
+		var newModel = _Utils_update(
+			model,
+			{
+				command: A2($author$project$Model$Reset, targetFilepath, newFileSaveStatus)
+			});
+		return _Utils_Tuple2(
+			newModel,
+			$author$project$Utils$Cmd$exitIfAllSavesAreComplete(newFileSaveStatus));
+	});
 var $author$project$Commands$Reset$Update$update = F4(
-	function (_v0, _v1, action, model) {
-		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	function (targetFilepath, fileSaveStatus, action, model) {
+		var path = action.a.path;
+		return _Utils_eq(
+			$author$project$Utils$Types$FilePath$fromString(path),
+			targetFilepath) ? A3($author$project$Commands$Reset$Update$confirmTargetFileWrite, targetFilepath, fileSaveStatus, model) : A3($author$project$Commands$Reset$Update$confirmSaveDataFileWrite, targetFilepath, fileSaveStatus, model);
 	});
 var $author$project$Update$update = F3(
 	function (_v0, action, model) {
@@ -8041,9 +8034,9 @@ var $author$project$Update$update = F3(
 					if (_v1.b.$ === 'HintAction') {
 						var _v4 = _v1.a;
 						var filepath = _v4.a;
-						var hintNumber = _v4.b;
+						var hintType = _v4.b;
 						var subAction = _v1.b.a;
-						var _v5 = A4($author$project$Commands$Hint$Update$update, filepath, hintNumber, subAction, model);
+						var _v5 = A4($author$project$Commands$Hint$Update$update, filepath, hintType, subAction, model);
 						var newModel = _v5.a;
 						var cmd = _v5.b;
 						return _Utils_Tuple2(
@@ -8136,7 +8129,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 				},
 				A2($elm$json$Json$Decode$field, 'versionMessage', $elm$json$Json$Decode$string));
 		},
-		A2($elm$json$Json$Decode$field, 'workingDirectory', $elm$json$Json$Decode$string)))({"versions":{"elm":"0.19.1"},"types":{"message":"Actions.Action","aliases":{},"unions":{"Actions.Action":{"args":[],"tags":{"BreakAction":["Commands.Break.Actions.Action"],"HintAction":["Commands.Hint.Actions.Action"],"ExplainAction":["Commands.Explain.Actions.Action"],"ResetAction":["Commands.Reset.Actions.Action"]}},"Commands.Break.Actions.Action":{"args":[],"tags":{"SuccessfulFileRead":["{ path : String.String, content : String.String }"],"SuccessfulFileWrite":["{ path : String.String, content : String.String }"]}},"Commands.Explain.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Hint.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Reset.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
+		A2($elm$json$Json$Decode$field, 'workingDirectory', $elm$json$Json$Decode$string)))({"versions":{"elm":"0.19.1"},"types":{"message":"Actions.Action","aliases":{},"unions":{"Actions.Action":{"args":[],"tags":{"BreakAction":["Commands.Break.Actions.Action"],"HintAction":["Commands.Hint.Actions.Action"],"ExplainAction":["Commands.Explain.Actions.Action"],"ResetAction":["Commands.Reset.Actions.Action"]}},"Commands.Break.Actions.Action":{"args":[],"tags":{"SuccessfulFileRead":["{ path : String.String, content : String.String }"],"SuccessfulFileWrite":["{ path : String.String, content : String.String }"]}},"Commands.Explain.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Hint.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Reset.Actions.Action":{"args":[],"tags":{"SuccessfulFileWrite":["{ path : String.String, content : String.String }"]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
 },{}],"ports/print.ts":[function(require,module,exports) {
 "use strict";
 
@@ -8266,8 +8259,7 @@ function default_1(program) {
         process.exit(1);
       }
 
-      logging_1.devLog('New file content written!'); // SavedData.save(fileData.dataToSave)
-
+      logging_1.devLog('New file content written!');
       program.ports.successfulFileWrite.send(fileData);
     });
   });
@@ -8306,7 +8298,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.clearTestFile = exports.clearSaveFile = exports.readTestFile = exports.createTestFileWithContent = exports.runResetCommand = exports.runHintCommand = exports.runBreakCommand = exports.dataFileName = exports.testFileName = void 0;
+exports.clearTestFile = exports.clearSaveFile = exports.readTestFile = exports.createTestFileWithContent = exports.runResetCommand = exports.runLineNumberHintCommand = exports.runErrorTypeHintCommand = exports.runBreakCommand = exports.dataFileName = exports.testFileName = void 0;
 
 var fs_1 = __importDefault(require("fs"));
 
@@ -8321,15 +8313,17 @@ function runBreakCommand() {
 
 exports.runBreakCommand = runBreakCommand;
 
-function runHintCommand(hintNumber) {
-  if (hintNumber) {
-    return runCommand("hint --hint-number " + hintNumber + " " + exports.testFileName);
-  } else {
-    return runCommand("hint " + exports.testFileName);
-  }
+function runErrorTypeHintCommand(hintNumber) {
+  return runCommand("error-type-hint " + exports.testFileName);
 }
 
-exports.runHintCommand = runHintCommand;
+exports.runErrorTypeHintCommand = runErrorTypeHintCommand;
+
+function runLineNumberHintCommand(hintNumber) {
+  return runCommand("line-hint " + exports.testFileName);
+}
+
+exports.runLineNumberHintCommand = runLineNumberHintCommand;
 
 function runResetCommand() {
   return runCommand("reset " + exports.testFileName);

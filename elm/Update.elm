@@ -19,10 +19,10 @@ update _ action ({ command } as model) =
             in
             ( newModel, Cmd.map BreakAction cmd )
 
-        ( Hint filepath hintNumber, HintAction subAction ) ->
+        ( Hint filepath hintType, HintAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Hint.Update.update filepath hintNumber subAction model
+                    Commands.Hint.Update.update filepath hintType subAction model
             in
             ( newModel, Cmd.map HintAction cmd )
 

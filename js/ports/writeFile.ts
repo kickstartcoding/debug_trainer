@@ -1,5 +1,4 @@
 import fs from 'fs'
-import * as SavedData from '../savedData'
 import { devLog } from '../logging'
 
 export default function (program): void {
@@ -14,7 +13,7 @@ export default function (program): void {
       }
 
       devLog('New file content written!');
-      // SavedData.save(fileData.dataToSave)
+
       program.ports.successfulFileWrite.send(fileData)
     })
   })

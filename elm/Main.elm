@@ -8,7 +8,7 @@ import Commands.Break.Cmd
 import Commands.Explain.Cmd
 import Commands.Hint.Cmd
 import Commands.Reset.Cmd
-import Model as Model exposing (CliOptions, Command(..), Flags, Model)
+import Model as Model exposing (CliOptions, Command(..), Flags, HintType(..), Model)
 import Model.SavedData as SavedData exposing (SavedDataError(..))
 import Ports
 import Subscriptions exposing (subscriptions)
@@ -27,8 +27,14 @@ programConfig =
                 |> OptionsParser.withDoc "Randomly introduce an error into the specified file."
             )
         |> Program.add
-            (OptionsParser.buildSubCommand "hint" Model.hintInit
-                |> OptionsParser.with (Option.optionalKeywordArg "hint-number")
+            (OptionsParser.buildSubCommand "error-type-hint" (Model.hintInit ErrorDescription)
+                |> OptionsParser.with (Option.requiredPositionalArg "filepath")
+                |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
+                |> OptionsParser.withDoc "Display a hint about the error that was introduced into the specified file."
+            )
+        |> Program.add
+            (OptionsParser.buildSubCommand "line-hint" (Model.hintInit LineNumber)
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.with (Option.flag "test")
@@ -69,8 +75,8 @@ init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { co
         Break filepath fileSaveStatus ->
             Commands.Break.Cmd.init filepath fileSaveStatus model
 
-        Hint filepath hintNumber ->
-            Commands.Hint.Cmd.init filepath hintNumber model
+        Hint filepath hintType ->
+            Commands.Hint.Cmd.init filepath hintType model
 
         Explain filepath ->
             Commands.Explain.Cmd.init filepath model

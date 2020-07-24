@@ -2,4 +2,4 @@ module Commands.Reset.Actions exposing (Action(..))
 
 
 type Action
-    = NoOp
+    = SuccessfulFileWrite { path : String, content : String }

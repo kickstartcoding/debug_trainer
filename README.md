@@ -15,9 +15,14 @@ Randomly introduce an error into the specified file:
 debug_trainer break <filepath>
 ```
 
-Display a hint about the error that was introduced into the specified file:
+Display a hint that explains what type of error was introduced into the specified file:
 ```
-debug_trainer hint <filepath>
+debug_trainer error-type-hint <filepath>
+```
+
+Display a hint that tells you the line number where the error was introduced into the specified file:
+```
+debug_trainer line-hint <filepath>
 ```
 
 Change the specified file back to its original, unbroken state:
