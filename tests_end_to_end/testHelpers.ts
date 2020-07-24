@@ -8,7 +8,7 @@ export function runBreakCommand(): string {
   return runCommand(`break ${testFileName}`)
 }
 
-export function runHintCommand(hintNumber: number): string {
+export function runHintCommand(hintNumber?: number): string {
   if (hintNumber) {
     return runCommand(`hint --hint-number ${hintNumber} ${testFileName}`)
   } else {
