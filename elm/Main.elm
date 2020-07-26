@@ -25,7 +25,7 @@ programConfig =
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.with (Option.flag "test")
-                |> OptionsParser.withDoc "Randomly introduce an error into the specified file."
+                |> OptionsParser.withDoc "Randomly introduce an error into the specified file. Or introduce several errors by using the `--count` flag to specify how many errors you want introduced."
             )
         |> Program.add
             (OptionsParser.buildSubCommand "error-type-hint" (Model.hintInit ErrorDescription)
