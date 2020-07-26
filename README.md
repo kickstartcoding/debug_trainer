@@ -10,12 +10,16 @@ npm install -g debug_trainer
 
 ## Usage:
 
-Randomly introduce an error into `myFile.js`:
+`debug_trainer` should work okay for most languages; I've tried to keep it fairly general.
+
+Replace `myFile.js` in any of these examples with one of the files in a project of yours.
+
+Randomly introduce an error into a file called `myFile.js`:
 ```bash
 debug_trainer break myFile.js
 ```
 
-Randomly introduce three errors into `myFile.js`:
+Randomly introduce three errors into a file called `myFile.js`:
 ```bash
 debug_trainer break --count 3 myFile.js
 ```
