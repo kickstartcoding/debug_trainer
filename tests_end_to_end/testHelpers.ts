@@ -8,12 +8,16 @@ export function runBreakCommand(): string {
   return runCommand(`break ${testFileName}`)
 }
 
-export function runErrorTypeHintCommand(hintNumber?: number): string {
+export function runErrorTypeHintCommand(): string {
   return runCommand(`error-type-hint ${testFileName}`)
 }
 
-export function runLineNumberHintCommand(hintNumber?: number): string {
+export function runLineNumberHintCommand(): string {
   return runCommand(`line-hint ${testFileName}`)
+}
+
+export function runLineExplainCommand(): string {
+  return runCommand(`explain ${testFileName}`)
 }
 
 export function runResetCommand(): string {

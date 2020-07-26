@@ -1,0 +1,88 @@
+import {
+  runBreakCommand,
+  runLineExplainCommand,
+  createTestFileWithContent,
+  readTestFile,
+  clearTestFile,
+  clearSaveFile
+} from './testHelpers'
+
+describe('explain command', () => {
+  afterEach(() => { clearSaveFile(); clearTestFile() })
+
+  test("explains case swaps", () => {
+    createTestFileWithContent('Test')
+    runBreakCommand()
+
+    const output = runLineExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      'changed `Test` to `test` on line 1 of the original file'
+    ))
+  })
+
+  test("explains function arg removals", () => {
+    createTestFileWithContent(' function functionName(arg1) ')
+    runBreakCommand()
+
+    const output = runLineExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      'removed the `arg1` argument from `functionName` on line 1 of the original file'
+    ))
+  })
+
+  test("explains function arg swaps", () => {
+    createTestFileWithContent(' function functionName(arg1, arg2) ')
+    runBreakCommand()
+
+    const output = runLineExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      'switched the positions of `arg1` and `arg2` in `functionName` on line 1 of the original file'
+    ))
+  })
+
+  test("explains return removals", () => {
+    createTestFileWithContent(' return ')
+    runBreakCommand()
+
+    const output = runLineExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      'removed a `return` on line 1 of the original file'
+    ))
+  })
+
+  test("explains bracket removals at the start of a line", () => {
+    createTestFileWithContent('\n{')
+    runBreakCommand()
+
+    const output = runLineExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      'removed a `{` from the beginning of the line on line 2 of the original file'
+    ))
+  })
+
+  test("explains bracket removals at the end of a line", () => {
+    createTestFileWithContent('{\n')
+    runBreakCommand()
+
+    const output = runLineExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      'removed a `{` from the end of the line on line 1 of the original file'
+    ))
+  })
+
+  test("does nothing if file hasn't been broken", () => {
+    createTestFileWithContent('Test')
+    const output = runLineExplainCommand()
+
+    expect(readTestFile()).toEqual('Test')
+    expect(output).toEqual(expect.stringContaining(
+      'Either it has never been changed or the changes that were made have been reverted'
+    ))
+  })
+})

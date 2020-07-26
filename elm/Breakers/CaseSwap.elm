@@ -29,7 +29,7 @@ run { randomNumber, originalFileContent, segments } =
                 { originalContent = originalFileContent
                 , updatedContent = newContent
                 , lineNumber = lineNumber
-                , changeDescription = "changed " ++ newWord ++ " to " ++ newWord
+                , changeDescription = "changed `" ++ content ++ "` to `" ++ newWord ++ "`"
                 , breakType = CaseSwap
                 }
             )

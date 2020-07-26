@@ -16,8 +16,8 @@ init filepath model =
         { filepath = filepath
         , model = model
         , dataPresentCmdFunc =
-            \_ _ ->
-                Ports.printAndExitSuccess "Feature not implemented yet."
+            \savedData { changeDescription, lineNumber } ->
+                Ports.printAndExitSuccess (changeDescription ++ " on line " ++ String.fromInt lineNumber ++ " of the original file")
         , dataAbsentCmd =
             Ports.printAndExitSuccess
                 (Messages.noRecordOfChangeMessage filepath)

@@ -40,13 +40,13 @@ programConfig =
                 |> OptionsParser.with (Option.flag "test")
                 |> OptionsParser.withDoc "Display a hint that tells you the line number where the error was introduced into the specified file."
             )
-        -- |> Program.add
-        --     (OptionsParser.buildSubCommand "explain" Model.explainInit
-        --         |> OptionsParser.with (Option.requiredPositionalArg "filepath")
-        --         |> OptionsParser.with (Option.flag "log")
-        --         |> OptionsParser.with (Option.flag "test")
-        --         |> OptionsParser.withDoc "Explain the specific change that was made in the specified file."
-        --     )
+        |> Program.add
+            (OptionsParser.buildSubCommand "explain" Model.explainInit
+                |> OptionsParser.with (Option.requiredPositionalArg "filepath")
+                |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
+                |> OptionsParser.withDoc "Explain the specific change that was made in the specified file."
+            )
         |> Program.add
             (OptionsParser.buildSubCommand "reset" Model.resetInit
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
