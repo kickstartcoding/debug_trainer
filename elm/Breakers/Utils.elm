@@ -1,11 +1,21 @@
 module Breakers.Utils exposing
-    ( candidates
+    ( BreakData
+    , candidates
     , chooseCandidate
     , segmentsToContent
     )
 
 import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
 import Utils.List
+import Utils.Types.BreakType exposing (BreakType)
+
+
+type alias BreakData =
+    { updatedContent : String
+    , lineNumber : Int
+    , changeDescription : String
+    , breakType : BreakType
+    }
 
 
 segmentsToContent : List Segment -> String

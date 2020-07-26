@@ -20,10 +20,10 @@ init filepath fileSaveStatus model =
                     ("\n\n"
                         ++ FilePath.toString filepath
                         ++ " has already had a change introduced to it. "
-                        ++ "Try fixing that change before breaking it again. "
-                        ++ "To get a hint, run:\n\ndebug_trainer hint "
+                        ++ "If you want to reset it to try breaking it in a different way, "
+                        ++ " run:\n\ndebug_trainer reset "
                         ++ FilePath.toString filepath
-                        ++ "\n\n"
+                        ++ "\n\nAfter that you'll be able to run the `break` command again."
                     )
         , dataAbsentCmd =
             Cmd.batch

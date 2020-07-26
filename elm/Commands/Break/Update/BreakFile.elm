@@ -25,19 +25,25 @@ run filepath fileSaveStatus fileContent model =
                     let
                         maybeBreakType =
                             chooseBreakType segments model.randomNumbers
+
+                        breakRunnerData =
+                            { randomNumber = model.randomNumbers.segmentToBreakInt
+                            , originalFileContent = fileContent
+                            , segments = segments
+                            }
                     in
                     case maybeBreakType of
                         Just CaseSwap ->
-                            CaseSwap.run model.randomNumbers.segmentToBreakInt segments
+                            CaseSwap.run breakRunnerData
 
                         Just RemoveReturn ->
-                            RemoveReturn.run model.randomNumbers.segmentToBreakInt segments
+                            RemoveReturn.run breakRunnerData
 
                         Just RemoveParenthesis ->
-                            RemoveParenthesis.run model.randomNumbers.segmentToBreakInt segments
+                            RemoveParenthesis.run breakRunnerData
 
                         Just ChangeFunctionArgs ->
-                            ChangeFunctionArgs.run model.randomNumbers.segmentToBreakInt segments
+                            ChangeFunctionArgs.run breakRunnerData
 
                         _ ->
                             Nothing
@@ -46,17 +52,16 @@ run filepath fileSaveStatus fileContent model =
                     Nothing
     in
     case maybeChange of
-        Just ( newContents, replacementData ) ->
+        Just newFileData ->
             let
                 oldSavedData =
                     SavedData.savedDataOrInit model.savedDataResult
 
                 newSavedData =
-                    SavedData.setChange
+                    SavedData.setFileData
                         { filepath = filepath
                         , workingDirectory = model.workingDirectory
-                        , fileContent = fileContent
-                        , change = replacementData
+                        , fileData = newFileData
                         }
                         oldSavedData
             in
@@ -64,7 +69,7 @@ run filepath fileSaveStatus fileContent model =
             , Cmd.batch
                 [ Ports.writeFile
                     { path = FilePath.toString filepath
-                    , content = newContents
+                    , content = newFileData.updatedContent
                     }
                 , Ports.writeFile
                     { path = FilePath.toString model.dataFilePath

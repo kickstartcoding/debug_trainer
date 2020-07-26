@@ -2,39 +2,66 @@ module Breakers.RemoveParenthesis exposing (run, validCandidateData)
 
 import Breakers.Utils
 import List.Extra as ListEx
-import Model.SavedData exposing (Change)
+import Model.SavedData exposing (FileData)
 import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
+import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
-run : Int -> List Segment -> Maybe ( String, Change )
-run randomNumber segments =
+run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe FileData
+run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
         |> Maybe.map
             (\( index, { content, offset } ) ->
                 let
-                    newContent =
+                    whereInTheLineIsTheBracket =
+                        if String.startsWith "\n" content then
+                            StartOfLine
+
+                        else
+                            EndOfLine
+
+                    lineNumber =
+                        originalFileContent
+                            |> FileContent.rowFromOffset
+                                (case whereInTheLineIsTheBracket of
+                                    StartOfLine ->
+                                        offset + 1
+
+                                    EndOfLine ->
+                                        offset
+                                )
+
+                    withoutBracket =
                         String.filter (not << isParenOrBracket) content
+
+                    newContent =
+                        ListEx.setAt index (Segment offset withoutBracket ReturnStatement) segments
+                            |> Breakers.Utils.segmentsToContent
                 in
-                ( ListEx.setAt index (Segment offset newContent ReturnStatement) segments
-                    |> Breakers.Utils.segmentsToContent
-                , { replacementData =
-                        { originalContent =
-                            { start = offset
-                            , end = offset + String.length content
-                            , content = content
-                            }
-                        , newContent =
-                            { start = offset
-                            , end = offset + String.length newContent
-                            , content = newContent
-                            }
-                        }
-                  , breakType = RemoveParenthesis
-                  }
-                )
+                { originalContent = originalFileContent
+                , updatedContent = newContent
+                , lineNumber = lineNumber
+                , changeDescription =
+                    "removed a `"
+                        ++ String.trim content
+                        ++ "` from the "
+                        ++ (case whereInTheLineIsTheBracket of
+                                StartOfLine ->
+                                    "beginning of the line"
+
+                                EndOfLine ->
+                                    "end of the line"
+                           )
+                , breakType = RemoveParenthesis
+                }
             )
+
+
+type WhereInLine
+    = StartOfLine
+    | EndOfLine
 
 
 isParenOrBracket : Char -> Bool

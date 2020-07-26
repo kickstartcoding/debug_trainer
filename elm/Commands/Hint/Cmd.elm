@@ -35,8 +35,8 @@ printHint fileData hintType =
 
 
 printErrorDescriptionHint : FileData -> Cmd Action
-printErrorDescriptionHint { change } =
-    case change.breakType of
+printErrorDescriptionHint { breakType } =
+    case breakType of
         CaseSwap ->
             Ports.printAndExitSuccess
                 ("\n\n"
@@ -72,17 +72,11 @@ printErrorDescriptionHint { change } =
 
 
 printLineNumberHint : FileData -> Cmd Action
-printLineNumberHint { change, originalContent } =
-    let
-        lineOfChange =
-            FileContent.rowFromOffset
-                change.replacementData.originalContent.start
-                originalContent
-    in
+printLineNumberHint { lineNumber } =
     Ports.printAndExitSuccess
         ("\n\n"
             ++ "HINT: The line where the change was made was line "
-            ++ String.fromInt lineOfChange
+            ++ String.fromInt lineNumber
             ++ " of the original file."
             ++ "\n\n"
         )

@@ -25,4 +25,36 @@ describe("error-type-hint command", () => {
     expect(output).toEqual(expect.stringContaining('has no record of'))
     expect(output).toEqual(expect.stringContaining('being changed'))
   })
+
+  test("gives the correct line number for bracket removals without preceding whitespace", () => {
+    createTestFileWithContent(' { \n\n')
+    runBreakCommand()
+    const output = runLineNumberHintCommand()
+
+    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 1 of the original file.'))
+  })
+
+  test("gives the correct line number for bracket removals with preceding whitespace", () => {
+    createTestFileWithContent('\n\n { ')
+    runBreakCommand()
+    const output = runLineNumberHintCommand()
+
+    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 3 of the original file.'))
+  })
+
+  test("gives the correct line number for function declarations without preceding whitespace", () => {
+    createTestFileWithContent('function hello(arg1) ')
+    runBreakCommand()
+    const output = runLineNumberHintCommand()
+
+    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 1 of the original file.'))
+  })
+
+  test("gives the correct line number for function declarations with preceding whitespace", () => {
+    createTestFileWithContent('\n\nfunction hello(arg1) ')
+    runBreakCommand()
+    const output = runLineNumberHintCommand()
+
+    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 3 of the original file.'))
+  })
 })

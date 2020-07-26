@@ -1,26 +1,23 @@
 module Model.SavedData exposing
-    ( Change
-    , FileData
+    ( FileData
     , SavedData
     , SavedDataError(..)
     , decode
     , encode
     , errorMessage
     , fromFlag
-    , getChange
     , getFileData
     , init
     , removeFileData
     , savedDataOrInit
-    , setChange
+    , setFileData
     )
 
-import Codec exposing (Codec, Decoder, Value)
+import Codec exposing (Codec, Decoder)
 import Dict exposing (Dict)
 import Json.Decode
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath, fullPath)
-import Utils.Types.ReplacementData as ReplacementData exposing (ReplacementData)
 
 
 type alias SavedData =
@@ -30,14 +27,10 @@ type alias SavedData =
 
 type alias FileData =
     { originalContent : String
-    , change : Change
-    , hintsGiven : Int
-    }
-
-
-type alias Change =
-    { replacementData : ReplacementData
+    , updatedContent : String
+    , lineNumber : Int
     , breakType : BreakType
+    , changeDescription : String
     }
 
 
@@ -76,37 +69,18 @@ removeFileData { filepath, workingDirectory } savedData =
     }
 
 
-getChange : { filepath : FilePath, workingDirectory : String } -> SavedData -> Maybe Change
-getChange config savedData =
-    savedData
-        |> getFileData config
-        |> Maybe.map .change
-
-
-setChange :
+setFileData :
     { filepath : FilePath
     , workingDirectory : String
-    , fileContent : String
-    , change : Change
+    , fileData : FileData
     }
     -> SavedData
     -> SavedData
-setChange { filepath, workingDirectory, fileContent, change } ({ changedFiles } as model) =
+setFileData { filepath, workingDirectory, fileData } ({ changedFiles } as model) =
     { model
         | changedFiles =
             Dict.update (fullPathString workingDirectory filepath)
-                (\maybeFileData ->
-                    case maybeFileData of
-                        Just fileData ->
-                            Just { fileData | change = change }
-
-                        Nothing ->
-                            Just
-                                { originalContent = fileContent
-                                , change = change
-                                , hintsGiven = 0
-                                }
-                )
+                (\maybeFileData -> Just fileData)
                 changedFiles
     }
 
@@ -178,14 +152,8 @@ fileDataCodec : Codec FileData
 fileDataCodec =
     Codec.object FileData
         |> Codec.field "originalContent" .originalContent Codec.string
-        |> Codec.field "change" .change changeCodec
-        |> Codec.field "hintsGiven" .hintsGiven Codec.int
-        |> Codec.buildObject
-
-
-changeCodec : Codec Change
-changeCodec =
-    Codec.object Change
-        |> Codec.field "replacementData" .replacementData ReplacementData.codec
+        |> Codec.field "updatedContent" .updatedContent Codec.string
+        |> Codec.field "lineNumber" .lineNumber Codec.int
         |> Codec.field "breakType" .breakType BreakType.codec
+        |> Codec.field "changeDescription" .changeDescription Codec.string
         |> Codec.buildObject

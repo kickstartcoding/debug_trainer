@@ -75,4 +75,22 @@ suite =
                                 }
                       }
                     ]
+        , test "detects brackets at the start of a line" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "\n{"
+                    [ { content = "\n{", offset = 0, segmentType = ParenthesisOrBracket } ]
+        , test "detects brackets at the start of a line with multiple preceing newlines" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "\n\n\n{"
+                    [ { content = "\n", offset = 0, segmentType = Whitespace }
+                    , { content = "\n", offset = 1, segmentType = Whitespace }
+                    , { content = "\n{", offset = 2, segmentType = ParenthesisOrBracket }
+                    ]
+        , test "detects brackets at the end of a line" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "}\n"
+                    [ { content = "}\n", offset = 0, segmentType = ParenthesisOrBracket } ]
         ]

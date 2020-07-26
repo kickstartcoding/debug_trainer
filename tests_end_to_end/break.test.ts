@@ -69,13 +69,6 @@ describe("break command", () => {
       expect(readTestFile()).toEqual(' function functionName() ')
     })
 
-    test("adds 'num' argument to no-argument function declaration", () => {
-      createTestFileWithContent(' function functionName() ')
-      runBreakCommand()
-
-      expect(readTestFile()).toEqual(' function functionName(num) ')
-    })
-
     test("swaps first two arguments of two-argument function declaration", () => {
       createTestFileWithContent(' function functionName(arg1, arg2) ')
       runBreakCommand()

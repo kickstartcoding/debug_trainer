@@ -2,34 +2,34 @@ module Breakers.RemoveReturn exposing (run, validCandidateData)
 
 import Breakers.Utils
 import List.Extra as ListEx
-import Model.SavedData exposing (Change)
+import Model.SavedData exposing (FileData)
 import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
+import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
-run : Int -> List Segment -> Maybe ( String, Change )
-run randomNumber segments =
+run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe FileData
+run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
         |> Maybe.map
             (\( index, { content, offset } ) ->
-                ( ListEx.setAt index (Segment offset (String.dropRight 7 content) ReturnStatement) segments
-                    |> Breakers.Utils.segmentsToContent
-                , { replacementData =
-                        { originalContent =
-                            { start = offset
-                            , end = offset + String.length content
-                            , content = content
-                            }
-                        , newContent =
-                            { start = offset
-                            , end = offset + String.length ""
-                            , content = ""
-                            }
-                        }
-                  , breakType = RemoveReturn
-                  }
-                )
+                let
+                    lineNumber =
+                        FileContent.rowFromOffset
+                            (offset + String.length content - 1)
+                            originalFileContent
+
+                    newContent =
+                        ListEx.setAt index (Segment offset (String.dropRight 7 content) ReturnStatement) segments
+                            |> Breakers.Utils.segmentsToContent
+                in
+                { originalContent = originalFileContent
+                , updatedContent = newContent
+                , lineNumber = lineNumber
+                , changeDescription = "removed a `return`"
+                , breakType = RemoveReturn
+                }
             )
 
 

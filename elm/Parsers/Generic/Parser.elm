@@ -38,7 +38,10 @@ segment =
                     , word
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content Word)
-                    , Whitespace.oneOrMore
+                    , Repeat.oneOrMore (chompIf Whitespace.isNonNewlineWhiteSpace)
+                        |> getChompedString
+                        |> Parser.map (\content -> Segment offset content Whitespace)
+                    , chompIf (\char -> char == '\n')
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content Whitespace)
                     , Repeat.oneOrMore otherCharacter

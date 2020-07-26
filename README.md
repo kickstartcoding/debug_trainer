@@ -32,6 +32,7 @@ debug_trainer reset <filepath>
 
 ## Possible future features:
 
+- Multiple simultaneous errors (user choice of how many)
 - Command to revert file to broken state, without any user changes made while debugging
 - Command to console log content of the original, working file
 - Command to console log content of the original broken state without any user changes made while debugging
