@@ -25,6 +25,11 @@ Display a hint that tells you the line number where the error was introduced int
 debug_trainer line-hint <filepath>
 ```
 
+Describe exactly what part of the specified file was broken and how:
+```
+debug_trainer explain <filepath>
+```
+
 Change the specified file back to its original, unbroken state:
 ```
 debug_trainer reset <filepath>
