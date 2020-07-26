@@ -6,6 +6,7 @@ import {
   clearTestFile,
   clearSaveFile
 } from './testHelpers'
+import { format } from '../js/utils'
 
 describe("error-type-hint command", () => {
   afterEach(() => { clearSaveFile(); clearTestFile() })
@@ -15,7 +16,9 @@ describe("error-type-hint command", () => {
     runBreakCommand()
     const output = runErrorTypeHintCommand()
 
-    expect(output).toEqual(expect.stringContaining('HINT: somewhere in this file, debug_trainer changed a word from starting with a capital letter to starting with a lowercase letter or vice versa.'))
+    expect(output).toEqual(expect.stringContaining(
+      format('HINT: somewhere in this file, `debug_trainer` changed a word from starting with a capital letter to starting with a lowercase letter or vice versa.')
+    ))
   })
 
   test("provides descriptions of multiple errors if multiple errors were introduced", () => {
@@ -25,13 +28,13 @@ describe("error-type-hint command", () => {
     const output = runErrorTypeHintCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      "1 time in file: somewhere in this file, debug_trainer removed a `return` keyword from a function."
+      format("1 time in file: somewhere in this file, `debug_trainer` removed a `return` keyword from a function.")
     ))
     expect(output).toEqual(expect.stringContaining(
-      "2 times in file: somewhere in this file, debug_trainer removed an opening or closing parenthesis or bracket."
+      format("2 times in file: somewhere in this file, `debug_trainer` removed an opening or closing parenthesis or bracket.")
     ))
     expect(output).toEqual(expect.stringContaining(
-      "1 time in file: somewhere in this file, debug_trainer changed the arguments to a function."
+      format("1 time in file: somewhere in this file, `debug_trainer` changed the arguments to a function.")
     ))
   })
 

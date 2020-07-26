@@ -78,14 +78,14 @@ printLineNumberHint { changes } =
 
             [ { lineNumber } ] ->
                 "\n\n"
-                    ++ "HINT: The line where the change was made was line "
+                    ++ "HINT: The line where the change was made was `line "
                     ++ String.fromInt lineNumber
-                    ++ " of the original file."
+                    ++ "` of the original file."
                     ++ "\n\n"
 
             changesList ->
                 "\n\n"
-                    ++ "HINT: Changes were made on these lines of the original file: "
+                    ++ "HINT: Changes were made on these lines of the original file: `"
                     ++ (changesList
                             |> List.map .lineNumber
                             |> ListEx.unique
@@ -93,4 +93,4 @@ printLineNumberHint { changes } =
                             |> List.map String.fromInt
                             |> String.join ", "
                        )
-                    ++ "\n\n"
+                    ++ "`\n\n"

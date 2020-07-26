@@ -6,6 +6,7 @@ import {
   clearTestFile,
   clearSaveFile
 } from './testHelpers'
+import { format } from '../js/utils'
 
 describe('explain command', () => {
   afterEach(() => { clearSaveFile(); clearTestFile() })
@@ -17,7 +18,7 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      'changed `Test` to `test` on line 1 of the original file'
+      format('changed `Test` to `test` on `line 1` of the original file')
     ))
   })
 
@@ -28,7 +29,7 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      'removed the `arg1` argument from `functionName` on line 1 of the original file'
+      format('removed the `arg1` argument from `functionName` on `line 1` of the original file')
     ))
   })
 
@@ -39,7 +40,7 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      'switched the positions of `arg1` and `arg2` in `functionName` on line 1 of the original file'
+      format('switched the positions of `arg1` and `arg2` in `functionName` on `line 1` of the original file')
     ))
   })
 
@@ -50,7 +51,7 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      'removed a `return` on line 1 of the original file'
+      format('removed a `return` on `line 1` of the original file')
     ))
   })
 
@@ -61,7 +62,7 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      'removed a `{` from the beginning of the line on line 2 of the original file'
+      format('removed a `{` from the beginning of the line on `line 2` of the original file')
     ))
   })
 
@@ -72,7 +73,7 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      'removed a `{` from the end of the line on line 1 of the original file'
+      format('removed a `{` from the end of the line on `line 1` of the original file')
     ))
   })
 
@@ -82,9 +83,9 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     const correctExplanations = [
-      "changed `thing1.thing2.thing3` to `thing1.thing2` on line 1 of the original file",
-      "changed `thing1.thing2.thing3` to `thing1.thing3` on line 1 of the original file",
-      "changed `thing1.thing2.thing3` to `thing2.thing3` on line 1 of the original file",
+      format("changed `thing1.thing2.thing3` to `thing1.thing2` on `line 1` of the original file"),
+      format("changed `thing1.thing2.thing3` to `thing1.thing3` on `line 1` of the original file"),
+      format("changed `thing1.thing2.thing3` to `thing2.thing3` on `line 1` of the original file"),
     ]
 
     expect(correctExplanations.includes(output.trim())).toBeTruthy()
@@ -97,13 +98,13 @@ describe('explain command', () => {
     const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      "removed a `{` from the end of the line on line 1 of the original file"
+      format("removed a `{` from the end of the line on `line 1` of the original file")
     ))
     expect(output).toEqual(expect.stringContaining(
-      "removed a `return` on line 2 of the original file"
+      format("removed a `return` on `line 2` of the original file")
     ))
     expect(output).toEqual(expect.stringContaining(
-      "switched the positions of `arg1` and `arg2` in `functionName` on line 2 of the original file"
+      format("switched the positions of `arg1` and `arg2` in `functionName` on `line 2` of the original file")
     ))
   })
 

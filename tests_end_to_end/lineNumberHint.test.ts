@@ -6,6 +6,7 @@ import {
   clearTestFile,
   clearSaveFile
 } from './testHelpers'
+import { format } from '../js/utils'
 
 describe("error-type-hint command", () => {
   afterEach(() => { clearSaveFile(); clearTestFile() })
@@ -15,7 +16,9 @@ describe("error-type-hint command", () => {
     runBreakCommand()
     const output = runLineNumberHintCommand()
 
-    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 1 of the original file.'))
+    expect(output).toEqual(expect.stringContaining(
+      format('HINT: The line where the change was made was `line 1` of the original file.')
+    ))
   })
 
   test("does not give a hint for an UNBROKEN file", () => {
@@ -31,7 +34,9 @@ describe("error-type-hint command", () => {
     runBreakCommand()
     const output = runLineNumberHintCommand()
 
-    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 1 of the original file.'))
+    expect(output).toEqual(expect.stringContaining(
+      format('HINT: The line where the change was made was `line 1` of the original file.')
+    ))
   })
 
   test("gives the correct line number for bracket removals with preceding whitespace", () => {
@@ -39,7 +44,9 @@ describe("error-type-hint command", () => {
     runBreakCommand()
     const output = runLineNumberHintCommand()
 
-    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 3 of the original file.'))
+    expect(output).toEqual(expect.stringContaining(
+      format('HINT: The line where the change was made was `line 3` of the original file.')
+    ))
   })
 
   test("gives the correct line number for function declarations without preceding whitespace", () => {
@@ -47,7 +54,9 @@ describe("error-type-hint command", () => {
     runBreakCommand()
     const output = runLineNumberHintCommand()
 
-    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 1 of the original file.'))
+    expect(output).toEqual(expect.stringContaining(
+      format('HINT: The line where the change was made was `line 1` of the original file.')
+    ))
   })
 
   test("gives the correct line number for function declarations with preceding whitespace", () => {
@@ -55,7 +64,9 @@ describe("error-type-hint command", () => {
     runBreakCommand()
     const output = runLineNumberHintCommand()
 
-    expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 3 of the original file.'))
+    expect(output).toEqual(expect.stringContaining(
+      format('HINT: The line where the change was made was `line 3` of the original file.')
+    ))
   })
 
 
@@ -66,7 +77,7 @@ describe("error-type-hint command", () => {
     const output = runLineNumberHintCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      "Changes were made on these lines of the original file: 1, 2"
+      format("Changes were made on these lines of the original file: `1, 2`")
     ))
   })
 })

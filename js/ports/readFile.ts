@@ -1,12 +1,12 @@
 import fs from 'fs'
-const { devLog } = require('../logging')
+import { devLog, formattedErrorLog } from '../utils'
 
 export default function (program): void {
   program.ports.readFile.subscribe((filepath: string): void => {
-    devLog(`Reading content of ${filepath}...`)
+    devLog(`Reading content of \`${filepath}\`...`)
     fs.readFile(filepath, 'utf8', function (err, content) {
       if (err) {
-        console.error(err)
+        formattedErrorLog(err)
         process.exit(1)
       }
 

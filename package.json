@@ -18,7 +18,9 @@
     "debug",
     "debugging"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "colors": "^1.4.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.10.5",
     "@babel/plugin-transform-modules-commonjs": "^7.10.4",

@@ -7,7 +7,7 @@ import readFile from './ports/readFile'
 import writeFile from './ports/writeFile'
 import exitSuccess from './ports/exitSuccess'
 import * as SavedData from './savedData'
-import { devLog } from './logging'
+import { devLog } from './utils'
 
 export function run(): void {
   const data: string = SavedData.load()

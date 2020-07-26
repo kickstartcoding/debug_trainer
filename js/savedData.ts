@@ -1,6 +1,6 @@
 import fs from 'fs'
 import os from 'os'
-import { devLog } from './logging'
+import { devLog } from './utils'
 import * as TestHelpers from '../tests_end_to_end/testHelpers'
 
 export const dataFilePath: string = process.argv.includes('--test') ?

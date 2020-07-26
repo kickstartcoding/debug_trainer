@@ -1,14 +1,14 @@
 import fs from 'fs'
-import { devLog } from '../logging'
+import { devLog, formattedErrorLog } from '../utils'
 
 export default function (program): void {
   program.ports.writeFile.subscribe((fileData: { path: string, content: string }): void => {
     createFileIfAbsent(fileData.path)
 
-    devLog(`Writing new content of ${fileData.path}...`)
+    devLog(`Writing new content of \`${fileData.path}\`...`)
     fs.writeFile(fileData.path, fileData.content, function (err) {
       if (err) {
-        console.error(err)
+        formattedErrorLog(err.toString())
         process.exit(1)
       }
 

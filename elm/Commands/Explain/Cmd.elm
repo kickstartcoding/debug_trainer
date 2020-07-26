@@ -18,7 +18,7 @@ init filepath model =
         , dataPresentCmdFunc =
             \savedData { changes } ->
                 changes
-                    |> List.map (\{ changeDescription, lineNumber } -> changeDescription ++ " on line " ++ String.fromInt lineNumber ++ " of the original file")
+                    |> List.map (\{ changeDescription, lineNumber } -> changeDescription ++ " on `line " ++ String.fromInt lineNumber ++ "` of the original file")
                     |> String.join "\n\n"
                     |> Ports.printAndExitSuccess
         , dataAbsentCmd =
