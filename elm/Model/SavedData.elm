@@ -111,23 +111,23 @@ errorMessage dataFilePath error =
     case error of
         FileMissing ->
             "\n\n"
-                ++ "Could not find any save data at "
+                ++ "Could not find any save data at `"
                 ++ FilePath.toString dataFilePath
-                ++ ". That file is where debug_trainer stores data on what files it has changed."
+                ++ "`. That file is where `debug_trainer` stores data on what files it has changed."
                 ++ " Without it, this feature won't work."
                 ++ "\n\n"
 
         DecodingFailed reason ->
             "\n\n"
-                ++ "Unable to parse the saved data file at "
+                ++ "Unable to parse the saved data file at `"
                 ++ FilePath.toString dataFilePath
-                ++ ". Here is the error it gave:\n\n"
+                ++ "`. Here is the error it gave:\n\n`"
                 ++ reason
-                ++ "\n\nThe save file at "
+                ++ "`\n\nThe save file at `"
                 ++ FilePath.toString dataFilePath
-                ++ " may be broken. If this error persists, try deleting "
+                ++ "` may be broken. If this error persists, try deleting `"
                 ++ FilePath.toString dataFilePath
-                ++ " and then running debug_trainer again."
+                ++ "` and then running `debug_trainer` again."
                 ++ "\n\n"
 
 

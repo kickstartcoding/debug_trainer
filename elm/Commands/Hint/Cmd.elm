@@ -56,10 +56,10 @@ timesDescription : Int -> String
 timesDescription integer =
     case integer of
         1 ->
-            "1 time in file: "
+            "`1 time` in file: "
 
         moreThanOne ->
-            String.fromInt moreThanOne ++ " times in file: "
+           "`"++ String.fromInt moreThanOne ++ " times` in file: "
 
 
 countOfType : BreakType -> List ChangeData -> Int

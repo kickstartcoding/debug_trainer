@@ -28,13 +28,13 @@ describe("error-type-hint command", () => {
     const output = runErrorTypeHintCommand()
 
     expect(output).toEqual(expect.stringContaining(
-      format("1 time in file: somewhere in this file, `debug_trainer` removed a `return` keyword from a function.")
+      format("`1 time` in file: somewhere in this file, `debug_trainer` removed a `return` keyword from a function.")
     ))
     expect(output).toEqual(expect.stringContaining(
-      format("2 times in file: somewhere in this file, `debug_trainer` removed an opening or closing parenthesis or bracket.")
+      format("`2 times` in file: somewhere in this file, `debug_trainer` removed an opening or closing parenthesis or bracket.")
     ))
     expect(output).toEqual(expect.stringContaining(
-      format("1 time in file: somewhere in this file, `debug_trainer` changed the arguments to a function.")
+      format("`1 time` in file: somewhere in this file, `debug_trainer` changed the arguments to a function.")
     ))
   })
 
