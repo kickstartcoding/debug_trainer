@@ -14,6 +14,10 @@
   },
   "author": "Neurodynamic",
   "license": "ISC",
+  "keywords": [
+    "debug",
+    "debugging"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.10.5",
