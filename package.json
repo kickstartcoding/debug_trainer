@@ -9,11 +9,19 @@
     "test": "elm-test && jest",
     "elm-typescript-interop": "elm-typescript-interop"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kickstartcoding/debug_trainer.git"
+  },
   "bin": {
     "debug_trainer": "bin/debug_trainer"
   },
   "author": "Neurodynamic",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kickstartcoding/debug_trainer/issues"
+  },
+  "homepage": "https://github.com/kickstartcoding/debug_trainer",
   "keywords": [
     "debug",
     "debugging"
