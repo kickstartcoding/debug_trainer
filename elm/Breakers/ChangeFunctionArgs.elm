@@ -2,10 +2,11 @@ module Breakers.ChangeFunctionArgs exposing (run, validCandidateData)
 
 import Breakers.Utils
 import List.Extra as ListEx
-import Model.SavedData exposing (FileData)
+import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Segment as Segment
     exposing
-        ( FunctionDeclarationData
+        ( BreakStatus(..)
+        , FunctionDeclarationData
         , Segment
         , SegmentType(..)
         )
@@ -13,7 +14,7 @@ import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
-run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe FileData
+run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe ( List Segment, ChangeData )
 run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
@@ -29,27 +30,26 @@ run { randomNumber, originalFileContent, segments } =
                     lineNumber =
                         FileContent.rowFromOffset (segment.offset + String.length segment.content) originalFileContent
 
-                    newContent =
+                    newSegments =
                         ListEx.setAt index
-                            (Segment segment.offset newFuncString (FunctionDeclaration newFuncData))
+                            (Segment segment.offset newFuncString (FunctionDeclaration newFuncData BreakHasBeenApplied))
                             segments
-                            |> Breakers.Utils.segmentsToContent
                 in
-                { originalContent = originalFileContent
-                , updatedContent = newContent
-                , lineNumber = lineNumber
-                , changeDescription =
-                    case ( data.arguments, newArguments ) of
-                        ( [ oldArg ], [] ) ->
-                            "removed the `" ++ oldArg ++ "` argument from `" ++ data.name ++ "`"
+                ( newSegments
+                , { lineNumber = lineNumber
+                  , changeDescription =
+                        case ( data.arguments, newArguments ) of
+                            ( [ oldArg ], [] ) ->
+                                "removed the `" ++ oldArg ++ "` argument from `" ++ data.name ++ "`"
 
-                        ( arg1 :: arg2 :: _, _ ) ->
-                            "switched the positions of `" ++ arg1 ++ "` and `" ++ arg2 ++ "` in `" ++ data.name ++ "`"
+                            ( arg1 :: arg2 :: _, _ ) ->
+                                "switched the positions of `" ++ arg1 ++ "` and `" ++ arg2 ++ "` in `" ++ data.name ++ "`"
 
-                        _ ->
-                            "error writing change description: unexpected number of arguments"
-                , breakType = ChangeFunctionArgs
-                }
+                            _ ->
+                                "error writing change description: unexpected number of arguments"
+                  , breakType = ChangeFunctionArgs
+                  }
+                )
             )
 
 
@@ -63,7 +63,7 @@ type alias FunctionChangeData =
 validCandidateData : Segment -> Maybe FunctionChangeData
 validCandidateData ({ segmentType } as segment) =
     case segmentType of
-        FunctionDeclaration ({ arguments } as data) ->
+        FunctionDeclaration ({ arguments } as data) _ ->
             let
                 dataWithNewArgs newArgs =
                     { segment = segment

@@ -6,9 +6,8 @@ import Breakers.RemoveParenthesis as RemoveParenthesis
 import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
-import List.Extra as ListEx
 import Model exposing (Command(..), FileSaveStatus, Model)
-import Model.SavedData as SavedData
+import Model.SavedData as SavedData exposing (ChangeData)
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)
 import Ports
@@ -25,51 +24,34 @@ run :
     , model : Model
     }
     -> ( Model, Cmd Action )
-run { breakCount, filepath, fileSaveStatus, fileContent, model } =
+run ({ breakCount, filepath, fileSaveStatus, fileContent, model } as config) =
     let
-        maybeChange =
+        maybeChanges =
             case GenericParser.run fileContent of
                 Ok segments ->
-                    let
-                        maybeBreakType =
-                            chooseBreakType segments 12345
-
-                        breakRunnerData =
-                            { randomNumber = 1234567
-                            , originalFileContent = fileContent
-                            , segments = segments
-                            }
-                    in
-                    case maybeBreakType of
-                        Just CaseSwap ->
-                            CaseSwap.run breakRunnerData
-
-                        Just RemoveReturn ->
-                            RemoveReturn.run breakRunnerData
-
-                        Just RemoveParenthesis ->
-                            RemoveParenthesis.run breakRunnerData
-
-                        Just ChangeFunctionArgs ->
-                            ChangeFunctionArgs.run breakRunnerData
-
-                        _ ->
-                            Nothing
+                    Just (buildChanges config segments [])
 
                 Err _ ->
                     Nothing
     in
-    case maybeChange of
-        Just newFileData ->
+    case maybeChanges of
+        Just ( newSegments, changes ) ->
             let
                 oldSavedData =
                     SavedData.savedDataOrInit model.savedDataResult
+
+                newFileContent =
+                    newSegments |> Breakers.Utils.segmentsToContent
 
                 newSavedData =
                     SavedData.setFileData
                         { filepath = filepath
                         , workingDirectory = model.workingDirectory
-                        , fileData = newFileData
+                        , fileData =
+                            { originalContent = fileContent
+                            , updatedContent = newFileContent
+                            , changes = changes
+                            }
                         }
                         oldSavedData
             in
@@ -84,7 +66,7 @@ run { breakCount, filepath, fileSaveStatus, fileContent, model } =
             , Cmd.batch
                 [ Ports.writeFile
                     { path = FilePath.toString filepath
-                    , content = newFileData.updatedContent
+                    , content = newFileContent
                     }
                 , Ports.writeFile
                     { path = FilePath.toString model.dataFilePath
@@ -99,7 +81,67 @@ run { breakCount, filepath, fileSaveStatus, fileContent, model } =
             )
 
 
-chooseBreakType : List Segment ->  Int -> Maybe BreakType
+buildChanges :
+    { breakCount : Int
+    , filepath : FilePath
+    , fileSaveStatus : FileSaveStatus
+    , fileContent : String
+    , model : Model
+    }
+    -> List Segment
+    -> List ChangeData
+    -> ( List Segment, List ChangeData )
+buildChanges config segments changes =
+    let
+        ( breakTypeChoiceSeed, segmentChoiceSeed ) =
+            case List.drop (config.breakCount * 2) config.model.randomNumbers of
+                num1 :: num2 :: _ ->
+                    ( num1, num2 )
+
+                _ ->
+                    ( 0, 0 )
+
+        maybeBreakType =
+            chooseBreakType segments breakTypeChoiceSeed
+
+        breakRunnerData =
+            { randomNumber = segmentChoiceSeed
+            , originalFileContent = config.fileContent
+            , segments = segments
+            }
+
+        maybeChanges =
+            case maybeBreakType of
+                Just CaseSwap ->
+                    CaseSwap.run breakRunnerData
+
+                Just RemoveReturn ->
+                    RemoveReturn.run breakRunnerData
+
+                Just RemoveParenthesis ->
+                    RemoveParenthesis.run breakRunnerData
+
+                Just ChangeFunctionArgs ->
+                    ChangeFunctionArgs.run breakRunnerData
+
+                _ ->
+                    Nothing
+    in
+    case maybeChanges of
+        Just ( newSegments, change ) ->
+            if config.breakCount == 1 then
+                ( newSegments, change :: changes )
+
+            else
+                buildChanges { config | breakCount = config.breakCount - 1 }
+                    newSegments
+                    (change :: changes)
+
+        Nothing ->
+            ( segments, changes )
+
+
+chooseBreakType : List Segment -> Int -> Maybe BreakType
 chooseBreakType segments breakTypeInt =
     let
         caseSwapCandidateCount =

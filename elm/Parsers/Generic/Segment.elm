@@ -1,5 +1,6 @@
 module Parsers.Generic.Segment exposing
-    ( FunctionDeclarationData
+    ( BreakStatus(..)
+    , FunctionDeclarationData
     , Segment
     , SegmentType(..)
     , functionDeclarationDataToString
@@ -7,12 +8,17 @@ module Parsers.Generic.Segment exposing
 
 
 type SegmentType
-    = Word
-    | ReturnStatement
-    | ParenthesisOrBracket
-    | FunctionDeclaration FunctionDeclarationData
+    = Word BreakStatus
+    | ReturnStatement BreakStatus
+    | ParenthesisOrBracket BreakStatus
+    | FunctionDeclaration FunctionDeclarationData BreakStatus
     | Whitespace
     | Other
+
+
+type BreakStatus
+    = BreakHasBeenApplied
+    | BreakNotAppliedYet
 
 
 type alias FunctionDeclarationData =

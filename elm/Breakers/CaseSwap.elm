@@ -2,14 +2,14 @@ module Breakers.CaseSwap exposing (run, validCandidateData)
 
 import Breakers.Utils
 import List.Extra as ListEx
-import Model.SavedData exposing (FileData)
-import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
+import Model.SavedData exposing (ChangeData)
+import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
 import Utils.FileContent as FileContent
 import Utils.String as StrUtils
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
-run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe FileData
+run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe ( List Segment, ChangeData )
 run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
@@ -22,16 +22,15 @@ run { randomNumber, originalFileContent, segments } =
                     lineNumber =
                         FileContent.rowFromOffset offset originalFileContent
 
-                    newContent =
-                        ListEx.setAt index (Segment offset newWord Word) segments
-                            |> Breakers.Utils.segmentsToContent
+                    newSegments =
+                        ListEx.setAt index (Segment offset newWord (Word BreakHasBeenApplied)) segments
                 in
-                { originalContent = originalFileContent
-                , updatedContent = newContent
-                , lineNumber = lineNumber
-                , changeDescription = "changed `" ++ content ++ "` to `" ++ newWord ++ "`"
-                , breakType = CaseSwap
-                }
+                ( newSegments
+                , { lineNumber = lineNumber
+                  , changeDescription = "changed `" ++ content ++ "` to `" ++ newWord ++ "`"
+                  , breakType = CaseSwap
+                  }
+                )
             )
 
 
@@ -39,7 +38,7 @@ validCandidateData : Segment -> Maybe Segment
 validCandidateData ({ content, segmentType } as segment) =
     if
         segmentType
-            == Word
+            == Word BreakNotAppliedYet
             && StrUtils.isMoreThanOneCharacter content
             && not (StrUtils.isAllCaps content)
     then

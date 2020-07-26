@@ -1,5 +1,6 @@
 module Utils.Types.BreakType exposing
     ( BreakType(..)
+    , allBreakTypes
     , codec
     , decode
     , encode
@@ -13,6 +14,15 @@ type BreakType
     | RemoveReturn
     | RemoveParenthesis
     | ChangeFunctionArgs
+
+
+allBreakTypes : List BreakType
+allBreakTypes =
+    [ CaseSwap
+    , RemoveReturn
+    , RemoveParenthesis
+    , ChangeFunctionArgs
+    ]
 
 
 encode : BreakType -> Value

@@ -1,7 +1,7 @@
 module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
-import Parsers.Generic.Segment exposing (FunctionDeclarationData, Segment, SegmentType(..))
+import Parsers.Generic.Segment exposing (BreakStatus(..), FunctionDeclarationData, Segment, SegmentType(..))
 import Parsers.Utils.Repeat as Repeat
 import Parsers.Utils.Whitespace as Whitespace
 
@@ -24,20 +24,20 @@ segment =
                 oneOf
                     [ returnStatement
                         |> getChompedString
-                        |> Parser.map (\content -> Segment offset content ReturnStatement)
+                        |> Parser.map (\content -> Segment offset content (ReturnStatement BreakNotAppliedYet))
                     , functionDeclarationWithContent
                         |> Parser.map
                             (\( content, data ) ->
                                 Segment offset
                                     content
-                                    (FunctionDeclaration data)
+                                    (FunctionDeclaration data BreakNotAppliedYet)
                             )
                     , parenthesisOrBracketAtStartOrEndOfLine
                         |> getChompedString
-                        |> Parser.map (\content -> Segment offset content ParenthesisOrBracket)
+                        |> Parser.map (\content -> Segment offset content (ParenthesisOrBracket BreakNotAppliedYet))
                     , word
                         |> getChompedString
-                        |> Parser.map (\content -> Segment offset content Word)
+                        |> Parser.map (\content -> Segment offset content (Word BreakNotAppliedYet))
                     , Repeat.oneOrMore (chompIf Whitespace.isNonNewlineWhiteSpace)
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content Whitespace)

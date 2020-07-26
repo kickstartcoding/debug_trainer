@@ -2,13 +2,13 @@ module Breakers.RemoveReturn exposing (run, validCandidateData)
 
 import Breakers.Utils
 import List.Extra as ListEx
-import Model.SavedData exposing (FileData)
-import Parsers.Generic.Segment exposing (Segment, SegmentType(..))
+import Model.SavedData exposing (ChangeData)
+import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
 import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
-run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe FileData
+run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe ( List Segment, ChangeData )
 run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
@@ -20,22 +20,21 @@ run { randomNumber, originalFileContent, segments } =
                             (offset + String.length content - 1)
                             originalFileContent
 
-                    newContent =
-                        ListEx.setAt index (Segment offset (String.dropRight 7 content) ReturnStatement) segments
-                            |> Breakers.Utils.segmentsToContent
+                    newSegments =
+                        ListEx.setAt index (Segment offset (String.dropRight 7 content) (ReturnStatement BreakHasBeenApplied)) segments
                 in
-                { originalContent = originalFileContent
-                , updatedContent = newContent
-                , lineNumber = lineNumber
-                , changeDescription = "removed a `return`"
-                , breakType = RemoveReturn
-                }
+                ( newSegments
+                , { lineNumber = lineNumber
+                  , changeDescription = "removed a `return`"
+                  , breakType = RemoveReturn
+                  }
+                )
             )
 
 
 validCandidateData : Segment -> Maybe Segment
 validCandidateData ({ segmentType } as segment) =
-    if segmentType == ReturnStatement then
+    if segmentType == ReturnStatement BreakNotAppliedYet then
         Just segment
 
     else
