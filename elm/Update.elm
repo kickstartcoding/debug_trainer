@@ -12,10 +12,10 @@ import Ports
 update : CliOptions -> Action -> Model -> ( Model, Cmd Action )
 update _ action ({ command } as model) =
     case ( command, action ) of
-        ( Break filepath fileSaveStatus, BreakAction subAction ) ->
+        ( Break breakData, BreakAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Break.Update.update filepath fileSaveStatus subAction model
+                    Commands.Break.Update.update breakData subAction model
             in
             ( newModel, Cmd.map BreakAction cmd )
 

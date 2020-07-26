@@ -21,6 +21,7 @@ programConfig =
     Program.config
         |> Program.add
             (OptionsParser.buildSubCommand "break" Model.breakInit
+                |> OptionsParser.with (Option.optionalKeywordArg "count")
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.with (Option.flag "test")
@@ -57,13 +58,10 @@ programConfig =
 
 
 init : Flags -> CliOptions -> ( Model, Cmd Action )
-init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { command } =
+init { randomNumbers, workingDirectory, data, dataFilePath } { command } =
     let
         model =
-            { randomNumbers =
-                { breakTypeInt = randomNumber1
-                , segmentToBreakInt = randomNumber2
-                }
+            { randomNumbers = randomNumbers
             , workingDirectory = workingDirectory
             , dataFilePath = FilePath.fromString dataFilePath
             , savedDataResult = SavedData.fromFlag data
@@ -72,8 +70,8 @@ init { randomNumber1, randomNumber2, workingDirectory, data, dataFilePath } { co
     in
     ( model
     , case command of
-        Break filepath fileSaveStatus ->
-            Commands.Break.Cmd.init filepath fileSaveStatus model
+        Break breakData ->
+            Commands.Break.Cmd.init breakData model
 
         Hint filepath hintType ->
             Commands.Hint.Cmd.init filepath hintType model
@@ -90,8 +88,7 @@ main :
     Program.StatefulProgram Model
         Action
         CliOptions
-        { randomNumber1 : Int
-        , randomNumber2 : Int
+        { randomNumbers : List Int
         , workingDirectory : String
         , dataFilePath : String
         , data : Maybe String

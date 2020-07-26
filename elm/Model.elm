@@ -1,5 +1,6 @@
 module Model exposing
-    ( CliOptions
+    ( BreakData
+    , CliOptions
     , Command(..)
     , FileSaveStatus
     , Flags
@@ -27,10 +28,7 @@ type alias CliOptions =
 
 
 type alias Model =
-    { randomNumbers :
-        { breakTypeInt : Int
-        , segmentToBreakInt : Int
-        }
+    { randomNumbers : List Int
     , dataFilePath : FilePath
     , workingDirectory : String
     , savedDataResult : Result SavedDataError SavedData
@@ -39,10 +37,17 @@ type alias Model =
 
 
 type Command
-    = Break FilePath FileSaveStatus
+    = Break BreakData
     | Hint FilePath HintType
     | Explain FilePath
     | Reset FilePath FileSaveStatus
+
+
+type alias BreakData =
+    { breakCount : Int
+    , filepath : FilePath
+    , fileSaveStatus : FileSaveStatus
+    }
 
 
 type HintType
@@ -68,17 +73,37 @@ type alias FileSaveStatus =
 
 type alias Flags =
     Program.FlagsIncludingArgv
-        { randomNumber1 : Int
-        , randomNumber2 : Int
+        { randomNumbers : List Int
         , workingDirectory : String
         , dataFilePath : String
         , data : Maybe String
         }
 
 
-breakInit : String -> Bool -> Bool -> CliOptions
-breakInit filepathString loggingIsOn isInTestMode =
-    { command = Break (FilePath.fromString filepathString) initFileSaveStatus
+breakInit : Maybe String -> String -> Bool -> Bool -> CliOptions
+breakInit maybeBreakCountString filepathString loggingIsOn isInTestMode =
+    let
+        breakCount =
+            case maybeBreakCountString of
+                Just string ->
+                    case String.toInt string of
+                        Just count ->
+                            -- Between one and ten breaks
+                            min count 10
+                                |> max 1
+
+                        Nothing ->
+                            1
+
+                Nothing ->
+                    1
+    in
+    { command =
+        Break
+            { breakCount = breakCount
+            , filepath = FilePath.fromString filepathString
+            , fileSaveStatus = initFileSaveStatus
+            }
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     , isInTestMode = isInTestMode
     }
@@ -111,7 +136,7 @@ resetInit filepathString loggingIsOn isInTestMode =
 filePathStringFromCommand : Command -> String
 filePathStringFromCommand command =
     case command of
-        Break filepath _ ->
+        Break { filepath } ->
             FilePath.toString filepath
 
         Hint filepath _ ->

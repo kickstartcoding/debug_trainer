@@ -6,6 +6,7 @@ import Breakers.RemoveParenthesis as RemoveParenthesis
 import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
+import List.Extra as ListEx
 import Model exposing (Command(..), FileSaveStatus, Model)
 import Model.SavedData as SavedData
 import Parsers.Generic.Parser as GenericParser
@@ -16,18 +17,25 @@ import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
-run : FilePath -> FileSaveStatus -> String -> Model -> ( Model, Cmd Action )
-run filepath fileSaveStatus fileContent model =
+run :
+    { breakCount : Int
+    , filepath : FilePath
+    , fileSaveStatus : FileSaveStatus
+    , fileContent : String
+    , model : Model
+    }
+    -> ( Model, Cmd Action )
+run { breakCount, filepath, fileSaveStatus, fileContent, model } =
     let
         maybeChange =
             case GenericParser.run fileContent of
                 Ok segments ->
                     let
                         maybeBreakType =
-                            chooseBreakType segments model.randomNumbers
+                            chooseBreakType segments 12345
 
                         breakRunnerData =
-                            { randomNumber = model.randomNumbers.segmentToBreakInt
+                            { randomNumber = 1234567
                             , originalFileContent = fileContent
                             , segments = segments
                             }
@@ -65,7 +73,14 @@ run filepath fileSaveStatus fileContent model =
                         }
                         oldSavedData
             in
-            ( { model | command = Break filepath fileSaveStatus }
+            ( { model
+                | command =
+                    Break
+                        { breakCount = breakCount
+                        , filepath = filepath
+                        , fileSaveStatus = fileSaveStatus
+                        }
+              }
             , Cmd.batch
                 [ Ports.writeFile
                     { path = FilePath.toString filepath
@@ -84,8 +99,8 @@ run filepath fileSaveStatus fileContent model =
             )
 
 
-chooseBreakType : List Segment -> { breakTypeInt : Int, segmentToBreakInt : Int } -> Maybe BreakType
-chooseBreakType segments { breakTypeInt } =
+chooseBreakType : List Segment ->  Int -> Maybe BreakType
+chooseBreakType segments breakTypeInt =
     let
         caseSwapCandidateCount =
             segments

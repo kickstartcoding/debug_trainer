@@ -8,7 +8,7 @@ import Model exposing (Command(..), Model)
 subscriptions : Model -> Sub Action
 subscriptions ({ command } as model) =
     case command of
-        Break _ _ ->
+        Break _ ->
             Sub.map BreakAction (Commands.Break.Subscriptions.subscriptions model)
 
         Hint _ _ ->

@@ -17,8 +17,7 @@ export function run(): void {
   const program = Elm.Main.init({
     flags: {
       argv: process.argv,
-      randomNumber1: getRandomInt(1_000_000),
-      randomNumber2: getRandomInt(1_000_000),
+      randomNumbers: getRandomInts(1_000_000, 20),
       dataFilePath: SavedData.dataFilePath,
       workingDirectory: process.cwd(),
       data: data,
@@ -38,6 +37,10 @@ export function run(): void {
   portFunctions.forEach(function (portSetupFunction) {
     portSetupFunction(program)
   })
+}
+
+function getRandomInts(max: number, count: number): number[] {
+  return [...Array(count)].map(val => getRandomInt(max))
 }
 
 function getRandomInt(max: number): number {
