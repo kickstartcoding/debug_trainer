@@ -1,6 +1,6 @@
 {
   "name": "debug_trainer",
-  "version": "4.0.1",
+  "version": "5.0.1",
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,10 @@
   },
   "author": "Neurodynamic",
   "license": "ISC",
+  "keywords": [
+    "debug",
+    "debugging"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.10.5",

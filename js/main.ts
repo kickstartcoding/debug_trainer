@@ -21,7 +21,7 @@ export function run(): void {
       dataFilePath: SavedData.dataFilePath,
       workingDirectory: process.cwd(),
       data: data,
-      versionMessage: "4.0.1"
+      versionMessage: "5.0.1"
     }
   })
 
