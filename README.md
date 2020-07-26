@@ -10,7 +10,7 @@ npm install -g debug_trainer
 
 ## Usage:
 
-`debug_trainer` should work okay for most languages; I've tried to keep it fairly general.
+`debug_trainer` should work well for files in many different languages; I've tried to keep the changes it makes as generalizable as is reasonably possible.
 
 Replace `myFile.js` in any of these examples with one of the files in a project of yours.
 
