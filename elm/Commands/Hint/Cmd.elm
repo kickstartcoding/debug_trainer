@@ -42,13 +42,13 @@ printErrorDescriptionHint { changes } =
                     "No changes were made to this file. Curious. Probably a bug."
 
                 [ { breakType } ] ->
-                    "HINT: " ++ changeDescriptionFromBreakType breakType
+                    "HINT: " ++ BreakType.toChangeDescription breakType
 
                 changesList ->
                     BreakType.allBreakTypes
                         |> List.map (\breakType -> ( breakType, countOfType breakType changesList ))
                         |> List.filter (\( _, count ) -> count > 0)
-                        |> List.map (\( breakType, count ) -> timesDescription count ++ changeDescriptionFromBreakType breakType)
+                        |> List.map (\( breakType, count ) -> timesDescription count ++ BreakType.toChangeDescription breakType)
                         |> String.join "\n\n"
 
 
@@ -67,27 +67,6 @@ countOfType targetBreakType list =
     list
         |> List.filter (\{ breakType } -> breakType == targetBreakType)
         |> List.length
-
-
-changeDescriptionFromBreakType : BreakType -> String
-changeDescriptionFromBreakType breakType =
-    case breakType of
-        CaseSwap ->
-            "somewhere in this file, debug_trainer changed a word from "
-                ++ "starting with a capital letter to starting with "
-                ++ "a lowercase letter or vice versa."
-
-        RemoveReturn ->
-            "somewhere in this file, debug_trainer removed "
-                ++ "a `return` keyword from a function."
-
-        RemoveParenthesis ->
-            "somewhere in this file, debug_trainer removed "
-                ++ "an opening or closing parenthesis or bracket."
-
-        ChangeFunctionArgs ->
-            "somewhere in this file, debug_trainer changed "
-                ++ "the arguments to a function."
 
 
 printLineNumberHint : FileData -> Cmd Action

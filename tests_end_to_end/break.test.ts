@@ -84,6 +84,17 @@ describe("break command", () => {
     })
   })
 
+  describe("dot-access removal", () => {
+    test(`removes dot access`, () => {
+      createTestFileWithContent(`thing1.thing2.thing3`)
+      runBreakCommand()
+
+      const correctBreaks = ["thing1.thing2", "thing1.thing3", "thing2.thing3"]
+
+      expect(correctBreaks.includes(readTestFile())).toBeTruthy()
+    })
+  })
+
   describe("multi-error breaking", () => {
     test(`causes specified number of errors`, () => {
       createTestFileWithContent(`hey ho hi`)

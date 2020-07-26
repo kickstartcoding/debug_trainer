@@ -11,6 +11,7 @@ module Model exposing
     , explainInit
     , filePathStringFromCommand
     , hintInit
+    , initFileSaveStatus
     , resetInit
     )
 

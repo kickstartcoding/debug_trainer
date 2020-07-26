@@ -11,6 +11,7 @@ type SegmentType
     = Word BreakStatus
     | ReturnStatement BreakStatus
     | ParenthesisOrBracket BreakStatus
+    | DotAccess BreakStatus
     | FunctionDeclaration FunctionDeclarationData BreakStatus
     | Whitespace
     | Other

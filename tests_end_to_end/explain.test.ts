@@ -76,6 +76,20 @@ describe('explain command', () => {
     ))
   })
 
+  test(`explains dot-access removal`, () => {
+    createTestFileWithContent(`thing1.thing2.thing3`)
+    runBreakCommand()
+    const output = runExplainCommand()
+
+    const correctExplanations = [
+      "changed `thing1.thing2.thing3` to `thing1.thing2` on line 1 of the original file",
+      "changed `thing1.thing2.thing3` to `thing1.thing3` on line 1 of the original file",
+      "changed `thing1.thing2.thing3` to `thing2.thing3` on line 1 of the original file",
+    ]
+
+    expect(correctExplanations.includes(output.trim())).toBeTruthy()
+  })
+
   test("explains multiple errors if multiple errors were introduced", () => {
     createTestFileWithContent('{\n return  function functionName(arg1, arg2) ')
     runBreakCommand(3)

@@ -4,7 +4,7 @@ import Expect
 import Parser exposing (DeadEnd)
 
 
-expectResult : (String -> Result (List DeadEnd) dataType) -> String -> dataType -> Expect.Expectation
+expectResult : (String -> Result errorType dataType) -> String -> dataType -> Expect.Expectation
 expectResult parseFunc source expected =
     case parseFunc source of
         Err deadEnds ->
@@ -16,3 +16,4 @@ expectResult parseFunc source expected =
 
         Ok validResult ->
             Expect.equal validResult expected
+

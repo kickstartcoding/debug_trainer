@@ -35,6 +35,9 @@ segment =
                     , parenthesisOrBracketAtStartOrEndOfLine
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content (ParenthesisOrBracket BreakNotAppliedYet))
+                    , dotAccess
+                        |> getChompedString
+                        |> Parser.map (\content -> Segment offset content (DotAccess BreakNotAppliedYet))
                     , word
                         |> getChompedString
                         |> Parser.map (\content -> Segment offset content (Word BreakNotAppliedYet))
@@ -60,6 +63,20 @@ returnStatement =
                     |. token "return"
            )
         |. Whitespace.one
+
+
+dotAccess : Parser ()
+dotAccess =
+    succeed ()
+        |. (backtrackable <|
+                succeed ()
+                    |. word
+                    |. Repeat.oneOrMore
+                        (succeed ()
+                            |. token "."
+                            |. word
+                        )
+           )
 
 
 parenthesisOrBracketAtStartOrEndOfLine : Parser ()
@@ -136,7 +153,7 @@ wordCharacter =
 
 isWordCharacter : Char -> Bool
 isWordCharacter char =
-    Char.isAlphaNum char || List.member char [ '_', '-' ]
+    Char.isAlphaNum char || List.member char [ '_' ]
 
 
 otherCharacter : Parser ()

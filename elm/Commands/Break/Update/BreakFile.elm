@@ -1,18 +1,15 @@
 module Commands.Break.Update.BreakFile exposing (run)
 
-import Breakers.CaseSwap as CaseSwap
-import Breakers.ChangeFunctionArgs as ChangeFunctionArgs
-import Breakers.RemoveParenthesis as RemoveParenthesis
-import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
 import Model exposing (Command(..), FileSaveStatus, Model)
 import Model.SavedData as SavedData exposing (ChangeData)
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)
+import Parsers.Generic.SegmentList as SegmentList
 import Ports
 import Utils.List
-import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.BreakType as BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
@@ -62,6 +59,7 @@ run ({ breakCount, filepath, fileSaveStatus, fileContent, model } as config) =
                         , filepath = filepath
                         , fileSaveStatus = fileSaveStatus
                         }
+                , savedDataResult = Ok newSavedData
               }
             , Cmd.batch
                 [ Ports.writeFile
@@ -94,12 +92,7 @@ buildChanges :
 buildChanges config segments changes =
     let
         ( breakTypeChoiceSeed, segmentChoiceSeed ) =
-            case List.drop (config.breakCount * 2) config.model.randomNumbers of
-                num1 :: num2 :: _ ->
-                    ( num1, num2 )
-
-                _ ->
-                    ( 0, 0 )
+            getSeeds config.breakCount config.model.randomNumbers
 
         maybeBreakType =
             chooseBreakType segments breakTypeChoiceSeed
@@ -110,24 +103,10 @@ buildChanges config segments changes =
             , segments = segments
             }
 
-        maybeChanges =
-            case maybeBreakType of
-                Just CaseSwap ->
-                    CaseSwap.run breakRunnerData
-
-                Just RemoveReturn ->
-                    RemoveReturn.run breakRunnerData
-
-                Just RemoveParenthesis ->
-                    RemoveParenthesis.run breakRunnerData
-
-                Just ChangeFunctionArgs ->
-                    ChangeFunctionArgs.run breakRunnerData
-
-                _ ->
-                    Nothing
+        maybeChange =
+            SegmentList.makeAChange maybeBreakType breakRunnerData
     in
-    case maybeChanges of
+    case maybeChange of
         Just ( newSegments, change ) ->
             if config.breakCount == 1 then
                 ( newSegments, change :: changes )
@@ -141,42 +120,29 @@ buildChanges config segments changes =
             ( segments, changes )
 
 
+getSeeds : Int -> List Int -> ( Int, Int )
+getSeeds breakCount randomNumberList =
+    case List.drop (breakCount * 2) randomNumberList of
+        num1 :: num2 :: _ ->
+            ( num1, num2 )
+
+        _ ->
+            ( 0, 0 )
+
+
 chooseBreakType : List Segment -> Int -> Maybe BreakType
 chooseBreakType segments breakTypeInt =
     let
-        caseSwapCandidateCount =
-            segments
-                |> Breakers.Utils.candidates CaseSwap.validCandidateData
-                |> List.length
-
-        returnStatementCandidateCount =
-            segments
-                |> Breakers.Utils.candidates RemoveReturn.validCandidateData
-                |> List.length
-
-        parenthesisCandidateCount =
-            segments
-                |> Breakers.Utils.candidates RemoveParenthesis.validCandidateData
-                |> List.length
-
-        functionDeclarationCandidateCount =
-            segments
-                |> Breakers.Utils.candidates ChangeFunctionArgs.validCandidateData
-                |> List.length
+        viableBreakTypePossibilities =
+            BreakType.allBreakTypes
+                |> List.map
+                    (\breakType ->
+                        ( breakType, SegmentList.countForBreakType breakType segments )
+                    )
+                |> List.filter (\( _, count ) -> count > 0)
 
         totalCandidateCount =
-            caseSwapCandidateCount
-                + returnStatementCandidateCount
-                + parenthesisCandidateCount
-                + functionDeclarationCandidateCount
-
-        viableBreakTypePossibilities =
-            [ ( CaseSwap, caseSwapCandidateCount )
-            , ( RemoveReturn, returnStatementCandidateCount )
-            , ( RemoveParenthesis, parenthesisCandidateCount )
-            , ( ChangeFunctionArgs, functionDeclarationCandidateCount )
-            ]
-                |> List.filter (\( _, count ) -> count > 0)
+            List.foldl (Tuple.second >> (+)) 0 viableBreakTypePossibilities
 
         totalViableBreakTypes =
             List.length viableBreakTypePossibilities

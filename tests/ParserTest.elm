@@ -94,4 +94,14 @@ suite =
                 TestHelp.expectResult GenericParser.run
                     "}\n"
                     [ { content = "}\n", offset = 0, segmentType = ParenthesisOrBracket BreakNotAppliedYet } ]
+        , test "detects dot-access" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "thing1.thing2"
+                    [ { content = "thing1.thing2", offset = 0, segmentType = DotAccess BreakNotAppliedYet } ]
+        , test "detects triple dot-access" <|
+            \_ ->
+                TestHelp.expectResult GenericParser.run
+                    "thing1.thing2.thing3"
+                    [ { content = "thing1.thing2.thing3", offset = 0, segmentType = DotAccess BreakNotAppliedYet } ]
         ]
