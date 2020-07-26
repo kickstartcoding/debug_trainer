@@ -51,7 +51,7 @@ toChangeDescription breakType =
         RemoveDotAccess ->
             "somewhere in this file, `debug_trainer` removed "
                 ++ "one part of a dot-access chain (for example, "
-                ++ "changing thing1.thing2.thing3 to thing1.thing2)."
+                ++ "changing `thing1.thing2.thing3` to `thing1.thing2`)."
 
 
 encode : BreakType -> Value
