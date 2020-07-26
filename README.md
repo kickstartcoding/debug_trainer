@@ -15,17 +15,22 @@ Randomly introduce an error into the specified file:
 debug_trainer break <filepath>
 ```
 
-Display a hint that explains what type of error was introduced into the specified file:
+Randomly introduce three errors into the specified file:
+```
+debug_trainer break --count 3 <filepath>
+```
+
+Display a hint that explains what type of error(s) were introduced into the specified file:
 ```
 debug_trainer error-type-hint <filepath>
 ```
 
-Display a hint that tells you the line number where the error was introduced into the specified file:
+Display a hint that tells you the line number where the error(s) were introduced into the specified file:
 ```
 debug_trainer line-hint <filepath>
 ```
 
-Describe exactly what part of the specified file was broken and how:
+Describe exactly what part(s) of the specified file were broken and how:
 ```
 debug_trainer explain <filepath>
 ```
@@ -37,7 +42,6 @@ debug_trainer reset <filepath>
 
 ## Possible future features:
 
-- Multiple simultaneous errors (user choice of how many)
 - Command to revert file to broken state, without any user changes made while debugging
 - Command to console log content of the original, working file
 - Command to console log content of the original broken state without any user changes made while debugging

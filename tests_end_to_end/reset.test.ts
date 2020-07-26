@@ -21,6 +21,17 @@ describe('reset command', () => {
     expect(readTestFile()).toEqual('Test')
   })
 
+  test("resets file to original state even with multiple errors", () => {
+    createTestFileWithContent('Test Test Test Test Test Test Test')
+    runBreakCommand(10)
+
+    expect(readTestFile()).toEqual('test test test test test test test')
+
+    runResetCommand()
+
+    expect(readTestFile()).toEqual('Test Test Test Test Test Test Test')
+  })
+
   test("does nothing if file hasn't been broken", () => {
     createTestFileWithContent('Test')
     const output = runResetCommand()

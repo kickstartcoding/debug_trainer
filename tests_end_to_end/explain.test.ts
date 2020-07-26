@@ -1,6 +1,6 @@
 import {
   runBreakCommand,
-  runLineExplainCommand,
+  runExplainCommand,
   createTestFileWithContent,
   readTestFile,
   clearTestFile,
@@ -14,7 +14,7 @@ describe('explain command', () => {
     createTestFileWithContent('Test')
     runBreakCommand()
 
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
       'changed `Test` to `test` on line 1 of the original file'
@@ -25,7 +25,7 @@ describe('explain command', () => {
     createTestFileWithContent(' function functionName(arg1) ')
     runBreakCommand()
 
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
       'removed the `arg1` argument from `functionName` on line 1 of the original file'
@@ -36,7 +36,7 @@ describe('explain command', () => {
     createTestFileWithContent(' function functionName(arg1, arg2) ')
     runBreakCommand()
 
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
       'switched the positions of `arg1` and `arg2` in `functionName` on line 1 of the original file'
@@ -47,7 +47,7 @@ describe('explain command', () => {
     createTestFileWithContent(' return ')
     runBreakCommand()
 
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
       'removed a `return` on line 1 of the original file'
@@ -58,7 +58,7 @@ describe('explain command', () => {
     createTestFileWithContent('\n{')
     runBreakCommand()
 
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
       'removed a `{` from the beginning of the line on line 2 of the original file'
@@ -69,16 +69,33 @@ describe('explain command', () => {
     createTestFileWithContent('{\n')
     runBreakCommand()
 
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(output).toEqual(expect.stringContaining(
       'removed a `{` from the end of the line on line 1 of the original file'
     ))
   })
 
+  test("explains multiple errors if multiple errors were introduced", () => {
+    createTestFileWithContent('{\n return  function functionName(arg1, arg2) ')
+    runBreakCommand(3)
+
+    const output = runExplainCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      "removed a `{` from the end of the line on line 1 of the original file"
+    ))
+    expect(output).toEqual(expect.stringContaining(
+      "removed a `return` on line 2 of the original file"
+    ))
+    expect(output).toEqual(expect.stringContaining(
+      "switched the positions of `arg1` and `arg2` in `functionName` on line 2 of the original file"
+    ))
+  })
+
   test("does nothing if file hasn't been broken", () => {
     createTestFileWithContent('Test')
-    const output = runLineExplainCommand()
+    const output = runExplainCommand()
 
     expect(readTestFile()).toEqual('Test')
     expect(output).toEqual(expect.stringContaining(

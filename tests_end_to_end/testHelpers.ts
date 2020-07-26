@@ -4,8 +4,12 @@ import { execSync } from 'child_process'
 export const testFileName: string = "testfile.txt"
 export const dataFileName: string = "debug_trainer_test_save_file.json"
 
-export function runBreakCommand(): string {
-  return runCommand(`break ${testFileName}`)
+export function runBreakCommand(errorCount?: number): string {
+  if (errorCount) {
+    return runCommand(`break --count ${errorCount} ${testFileName}`)
+  } else {
+    return runCommand(`break ${testFileName}`)
+  }
 }
 
 export function runErrorTypeHintCommand(): string {
@@ -16,7 +20,7 @@ export function runLineNumberHintCommand(): string {
   return runCommand(`line-hint ${testFileName}`)
 }
 
-export function runLineExplainCommand(): string {
+export function runExplainCommand(): string {
   return runCommand(`explain ${testFileName}`)
 }
 

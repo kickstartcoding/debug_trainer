@@ -63,7 +63,7 @@ type alias FunctionChangeData =
 validCandidateData : Segment -> Maybe FunctionChangeData
 validCandidateData ({ segmentType } as segment) =
     case segmentType of
-        FunctionDeclaration ({ arguments } as data) _ ->
+        FunctionDeclaration ({ arguments } as data) BreakNotAppliedYet ->
             let
                 dataWithNewArgs newArgs =
                     { segment = segment

@@ -57,4 +57,16 @@ describe("error-type-hint command", () => {
 
     expect(output).toEqual(expect.stringContaining('HINT: The line where the change was made was line 3 of the original file.'))
   })
+
+
+  test("a full list of line numbers if multiple errors were introduced", () => {
+    createTestFileWithContent('{\n return  function functionName(arg1, arg2) }\n')
+    runBreakCommand(4)
+
+    const output = runLineNumberHintCommand()
+
+    expect(output).toEqual(expect.stringContaining(
+      "Changes were made on these lines of the original file: 1, 2"
+    ))
+  })
 })

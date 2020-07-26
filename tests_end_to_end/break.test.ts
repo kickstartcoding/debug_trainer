@@ -83,4 +83,20 @@ describe("break command", () => {
       expect(readTestFile()).toEqual(' function functionName(arg2, arg1, arg3) ')
     })
   })
+
+  describe("multi-error breaking", () => {
+    test(`causes specified number of errors`, () => {
+      createTestFileWithContent(`hey ho hi`)
+      runBreakCommand(3)
+
+      expect(readTestFile()).toEqual("Hey Ho Hi")
+    })
+
+    test(`gives up on more errors if no possible errors left`, () => {
+      createTestFileWithContent(`hey ho hi`)
+      runBreakCommand(9999)
+
+      expect(readTestFile()).toEqual("Hey Ho Hi")
+    })
+  })
 })

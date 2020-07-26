@@ -1,12 +1,11 @@
 module Commands.Hint.Cmd exposing (init)
 
 import Actions exposing (Action)
-import Http exposing (Error)
+import List.Extra as ListEx
 import Model exposing (Command(..), HintType(..), Model)
 import Model.SavedData exposing (ChangeData, FileData, SavedDataError(..))
 import Ports
 import Utils.Cmd as Cmd
-import Utils.FileContent as FileContent
 import Utils.Messages as Messages
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
 import Utils.Types.FilePath exposing (FilePath)
@@ -74,20 +73,20 @@ changeDescriptionFromBreakType : BreakType -> String
 changeDescriptionFromBreakType breakType =
     case breakType of
         CaseSwap ->
-            "Somewhere in this file, debug_trainer changed a word from "
+            "somewhere in this file, debug_trainer changed a word from "
                 ++ "starting with a capital letter to starting with "
                 ++ "a lowercase letter or vice versa."
 
         RemoveReturn ->
-            "Somewhere in this file, debug_trainer removed "
+            "somewhere in this file, debug_trainer removed "
                 ++ "a `return` keyword from a function."
 
         RemoveParenthesis ->
-            "Somewhere in this file, debug_trainer removed "
+            "somewhere in this file, debug_trainer removed "
                 ++ "an opening or closing parenthesis or bracket."
 
         ChangeFunctionArgs ->
-            "Somewhere in this file, debug_trainer changed "
+            "somewhere in this file, debug_trainer changed "
                 ++ "the arguments to a function."
 
 
@@ -109,7 +108,10 @@ printLineNumberHint { changes } =
                 "\n\n"
                     ++ "HINT: Changes were made on these lines of the original file: "
                     ++ (changesList
-                            |> List.map (.lineNumber >> String.fromInt)
+                            |> List.map .lineNumber
+                            |> ListEx.unique
+                            |> List.sort
+                            |> List.map String.fromInt
                             |> String.join ", "
                        )
                     ++ "\n\n"
