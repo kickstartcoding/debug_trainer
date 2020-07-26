@@ -10,34 +10,34 @@ npm install -g debug_trainer
 
 ## Usage:
 
-Randomly introduce an error into the specified file:
+Randomly introduce an error into `myFile.js`:
 ```bash
-debug_trainer break <filepath>
+debug_trainer break myFile.js
 ```
 
-Randomly introduce three errors into the specified file:
+Randomly introduce three errors into `myFile.js`:
 ```bash
-debug_trainer break --count 3 <filepath>
+debug_trainer break --count 3 myFile.js
 ```
 
-Display a hint that explains what type of error(s) were introduced into the specified file:
+Display a hint that explains what type of error(s) were introduced into `myFile.js`:
 ```bash
-debug_trainer error-type-hint <filepath>
+debug_trainer error-type-hint myFile.js
 ```
 
-Display a hint that tells you the line number where the error(s) were introduced into the specified file:
+Display a hint that tells you the line number where the error(s) were introduced into `myFile.js`:
 ```bash
-debug_trainer line-hint <filepath>
+debug_trainer line-hint myFile.js
 ```
 
-Describe exactly what part(s) of the specified file were broken and how:
+Describe exactly what part(s) of `myFile.js` were broken and how:
 ```bash
-debug_trainer explain <filepath>
+debug_trainer explain myFile.js
 ```
 
-Change the specified file back to its original, unbroken state:
+Change `myFile.js` back to its original, unbroken state:
 ```bash
-debug_trainer reset <filepath>
+debug_trainer reset myFile.js
 ```
 
 ## Possible future features:
