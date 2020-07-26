@@ -4,7 +4,7 @@ Randomly break your code and then use your debugging skills to fix it!
 
 ## Installation
 
-```
+```bash
 npm install -g debug_trainer
 ```
 
