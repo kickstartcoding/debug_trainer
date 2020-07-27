@@ -22,7 +22,7 @@ This package should work well for files in many different languages; I've tried 
 npm install -g debug_trainer
 ```
 
-## Usage:
+## Usage
 
 Replace `myFile.js` in any of these examples with one of the files in a project of yours (it does not have to be a JavaScript file).
 
@@ -56,7 +56,7 @@ Change `myFile.js` back to its original, unbroken state:
 debug_trainer reset myFile.js
 ```
 
-## Possible future features:
+## Possible future features
 
 - Command to revert file to broken state, without any user changes made while debugging
 - Command to console log content of the original, working file
@@ -66,7 +66,7 @@ debug_trainer reset myFile.js
 - Command to remove break data without resetting any files
 - Ability to run the file to confirm the original isn't broken, or to confirm that the broken version is actually broken
 
-## Possible future error possibilities to introduce:
+## Possible future error possibilities to introduce
 
 - == vs = swap
 - underscore vs hyphen swap
