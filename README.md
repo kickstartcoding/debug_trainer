@@ -4,7 +4,7 @@ Randomly break your code and then use your debugging skills to fix it!
 
 ## What is it?
 
-`debug_trainer` is a terminal program that can introduce a random error (or errors if you're feeling adventurous) into a file of your choosing (the `break` command), so that you can practice debugging.
+`debug_trainer` is a terminal program that helps you practice debugging by breaking your code in random ways, so that you can practice tracking down and fixing the errors.
 
 The `break` command will introduce an error to a file of your choosing.
 
