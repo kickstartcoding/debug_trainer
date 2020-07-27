@@ -45,31 +45,3 @@ update _ action ({ command } as model) =
             , Ports.printAndExitFailure
                 "Encountered a bug in the program: mismatched command and action."
             )
-
-
-
--- case action of
---     BreakAction filepath fileSaveStatus subAction ->
---         let
---             ( newModel, cmd ) =
---                 Commands.Break.Update.update filepath  subAction model
---         in
---         ( newModel, Cmd.map (BreakAction filepath fileSaveStatus) cmd )
---     HintAction filepath subAction ->
---         let
---             ( newModel, cmd ) =
---                 Commands.Hint.Update.update filepath subAction model
---         in
---         ( newModel, Cmd.map (HintAction filepath) cmd )
---     ExplainAction filepath subAction ->
---         let
---             ( newModel, cmd ) =
---                 Commands.Explain.Update.update filepath subAction model
---         in
---         ( newModel, Cmd.map (ExplainAction filepath) cmd )
---     ResetAction filepath subAction ->
---         let
---             ( newModel, cmd ) =
---                 Commands.Reset.Update.update filepath subAction model
---         in
---         ( newModel, Cmd.map (ResetAction filepath) cmd )
