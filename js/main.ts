@@ -29,7 +29,7 @@ export function run(): void {
     print,
     printAndExitFailure,
     printAndExitSuccess,
-    exitSuccess,
+    // exitSuccess,
     readFile,
     writeFile
   ]

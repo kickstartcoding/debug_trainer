@@ -12,6 +12,7 @@ toggleTitleCase : String -> String
 toggleTitleCase string =
     if isTitleCase string then
         StrEx.decapitalize string
+
     else
         StrEx.toTitleCase string
 

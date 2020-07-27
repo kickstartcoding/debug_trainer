@@ -8,11 +8,16 @@ export default function (program): void {
     devLog(`Writing new content of \`${fileData.path}\`...`)
     fs.writeFile(fileData.path, fileData.content, function (err) {
       if (err) {
-        formattedErrorLog(err.toString())
+        if (err.code === "ENOENT") {
+          formattedErrorLog(`I couldn't find a file at \`${fileData.path}\``)
+        } else {
+          formattedErrorLog(err.toString())
+        }
         process.exit(1)
       }
 
       devLog('New file content written!');
+      devLog("fileData:", JSON.stringify(fileData));
 
       program.ports.successfulFileWrite.send(fileData)
     })

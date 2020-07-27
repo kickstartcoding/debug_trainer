@@ -1,4 +1,4 @@
-module Utils.Cmd exposing (exitIfAllSavesAreComplete, fromFileData)
+module Utils.Cmd exposing (exitIfAllSavesAreComplete, fromFileData, printAndExitIfAllSavesAreComplete)
 
 import Actions exposing (Action)
 import Model exposing (Command(..), FileSaveStatus, Model)
@@ -12,6 +12,15 @@ exitIfAllSavesAreComplete : FileSaveStatus -> Cmd action
 exitIfAllSavesAreComplete fileSaveStatus =
     if Model.allSavesComplete fileSaveStatus then
         Ports.exitSuccess ()
+
+    else
+        Cmd.none
+
+
+printAndExitIfAllSavesAreComplete : String -> FileSaveStatus -> Cmd action
+printAndExitIfAllSavesAreComplete text fileSaveStatus =
+    if Model.allSavesComplete fileSaveStatus then
+        Ports.printAndExitSuccess text
 
     else
         Cmd.none

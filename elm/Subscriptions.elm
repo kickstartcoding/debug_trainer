@@ -2,6 +2,7 @@ module Subscriptions exposing (subscriptions)
 
 import Actions exposing (Action(..))
 import Commands.Break.Subscriptions
+import Commands.Reset.Subscriptions
 import Model exposing (Command(..), Model)
 
 
@@ -18,4 +19,4 @@ subscriptions ({ command } as model) =
             Sub.none
 
         Reset _ _ ->
-            Sub.none
+            Sub.map ResetAction (Commands.Reset.Subscriptions.subscriptions model)

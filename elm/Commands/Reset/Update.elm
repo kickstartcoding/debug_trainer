@@ -3,6 +3,7 @@ module Commands.Reset.Update exposing (update)
 import Commands.Reset.Actions exposing (Action(..))
 import Model exposing (Command(..), FileSaveStatus, Model)
 import Utils.Cmd as Cmd
+import Utils.Messages as Messages
 import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 
@@ -27,7 +28,7 @@ confirmTargetFileWrite targetFilepath fileSaveStatus model =
         newModel =
             { model | command = Reset targetFilepath newFileSaveStatus }
     in
-    ( newModel, Cmd.exitIfAllSavesAreComplete newFileSaveStatus )
+    ( newModel, Cmd.printAndExitIfAllSavesAreComplete (resetCompleteMessage targetFilepath) newFileSaveStatus )
 
 
 confirmSaveDataFileWrite : FilePath -> FileSaveStatus -> Model -> ( Model, Cmd Action )
@@ -39,4 +40,12 @@ confirmSaveDataFileWrite targetFilepath fileSaveStatus model =
         newModel =
             { model | command = Reset targetFilepath newFileSaveStatus }
     in
-    ( newModel, Cmd.exitIfAllSavesAreComplete newFileSaveStatus )
+    ( newModel, Cmd.printAndExitIfAllSavesAreComplete (resetCompleteMessage targetFilepath) newFileSaveStatus )
+
+
+resetCompleteMessage : FilePath -> String
+resetCompleteMessage filepath =
+    Messages.withNewlineBuffers <|
+        "`"
+            ++ FilePath.toString filepath
+            ++ "` has been reset!"
