@@ -65,6 +65,7 @@ debug_trainer reset myFile.js
 - Command to reset *all* broken files
 - Command to remove break data without resetting any files
 - Ability to run the file to confirm the original isn't broken, or to confirm that the broken version is actually broken
+- Add more encouragements (perhaps using Leslie Knope compliments for inspiration?)
 
 ## Possible future error possibilities to introduce
 
