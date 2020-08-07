@@ -121,4 +121,14 @@ suite =
                 TestHelp.expectResult (GenericParser.run Ruby)
                     "=begin comment\ncomment =end"
                     [ { content = "=begin comment\ncomment =end", offset = 0, segmentType = Comment } ]
+        , test "detects double-quoted strings" <|
+            \_ ->
+                TestHelp.expectResult (GenericParser.run Ruby)
+                    "\"word word word\""
+                    [ { content = "\"word word word\"", offset = 0, segmentType = String } ]
+        , test "detects single-quoted strings" <|
+            \_ ->
+                TestHelp.expectResult (GenericParser.run Ruby)
+                    "\'word word word\'"
+                    [ { content = "\'word word word\'", offset = 0, segmentType = String } ]
         ]

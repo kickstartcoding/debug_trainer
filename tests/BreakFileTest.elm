@@ -106,4 +106,18 @@ suite =
                             }
                 ]
             ]
+        , describe "string ignoring functionality"
+            [ test "ignores double-quoted strings" <|
+                \_ ->
+                    expectBreakResult
+                        { input = "\"word word word\""
+                        , output = "\"word word word\""
+                        }
+            , test "ignores single-quoted strings" <|
+                \_ ->
+                    expectBreakResult
+                        { input = "'word word word'"
+                        , output = "'word word word'"
+                        }
+            ]
         ]
