@@ -14,6 +14,7 @@ type SegmentType
     | DotAccess BreakStatus
     | FunctionDeclaration NamedFunctionDeclaration BreakStatus
     | Whitespace
+    | String
     | Comment
     | Other
 

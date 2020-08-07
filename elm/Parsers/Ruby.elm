@@ -29,6 +29,5 @@ comment =
 blockComment : Parser ()
 blockComment =
     succeed ()
-     |. multiComment "=begin" "=end" NotNestable
-     |. token "=end"
-    
+        |. multiComment "=begin" "=end" NotNestable
+        |. token "=end"

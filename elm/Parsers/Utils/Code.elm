@@ -3,6 +3,7 @@ module Parsers.Utils.Code exposing
     , parenthesisOrBracket
     , returnStatement
     , word
+    , string
     )
 
 import Parser exposing (..)
@@ -53,3 +54,32 @@ otherCharacter =
 isOtherCharacter : Char -> Bool
 isOtherCharacter char =
     not (isWordCharacter char) && not (Whitespace.isValidWhiteSpace char)
+
+
+string : Parser ()
+string =
+    oneOf
+        [ doubleQuoteString
+        , singleQuoteString
+        ]
+
+
+doubleQuoteString : Parser ()
+doubleQuoteString =
+    succeed ()
+        |. token "\""
+        |. Repeat.zeroOrMore
+            (oneOf
+                [ token "\\\""
+                , chompIf (\char -> char /= '"')
+                ]
+            )
+        |. token "\""
+
+
+singleQuoteString : Parser ()
+singleQuoteString =
+    succeed ()
+        |. token "'"
+        |. Repeat.zeroOrMore (chompIf (\char -> char /= '\''))
+        |. token "'"

@@ -35,7 +35,7 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , JavaScript.blockComment
                                 |> mapStringToSegment offset Comment
-                            , Parsers.Utils.stringAndResult JavaScript.functionDeclaration
+                            , Parsers.Utils.contentAndResult JavaScript.functionDeclaration
                                 |> Parser.map
                                     (\( content, data ) ->
                                         Segment offset
@@ -49,7 +49,7 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , Python.blockComment
                                 |> mapStringToSegment offset Comment
-                            , Parsers.Utils.stringAndResult Python.functionDeclaration
+                            , Parsers.Utils.contentAndResult Python.functionDeclaration
                                 |> Parser.map
                                     (\( content, data ) ->
                                         Segment offset
@@ -63,7 +63,7 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , Ruby.blockComment
                                 |> mapStringToSegment offset Comment
-                            , Parsers.Utils.stringAndResult Ruby.functionDeclaration
+                            , Parsers.Utils.contentAndResult Ruby.functionDeclaration
                                 |> Parser.map
                                     (\( content, data ) ->
                                         Segment offset
@@ -73,7 +73,7 @@ segment fileType =
                             ]
 
                         Unknown ->
-                            [ Parsers.Utils.stringAndResult UnknownLanguage.functionDeclaration
+                            [ Parsers.Utils.contentAndResult UnknownLanguage.functionDeclaration
                                 |> Parser.map
                                     (\( content, data ) ->
                                         Segment offset
@@ -90,6 +90,8 @@ segment fileType =
                                 |> mapStringToSegment offset (DotAccess BreakNotAppliedYet)
                            , Code.word
                                 |> mapStringToSegment offset (Word BreakNotAppliedYet)
+                           , Code.string
+                                |> mapStringToSegment offset String
                            , Repeat.oneOrMore (chompIf Whitespace.isNonNewlineWhiteSpace)
                                 |> mapStringToSegment offset Whitespace
                            , chompIf (\char -> char == '\n')
