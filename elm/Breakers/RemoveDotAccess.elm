@@ -1,6 +1,6 @@
 module Breakers.RemoveDotAccess exposing (run, validCandidateData)
 
-import Breakers.Utils
+import Breakers.Utils exposing (BreakRunnerData)
 import List.Extra as ListEx
 import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
@@ -9,7 +9,7 @@ import Utils.List
 import Utils.Types.BreakType exposing (BreakType(..))
 
 
-run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe ( List Segment, ChangeData )
+run : BreakRunnerData -> Maybe ( List Segment, ChangeData )
 run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData

@@ -1,10 +1,10 @@
 module Parsers.Generic.Segment exposing
     ( BreakStatus(..)
-    , FunctionDeclarationData
     , Segment
     , SegmentType(..)
-    , functionDeclarationDataToString
     )
+
+import Utils.Types.NamedFunctionDeclaration exposing (NamedFunctionDeclaration)
 
 
 type SegmentType
@@ -12,27 +12,15 @@ type SegmentType
     | ReturnStatement BreakStatus
     | ParenthesisOrBracket BreakStatus
     | DotAccess BreakStatus
-    | FunctionDeclaration FunctionDeclarationData BreakStatus
+    | FunctionDeclaration NamedFunctionDeclaration BreakStatus
     | Whitespace
+    | Comment
     | Other
 
 
 type BreakStatus
     = BreakHasBeenApplied
     | BreakNotAppliedYet
-
-
-type alias FunctionDeclarationData =
-    { precedingWhitespace : String
-    , declarationWord : String
-    , name : String
-    , arguments : List String
-    }
-
-
-functionDeclarationDataToString : FunctionDeclarationData -> String
-functionDeclarationDataToString { precedingWhitespace, declarationWord, name, arguments } =
-    precedingWhitespace ++ declarationWord ++ name ++ "(" ++ String.join ", " arguments ++ ")"
 
 
 type alias Segment =

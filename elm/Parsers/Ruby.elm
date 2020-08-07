@@ -1,4 +1,4 @@
-module Parsers.Python exposing (blockComment, comment, functionDeclaration)
+module Parsers.Ruby exposing (blockComment, comment, functionDeclaration)
 
 import Parser exposing (..)
 import Parsers.Utils.Code as Code
@@ -29,5 +29,6 @@ comment =
 blockComment : Parser ()
 blockComment =
     succeed ()
-     |. multiComment "'''" "'''" NotNestable
-     |. token "'''"
+     |. multiComment "=begin" "=end" NotNestable
+     |. token "=end"
+    

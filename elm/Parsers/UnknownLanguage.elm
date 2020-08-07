@@ -1,4 +1,4 @@
-module Parsers.Python exposing (blockComment, comment, functionDeclaration)
+module Parsers.UnknownLanguage exposing (functionDeclaration)
 
 import Parser exposing (..)
 import Parsers.Utils.Code as Code
@@ -7,11 +7,12 @@ import Parsers.Utils.Whitespace as Whitespace
 import Utils.Types.NamedFunctionDeclaration exposing (NamedFunctionDeclaration)
 
 
+
 functionDeclaration : Parser NamedFunctionDeclaration
 functionDeclaration =
     backtrackable <|
         succeed NamedFunctionDeclaration
-            |= (getChompedString <| token "def")
+            |= (getChompedString <| oneOf [ token "function", token "def" ])
             |. token " "
             |= (getChompedString <| Code.word)
             |. token "("
@@ -19,15 +20,3 @@ functionDeclaration =
                 Repeat.commaSeparator
                 Code.word
             |. token ")"
-
-
-comment : Parser ()
-comment =
-    lineComment "#"
-
-
-blockComment : Parser ()
-blockComment =
-    succeed ()
-     |. multiComment "'''" "'''" NotNestable
-     |. token "'''"

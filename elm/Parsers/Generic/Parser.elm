@@ -1,68 +1,111 @@
 module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
-import Parsers.Generic.Segment exposing (BreakStatus(..), FunctionDeclarationData, Segment, SegmentType(..))
+import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
+import Parsers.JavaScript as JavaScript
+import Parsers.Python as Python
+import Parsers.Ruby as Ruby
+import Parsers.UnknownLanguage as UnknownLanguage
+import Parsers.Utils
+import Parsers.Utils.Code as Code
 import Parsers.Utils.Repeat as Repeat
 import Parsers.Utils.Whitespace as Whitespace
+import Utils.Types.FileType exposing (FileType(..))
 
 
-run : String -> Result (List DeadEnd) (List Segment)
-run string =
-    Parser.run segments string
+run : FileType -> String -> Result (List DeadEnd) (List Segment)
+run fileType string =
+    Parser.run (segments fileType) string
 
 
-segments : Parser (List Segment)
-segments =
-    Repeat.oneOrMore segment
+segments : FileType -> Parser (List Segment)
+segments fileType =
+    Repeat.oneOrMore (segment fileType)
 
 
-segment : Parser Segment
-segment =
+segment : FileType -> Parser Segment
+segment fileType =
     getOffset
         |> andThen
             (\offset ->
                 oneOf
-                    [ returnStatement
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content (ReturnStatement BreakNotAppliedYet))
-                    , functionDeclarationWithContent
-                        |> Parser.map
-                            (\( content, data ) ->
-                                Segment offset
-                                    content
-                                    (FunctionDeclaration data BreakNotAppliedYet)
-                            )
-                    , parenthesisOrBracketAtStartOrEndOfLine
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content (ParenthesisOrBracket BreakNotAppliedYet))
-                    , dotAccess
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content (DotAccess BreakNotAppliedYet))
-                    , word
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content (Word BreakNotAppliedYet))
-                    , Repeat.oneOrMore (chompIf Whitespace.isNonNewlineWhiteSpace)
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content Whitespace)
-                    , chompIf (\char -> char == '\n')
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content Whitespace)
-                    , Repeat.oneOrMore otherCharacter
-                        |> getChompedString
-                        |> Parser.map (\content -> Segment offset content Other)
-                    ]
+                    ((case fileType of
+                        JavaScript ->
+                            [ JavaScript.comment
+                                |> mapStringToSegment offset Comment
+                            , JavaScript.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Parsers.Utils.stringAndResult JavaScript.functionDeclaration
+                                |> Parser.map
+                                    (\( content, data ) ->
+                                        Segment offset
+                                            content
+                                            (FunctionDeclaration data BreakNotAppliedYet)
+                                    )
+                            ]
+
+                        Python ->
+                            [ Python.comment
+                                |> mapStringToSegment offset Comment
+                            , Python.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Parsers.Utils.stringAndResult Python.functionDeclaration
+                                |> Parser.map
+                                    (\( content, data ) ->
+                                        Segment offset
+                                            content
+                                            (FunctionDeclaration data BreakNotAppliedYet)
+                                    )
+                            ]
+
+                        Ruby ->
+                            [ Ruby.comment
+                                |> mapStringToSegment offset Comment
+                            , Ruby.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Parsers.Utils.stringAndResult Ruby.functionDeclaration
+                                |> Parser.map
+                                    (\( content, data ) ->
+                                        Segment offset
+                                            content
+                                            (FunctionDeclaration data BreakNotAppliedYet)
+                                    )
+                            ]
+
+                        Unknown ->
+                            [ Parsers.Utils.stringAndResult UnknownLanguage.functionDeclaration
+                                |> Parser.map
+                                    (\( content, data ) ->
+                                        Segment offset
+                                            content
+                                            (FunctionDeclaration data BreakNotAppliedYet)
+                                    )
+                            ]
+                     )
+                        ++ [ Code.returnStatement
+                                |> mapStringToSegment offset (ReturnStatement BreakNotAppliedYet)
+                           , parenthesisOrBracketAtStartOrEndOfLine
+                                |> mapStringToSegment offset (ParenthesisOrBracket BreakNotAppliedYet)
+                           , dotAccess
+                                |> mapStringToSegment offset (DotAccess BreakNotAppliedYet)
+                           , Code.word
+                                |> mapStringToSegment offset (Word BreakNotAppliedYet)
+                           , Repeat.oneOrMore (chompIf Whitespace.isNonNewlineWhiteSpace)
+                                |> mapStringToSegment offset Whitespace
+                           , chompIf (\char -> char == '\n')
+                                |> mapStringToSegment offset Whitespace
+                           , Repeat.oneOrMore Code.otherCharacter
+                                |> mapStringToSegment offset Other
+                           ]
+                    )
             )
 
 
-returnStatement : Parser ()
-returnStatement =
-    succeed ()
-        |. (backtrackable <|
-                succeed ()
-                    |. Whitespace.oneOrMore
-                    |. token "return"
-           )
-        |. Whitespace.one
+mapStringToSegment : Int -> SegmentType -> Parser data -> Parser Segment
+mapStringToSegment offset segmentType parser =
+    parser
+        |> getChompedString
+        |> Parser.map (\content -> Segment offset content segmentType)
 
 
 dotAccess : Parser ()
@@ -70,11 +113,11 @@ dotAccess =
     succeed ()
         |. (backtrackable <|
                 succeed ()
-                    |. word
+                    |. Code.word
                     |. Repeat.oneOrMore
                         (succeed ()
                             |. token "."
-                            |. word
+                            |. Code.word
                         )
            )
 
@@ -87,80 +130,12 @@ parenthesisOrBracketAtStartOrEndOfLine =
                 succeed ()
                     |. token "\n"
                     |. Repeat.zeroOrMore (token " ")
-                    |. parenthesisOrBracket
+                    |. Code.parenthesisOrBracket
                     |. Repeat.zeroOrMore (token " ")
             , backtrackable <|
                 succeed ()
                     |. Repeat.zeroOrMore (token " ")
-                    |. parenthesisOrBracket
+                    |. Code.parenthesisOrBracket
                     |. Repeat.zeroOrMore (token " ")
                     |. token "\n"
             ]
-
-
-parenthesisOrBracket : Parser ()
-parenthesisOrBracket =
-    oneOf
-        [ token "{"
-        , token "}"
-        , token "("
-        , token ")"
-        , token "["
-        , token "]"
-        ]
-
-
-functionDeclarationWithContent : Parser ( String, FunctionDeclarationData )
-functionDeclarationWithContent =
-    getChompedString functionDeclaration
-        |> andThen
-            (\string ->
-                case Parser.run functionDeclaration string of
-                    Ok validFunctionDeclaration ->
-                        succeed ( string, validFunctionDeclaration )
-
-                    Err _ ->
-                        Parser.problem
-                            ("Script error: parsed function declaration successfully once "
-                                ++ "and then failed just after with the same content???"
-                            )
-            )
-
-
-functionDeclaration : Parser FunctionDeclarationData
-functionDeclaration =
-    backtrackable <|
-        succeed FunctionDeclarationData
-            |= getChompedString Whitespace.oneOrMore
-            |= (getChompedString <| oneOf [ token "function ", token "def " ])
-            |= (getChompedString <| word)
-            |. token "("
-            |= Repeat.zeroOrMoreWithSeparator
-                Repeat.commaSeparator
-                word
-            |. token ")"
-
-
-word : Parser String
-word =
-    getChompedString <| Repeat.oneOrMore wordCharacter
-
-
-wordCharacter : Parser ()
-wordCharacter =
-    chompIf isWordCharacter
-
-
-isWordCharacter : Char -> Bool
-isWordCharacter char =
-    Char.isAlphaNum char || List.member char [ '_' ]
-
-
-otherCharacter : Parser ()
-otherCharacter =
-    chompIf isOtherCharacter
-
-
-isOtherCharacter : Char -> Bool
-isOtherCharacter char =
-    not (isWordCharacter char) && not (Whitespace.isValidWhiteSpace char)

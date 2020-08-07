@@ -74,19 +74,35 @@ suite =
             ]
         , describe "comment ignoring functionality"
             [ describe "javascript"
-                [ test "ignores js comments" <|
+                [ test "does not break words in js comments" <|
                     \_ ->
                         expectBreakResultWithExt
                             { extension = "js"
-                            , input = "// word"
-                            , output = "// word"
+                            , input = "// comment"
+                            , output = "// comment"
                             }
-                , test "does not ignore python comments" <|
+                , test "breaks words in python comments" <|
                     \_ ->
                         expectBreakResultWithExt
                             { extension = "js"
                             , input = "# word"
                             , output = "# Word"
+                            }
+                ]
+            , describe "python"
+                [ test "does not break words in python comments" <|
+                    \_ ->
+                        expectBreakResultWithExt
+                            { extension = "py"
+                            , input = "# comment"
+                            , output = "# comment"
+                            }
+                , test "breaks words in js comments" <|
+                    \_ ->
+                        expectBreakResultWithExt
+                            { extension = "py"
+                            , input = "// word"
+                            , output = "// Word"
                             }
                 ]
             ]

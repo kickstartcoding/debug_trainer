@@ -1,20 +1,20 @@
 module Breakers.ChangeFunctionArgs exposing (run, validCandidateData)
 
-import Breakers.Utils
+import Breakers.Utils exposing (BreakRunnerData)
 import List.Extra as ListEx
 import Model.SavedData exposing (ChangeData)
-import Parsers.Generic.Segment as Segment
+import Parsers.Generic.Segment
     exposing
         ( BreakStatus(..)
-        , FunctionDeclarationData
         , Segment
         , SegmentType(..)
         )
 import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.NamedFunctionDeclaration as Function exposing (NamedFunctionDeclaration)
 
 
-run : { randomNumber : Int, originalFileContent : String, segments : List Segment } -> Maybe ( List Segment, ChangeData )
+run : BreakRunnerData -> Maybe ( List Segment, ChangeData )
 run { randomNumber, originalFileContent, segments } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
@@ -25,7 +25,7 @@ run { randomNumber, originalFileContent, segments } =
                         { data | arguments = newArguments }
 
                     newFuncString =
-                        Segment.functionDeclarationDataToString newFuncData
+                        Function.toString newFuncData
 
                     lineNumber =
                         FileContent.rowFromOffset (segment.offset + String.length segment.content) originalFileContent
@@ -55,7 +55,7 @@ run { randomNumber, originalFileContent, segments } =
 
 type alias FunctionChangeData =
     { segment : Segment
-    , data : FunctionDeclarationData
+    , data : NamedFunctionDeclaration
     , newArguments : List String
     }
 

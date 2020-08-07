@@ -9,6 +9,7 @@ import Breakers.Utils
 import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Segment exposing (Segment)
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileType exposing (FileType(..))
 
 
 makeAChange :
@@ -17,6 +18,7 @@ makeAChange :
         { randomNumber : Int
         , originalFileContent : String
         , segments : List Segment
+        , fileType : FileType
         }
     -> Maybe ( List Segment, ChangeData )
 makeAChange maybeBreakType breakRunnerData =

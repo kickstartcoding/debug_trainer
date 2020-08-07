@@ -11,6 +11,7 @@ import Ports
 import Utils.List
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.FileType as FileType
 
 
 run :
@@ -24,7 +25,7 @@ run :
 run ({ breakCount, filepath, fileSaveStatus, fileContent, model } as config) =
     let
         maybeChanges =
-            case GenericParser.run fileContent of
+            case GenericParser.run (FileType.fromFilePath filepath) fileContent of
                 Ok segments ->
                     Just (buildChanges config segments [])
 
@@ -101,6 +102,7 @@ buildChanges config segments changes =
             { randomNumber = segmentChoiceSeed
             , originalFileContent = config.fileContent
             , segments = segments
+            , fileType = FileType.fromFilePath config.filepath
             }
 
         maybeChange =

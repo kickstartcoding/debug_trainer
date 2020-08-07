@@ -1,4 +1,4 @@
-module Parsers.Python exposing (blockComment, comment, functionDeclaration)
+module Parsers.JavaScript exposing (blockComment, comment, functionDeclaration)
 
 import Parser exposing (..)
 import Parsers.Utils.Code as Code
@@ -11,7 +11,7 @@ functionDeclaration : Parser NamedFunctionDeclaration
 functionDeclaration =
     backtrackable <|
         succeed NamedFunctionDeclaration
-            |= (getChompedString <| token "def")
+            |= (getChompedString <| token "function")
             |. token " "
             |= (getChompedString <| Code.word)
             |. token "("
@@ -23,11 +23,12 @@ functionDeclaration =
 
 comment : Parser ()
 comment =
-    lineComment "#"
+    lineComment "//"
 
 
 blockComment : Parser ()
 blockComment =
     succeed ()
-     |. multiComment "'''" "'''" NotNestable
-     |. token "'''"
+     |. multiComment "/*" "*/" NotNestable
+     |. token "*/"
+
