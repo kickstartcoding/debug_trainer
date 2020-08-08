@@ -1,11 +1,13 @@
 module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
+import Parsers.Elixir as Elixir
 import Parsers.Elm as Elm
 import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
 import Parsers.JavaScript as JavaScript
 import Parsers.Python as Python
 import Parsers.Ruby as Ruby
+import Parsers.Rust as Rust
 import Parsers.UnknownLanguage as UnknownLanguage
 import Parsers.Utils
 import Parsers.Utils.Code as Code
@@ -65,6 +67,24 @@ segment fileType =
                             , Elm.blockComment
                                 |> mapStringToSegment offset Comment
                             , Elm.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
+                            ]
+
+                        Elixir ->
+                            [ Elixir.comment
+                                |> mapStringToSegment offset Comment
+                            , Elixir.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Elixir.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
+                            ]
+
+                        Rust ->
+                            [ Rust.comment
+                                |> mapStringToSegment offset Comment
+                            , Rust.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Rust.functionDeclaration
                                 |> mapFunctionDeclarationToSegment offset
                             ]
 

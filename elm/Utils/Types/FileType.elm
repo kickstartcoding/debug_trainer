@@ -9,6 +9,8 @@ type FileType
     | JavaScript
     | Ruby
     | Elm
+    | Elixir
+    | Rust
     | Unknown
 
 
@@ -29,6 +31,15 @@ fromFilePath filepath =
 
     else if String.endsWith ".elm" filepathString then
         Elm
+
+    else if String.endsWith ".ex" filepathString then
+        Elixir
+
+    else if String.endsWith ".exs" filepathString then
+        Elixir
+
+    else if String.endsWith ".rs" filepathString then
+        Rust
 
     else
         Unknown
