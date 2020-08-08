@@ -1,5 +1,6 @@
 module Breakers.RemoveParenthesisTest exposing (..)
 
+import Fuzz exposing (int, list)
 import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
 import Test exposing (..)
 import TestHelp
@@ -17,17 +18,19 @@ suite =
         (List.map
             (\parenString ->
                 describe ("removing a " ++ parenString)
-                    [ test ("removes a " ++ parenString ++ " from the beginning of a line") <|
-                        \_ ->
+                    [ fuzz (list int) ("removes a " ++ parenString ++ " from the beginning of a line") <|
+                        \randomNumbers ->
                             expectBreakResult
                                 { input = "\n" ++ parenString
                                 , output = "\n"
+                                , randomNumbers = randomNumbers
                                 }
-                    , test ("removes a " ++ parenString ++ " from the end of a line") <|
-                        \_ ->
+                    , fuzz (list int) ("removes a " ++ parenString ++ " from the end of a line") <|
+                        \randomNumbers ->
                             expectBreakResult
                                 { input = parenString ++ "\n"
                                 , output = "\n"
+                                , randomNumbers = randomNumbers
                                 }
                     ]
             )

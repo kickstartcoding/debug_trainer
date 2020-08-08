@@ -1,5 +1,6 @@
 module Breakers.RemoveDotAccessTest exposing (..)
 
+import Fuzz exposing (int, list)
 import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
 import Test exposing (..)
 import TestHelp
@@ -14,10 +15,11 @@ import TestHelp
 suite : Test
 suite =
     describe "RemoveDotAccess"
-        [ test "dot-access removal" <|
-            \_ ->
+        [ fuzz (list int) "dot-access removal" <|
+            \randomNumbers ->
                 expectBreakToOutputOneOf
                     { input = "thing1.thing2.thing3"
                     , outputPossibilities = [ "thing1.thing2", "thing1.thing3", "thing2.thing3" ]
+                    , randomNumbers = randomNumbers
                     }
         ]

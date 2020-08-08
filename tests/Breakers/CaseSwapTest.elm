@@ -2,6 +2,7 @@ module Breakers.CaseSwapTest exposing (..)
 
 import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
 import Test exposing (..)
+import Fuzz exposing (int, list)
 import TestHelp
     exposing
         ( expectBreakResult
@@ -14,16 +15,18 @@ import TestHelp
 suite : Test
 suite =
     describe "CaseSwap"
-        [ test "capitalizes" <|
-            \_ ->
+        [ fuzz (list int) "capitalizes" <|
+            \randomNumbers ->
                 expectBreakResult
                     { input = "word"
                     , output = "Word"
+                    , randomNumbers = randomNumbers
                     }
-        , test "lowercases" <|
-            \_ ->
+        , fuzz (list int) "lowercases" <|
+            \randomNumbers ->
                 expectBreakResult
                     { input = "Word"
                     , output = "word"
+                    , randomNumbers = randomNumbers
                     }
         ]

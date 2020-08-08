@@ -1,5 +1,6 @@
 module Breakers.RemoveReturnTest exposing (..)
 
+import Fuzz exposing (int, list)
 import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
 import Test exposing (..)
 import TestHelp
@@ -14,10 +15,11 @@ import TestHelp
 suite : Test
 suite =
     describe "RemoveReturn"
-        [ test "return removal" <|
-            \_ ->
+        [ fuzz (list int) "return removal" <|
+            \randomNumbers ->
                 expectBreakResult
                     { input = "return "
                     , output = ""
+                    , randomNumbers = randomNumbers
                     }
         ]
