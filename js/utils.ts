@@ -1,4 +1,4 @@
-import colors from 'colors'
+import * as colors from 'colors'
 
 const loggingIsOn: boolean = process.argv.includes('--log') || process.argv.includes('-l')
 

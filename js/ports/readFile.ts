@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import { devLog, formattedLog, formattedErrorLog } from '../utils'
 
 export default function (program): void {

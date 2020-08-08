@@ -1,5 +1,5 @@
-import fs from 'fs'
-import os from 'os'
+import * as fs from 'fs'
+import * as os from 'os'
 import { devLog } from './utils'
 import * as TestHelpers from '../tests_end_to_end/testHelpers'
 
