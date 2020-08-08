@@ -3,6 +3,10 @@ module TestHelp exposing
     , expectBreakResultWithExt
     , expectBreakToOutputOneOf
     , expectBreakWithExtToOutputOneOf
+    , expectMultiBreakResult
+    , expectMultiBreakResultWithExt
+    , expectMultiBreakToOutputOneOf
+    , expectMultiBreakWithExtToOutputOneOf
     , expectResult
     )
 
@@ -37,9 +41,29 @@ expectBreakResult { input, output } =
         }
 
 
+expectMultiBreakResult : { input : String, output : String, breakCount : Int } -> Expect.Expectation
+expectMultiBreakResult { input, output, breakCount } =
+    expectMultiBreakResultWithExt
+        { extension = "example"
+        , input = input
+        , output = output
+        , breakCount = breakCount
+        }
+
+
 expectBreakResultWithExt : { extension : String, input : String, output : String } -> Expect.Expectation
 expectBreakResultWithExt { extension, input, output } =
-    breakContent { filename = "filepath." ++ extension, content = input }
+    expectMultiBreakResultWithExt
+        { extension = extension
+        , input = input
+        , output = output
+        , breakCount = 1
+        }
+
+
+expectMultiBreakResultWithExt : { extension : String, input : String, output : String, breakCount : Int } -> Expect.Expectation
+expectMultiBreakResultWithExt { extension, input, output, breakCount } =
+    breakContent { filename = "filepath." ++ extension, content = input, breakCount = breakCount }
         |> Expect.equal output
 
 
@@ -52,9 +76,29 @@ expectBreakToOutputOneOf { input, outputPossibilities } =
         }
 
 
+expectMultiBreakToOutputOneOf : { input : String, outputPossibilities : List String, breakCount : Int } -> Expect.Expectation
+expectMultiBreakToOutputOneOf { input, outputPossibilities, breakCount } =
+    expectMultiBreakWithExtToOutputOneOf
+        { extension = "example"
+        , input = input
+        , outputPossibilities = outputPossibilities
+        , breakCount = breakCount
+        }
+
+
 expectBreakWithExtToOutputOneOf : { extension : String, input : String, outputPossibilities : List String } -> Expect.Expectation
 expectBreakWithExtToOutputOneOf { extension, input, outputPossibilities } =
-    breakContent { filename = "filepath." ++ extension, content = input }
+    expectMultiBreakWithExtToOutputOneOf
+        { extension = extension
+        , input = input
+        , outputPossibilities = outputPossibilities
+        , breakCount = 1
+        }
+
+
+expectMultiBreakWithExtToOutputOneOf : { extension : String, input : String, outputPossibilities : List String, breakCount : Int } -> Expect.Expectation
+expectMultiBreakWithExtToOutputOneOf { extension, input, outputPossibilities, breakCount } =
+    breakContent { filename = "filepath." ++ extension, content = input, breakCount = breakCount }
         |> (\content ->
                 if List.member content outputPossibilities then
                     True
@@ -69,8 +113,8 @@ expectBreakWithExtToOutputOneOf { extension, input, outputPossibilities } =
         |> Expect.equal True
 
 
-breakContent : { filename : String, content : String } -> String
-breakContent { filename, content } =
+breakContent : { filename : String, content : String, breakCount : Int } -> String
+breakContent { filename, content, breakCount } =
     let
         filepath =
             FilePath.fromString filename
@@ -79,7 +123,7 @@ breakContent { filename, content } =
             "/directory/example"
     in
     BreakFile.run
-        { breakCount = 1
+        { breakCount = breakCount
         , filepath = filepath
         , fileSaveStatus = Model.initFileSaveStatus
         , fileContent = content
