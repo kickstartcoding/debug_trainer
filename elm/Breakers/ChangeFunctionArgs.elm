@@ -11,11 +11,12 @@ import Parsers.Generic.Segment
         )
 import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileType exposing (FileType(..))
 import Utils.Types.NamedFunctionDeclaration as Function exposing (NamedFunctionDeclaration)
 
 
 run : BreakRunnerData -> Maybe ( List Segment, ChangeData )
-run { randomNumber, originalFileContent, segments } =
+run { randomNumber, originalFileContent, segments, fileType } =
     segments
         |> Breakers.Utils.chooseCandidate randomNumber validCandidateData
         |> Maybe.map
@@ -25,7 +26,16 @@ run { randomNumber, originalFileContent, segments } =
                         { data | arguments = newArguments }
 
                     newFuncString =
-                        Function.toString newFuncData
+                        case fileType of
+                            Elm ->
+                                let
+                                    { name, arguments } =
+                                        newFuncData
+                                in
+                                name ++ " " ++ String.join " " arguments ++ " ="
+
+                            _ ->
+                                Function.toString newFuncData
 
                     lineNumber =
                         FileContent.rowFromOffset (segment.offset + String.length segment.content) originalFileContent

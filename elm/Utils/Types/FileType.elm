@@ -8,6 +8,7 @@ type FileType
     = Python
     | JavaScript
     | Ruby
+    | Elm
     | Unknown
 
 
@@ -25,6 +26,9 @@ fromFilePath filepath =
 
     else if String.endsWith ".rb" filepathString then
         Ruby
+
+    else if String.endsWith ".elm" filepathString then
+        Elm
 
     else
         Unknown

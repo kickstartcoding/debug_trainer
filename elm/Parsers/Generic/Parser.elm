@@ -1,6 +1,7 @@
 module Parsers.Generic.Parser exposing (run)
 
 import Parser exposing (..)
+import Parsers.Elm as Elm
 import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
 import Parsers.JavaScript as JavaScript
 import Parsers.Python as Python
@@ -11,6 +12,7 @@ import Parsers.Utils.Code as Code
 import Parsers.Utils.Repeat as Repeat
 import Parsers.Utils.Whitespace as Whitespace
 import Utils.Types.FileType exposing (FileType(..))
+import Utils.Types.NamedFunctionDeclaration exposing (NamedFunctionDeclaration)
 
 
 run : FileType -> String -> Result (List DeadEnd) (List Segment)
@@ -35,13 +37,8 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , JavaScript.blockComment
                                 |> mapStringToSegment offset Comment
-                            , Parsers.Utils.contentAndResult JavaScript.functionDeclaration
-                                |> Parser.map
-                                    (\( content, data ) ->
-                                        Segment offset
-                                            content
-                                            (FunctionDeclaration data BreakNotAppliedYet)
-                                    )
+                            , JavaScript.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
                             ]
 
                         Python ->
@@ -49,13 +46,8 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , Python.blockComment
                                 |> mapStringToSegment offset Comment
-                            , Parsers.Utils.contentAndResult Python.functionDeclaration
-                                |> Parser.map
-                                    (\( content, data ) ->
-                                        Segment offset
-                                            content
-                                            (FunctionDeclaration data BreakNotAppliedYet)
-                                    )
+                            , Python.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
                             ]
 
                         Ruby ->
@@ -63,23 +55,22 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , Ruby.blockComment
                                 |> mapStringToSegment offset Comment
-                            , Parsers.Utils.contentAndResult Ruby.functionDeclaration
-                                |> Parser.map
-                                    (\( content, data ) ->
-                                        Segment offset
-                                            content
-                                            (FunctionDeclaration data BreakNotAppliedYet)
-                                    )
+                            , Ruby.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
+                            ]
+
+                        Elm ->
+                            [ Elm.comment
+                                |> mapStringToSegment offset Comment
+                            , Elm.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Elm.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
                             ]
 
                         Unknown ->
-                            [ Parsers.Utils.contentAndResult UnknownLanguage.functionDeclaration
-                                |> Parser.map
-                                    (\( content, data ) ->
-                                        Segment offset
-                                            content
-                                            (FunctionDeclaration data BreakNotAppliedYet)
-                                    )
+                            [ UnknownLanguage.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
                             ]
                      )
                         ++ [ Code.returnStatement
@@ -108,6 +99,17 @@ mapStringToSegment offset segmentType parser =
     parser
         |> getChompedString
         |> Parser.map (\content -> Segment offset content segmentType)
+
+
+mapFunctionDeclarationToSegment : Int -> Parser NamedFunctionDeclaration -> Parser Segment
+mapFunctionDeclarationToSegment offset parser =
+    Parsers.Utils.contentAndResult parser
+        |> Parser.map
+            (\( content, data ) ->
+                Segment offset
+                    content
+                    (FunctionDeclaration data BreakNotAppliedYet)
+            )
 
 
 dotAccess : Parser ()
