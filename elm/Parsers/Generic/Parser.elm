@@ -41,6 +41,8 @@ segment fileType =
                                 |> mapStringToSegment offset Comment
                             , JavaScript.functionDeclaration
                                 |> mapFunctionDeclarationToSegment offset
+                            , JavaScript.fatArrowFunctionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
                             ]
 
                         Python ->

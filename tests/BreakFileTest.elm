@@ -46,19 +46,33 @@ suite =
                             }
                 ]
             , describe "javascript"
-                [ test "one argument" <|
+                [ test "one argument standard function syntax" <|
                     \_ ->
                         expectBreakResultWithExt
                             { extension = "js"
                             , input = " function name(arg1){"
                             , output = " function name(){"
                             }
-                , test "two arguments" <|
+                , test "two arguments standard function syntax" <|
                     \_ ->
                         expectBreakResultWithExt
                             { extension = "js"
                             , input = " function name(arg1, arg2){"
                             , output = " function name(arg2, arg1){"
+                            }
+                , test "one argument fat arrow function syntax" <|
+                    \_ ->
+                        expectBreakResultWithExt
+                            { extension = "js"
+                            , input = "const name = (arg1) => "
+                            , output = "const name = () => "
+                            }
+                , test "two arguments fat arrow function syntax" <|
+                    \_ ->
+                        expectBreakResultWithExt
+                            { extension = "js"
+                            , input = "const name = (arg1, arg2) => "
+                            , output = "const name = (arg2, arg1) => "
                             }
                 ]
             , describe "ruby"

@@ -36,6 +36,22 @@ run { randomNumber, originalFileContent, segments, fileType } =
                                 (name ++ " " ++ String.join " " arguments ++ " =")
                                     |> String.Extra.clean
 
+                            JavaScript ->
+                                let
+                                    { declarationWord, name, arguments } =
+                                        newFuncData
+                                in
+                                if declarationWord == "function" then
+                                    Function.toString newFuncData
+
+                                else
+                                    declarationWord
+                                        ++ " "
+                                        ++ name
+                                        ++ " = ("
+                                        ++ String.join ", " arguments
+                                        ++ ") => "
+
                             _ ->
                                 Function.toString newFuncData
 

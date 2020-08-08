@@ -1,4 +1,9 @@
-module Parsers.JavaScript exposing (blockComment, comment, functionDeclaration)
+module Parsers.JavaScript exposing
+    ( blockComment
+    , comment
+    , fatArrowFunctionDeclaration
+    , functionDeclaration
+    )
 
 import Parser exposing (..)
 import Parsers.Utils.Code as Code
@@ -21,6 +26,21 @@ functionDeclaration =
             |. token ")"
 
 
+fatArrowFunctionDeclaration : Parser NamedFunctionDeclaration
+fatArrowFunctionDeclaration =
+    backtrackable <|
+        succeed NamedFunctionDeclaration
+            |= (getChompedString <| oneOf [ token "const", token "let", token "var" ])
+            |. token " "
+            |= (getChompedString <| Code.word)
+            |. token " = "
+            |. token "("
+            |= Repeat.zeroOrMoreWithSeparator
+                Repeat.commaSeparator
+                Code.word
+            |. token ") => "
+
+
 comment : Parser ()
 comment =
     lineComment "//"
@@ -29,6 +49,5 @@ comment =
 blockComment : Parser ()
 blockComment =
     succeed ()
-     |. multiComment "/*" "*/" NotNestable
-     |. token "*/"
-
+        |. multiComment "/*" "*/" NotNestable
+        |. token "*/"
