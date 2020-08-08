@@ -4,6 +4,8 @@ Randomly break your code and then use your debugging skills to fix it!
 
 ## What is it?
 
+[The blog post](https://kickstartcoding.online/learn/articles/introducing-debug-trainer/) goes into more detail, but basically:
+
 `debug_trainer` is a terminal program that helps you practice debugging by breaking your code in random ways, so that you can practice tracking down and fixing the errors.
 
 The `break` command will introduce an error to a file of your choosing.
