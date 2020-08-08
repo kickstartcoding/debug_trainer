@@ -12,7 +12,7 @@ functionDeclaration : Parser NamedFunctionDeclaration
 functionDeclaration =
     backtrackable <|
         succeed NamedFunctionDeclaration
-            |= (getChompedString <| oneOf [ token "function", token "def", token "fn" ])
+            |= (getChompedString <| oneOf [ token "function", token "def", token "defp", token "fn" ])
             |. token " "
             |= (getChompedString <| Code.word)
             |. token "("
