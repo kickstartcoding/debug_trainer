@@ -9,6 +9,7 @@ import Parsers.Generic.Segment
         , Segment
         , SegmentType(..)
         )
+import String.Extra
 import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FileType exposing (FileType(..))
@@ -32,7 +33,8 @@ run { randomNumber, originalFileContent, segments, fileType } =
                                     { name, arguments } =
                                         newFuncData
                                 in
-                                name ++ " " ++ String.join " " arguments ++ " ="
+                                (name ++ " " ++ String.join " " arguments ++ " =")
+                                    |> String.Extra.clean
 
                             _ ->
                                 Function.toString newFuncData

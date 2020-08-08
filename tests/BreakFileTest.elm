@@ -63,6 +63,38 @@ suite =
                             , output = " function name(arg2, arg1){"
                             }
                 ]
+            , describe "ruby"
+                [ test "one argument" <|
+                    \_ ->
+                        expectBreakResultWithExt
+                            { extension = "rb"
+                            , input = "def name(arg1)"
+                            , output = "def name()"
+                            }
+                , test "two arguments" <|
+                    \_ ->
+                        expectBreakResultWithExt
+                            { extension = "rb"
+                            , input = "def name(arg1, arg2)"
+                            , output = "def name(arg2, arg1)"
+                            }
+                , describe "elm"
+                    [ test "one argument" <|
+                        \_ ->
+                            expectBreakResultWithExt
+                                { extension = "elm"
+                                , input = "name arg1 ="
+                                , output = "name ="
+                                }
+                    , test "two arguments" <|
+                        \_ ->
+                            expectBreakResultWithExt
+                                { extension = "elm"
+                                , input = "name arg1 arg2 ="
+                                , output = "name arg2 arg1 ="
+                                }
+                    ]
+                ]
             ]
         , describe "RemoveDotAccess"
             [ test "dot-access removal" <|
