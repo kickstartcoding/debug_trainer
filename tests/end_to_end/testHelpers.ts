@@ -1,8 +1,8 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import { execSync } from 'child_process'
+import { testDataFileName } from '../../src/savedData'
 
 export const testFileName: string = "testfile.txt"
-export const dataFileName: string = "debug_trainer_test_save_file.json"
 
 export function runBreakCommand(errorCount?: number): string {
   if (errorCount) {
@@ -41,8 +41,8 @@ export function readTestFile(): string {
 }
 
 export function clearSaveFile(): void {
-  if (fs.existsSync(dataFileName)) {
-    fs.unlinkSync(dataFileName)
+  if (fs.existsSync(testDataFileName)) {
+    fs.unlinkSync(testDataFileName)
   }
 }
 

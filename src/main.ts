@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Elm } from '../elm/Main.elm'
+import { Elm } from './elm/Main.elm'
 import print from './ports/print'
 import printAndExitFailure from './ports/printAndExitFailure'
 import printAndExitSuccess from './ports/printAndExitSuccess'

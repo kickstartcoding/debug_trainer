@@ -6,7 +6,7 @@ import {
   clearTestFile,
   clearSaveFile
 } from './testHelpers'
-import { format } from '../js/utils'
+import { format } from '../../src/utils'
 
 describe('explain command', () => {
   afterEach(() => { clearSaveFile(); clearTestFile() })

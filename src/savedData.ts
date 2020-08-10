@@ -1,10 +1,11 @@
 import * as fs from 'fs'
 import * as os from 'os'
 import { devLog } from './utils'
-import * as TestHelpers from '../tests_end_to_end/testHelpers'
+
+export const testDataFileName: string = "debug_trainer_test_save_file.json"
 
 export const dataFilePath: string = process.argv.includes('--test') ?
-  TestHelpers.dataFileName : `${os.homedir()}/.debug_trainer.json`
+  testDataFileName : `${os.homedir()}/.debug_trainer.json`
 
 export function load(): string | null {
   devLog(`Loading data from ${dataFilePath}...`);

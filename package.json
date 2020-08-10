@@ -2,10 +2,10 @@
   "name": "debug_trainer",
   "version": "6.2.10",
   "description": "A tool to create errors so that you can practice debugging them",
-  "main": "index.js",
+  "main": "bin/debug_trainer",
   "scripts": {
-    "build": "parcel build js/main.ts --target node --bundle-node-modules --out-file debug_trainer.js",
-    "dev": "parcel js/main.ts --target node --bundle-node-modules --out-file debug_trainer.js",
+    "build": "parcel build src/main.ts --target node --bundle-node-modules --out-file debug_trainer.js",
+    "dev": "parcel src/main.ts --target node --bundle-node-modules --out-file debug_trainer.js",
     "test": "elm-test && jest",
     "elm-typescript-interop": "elm-typescript-interop"
   },
