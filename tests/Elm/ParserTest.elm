@@ -1,12 +1,12 @@
-module ParserTest exposing (..)
+module Elm.ParserTest exposing (..)
 
+import Elm.TestHelp as TestHelp
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Parser exposing (DeadEnd)
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
 import Test exposing (..)
-import TestHelp
 import Utils.Types.FileType exposing (FileType(..))
 
 
@@ -129,6 +129,6 @@ suite =
         , test "detects single-quoted strings" <|
             \_ ->
                 TestHelp.expectResult (GenericParser.run Ruby)
-                    "\'word word word\'"
-                    [ { content = "\'word word word\'", offset = 0, segmentType = String } ]
+                    "'word word word'"
+                    [ { content = "'word word word'", offset = 0, segmentType = String } ]
         ]

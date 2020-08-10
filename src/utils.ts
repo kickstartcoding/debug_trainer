@@ -1,4 +1,4 @@
-import * as colors from 'colors'
+import colors from 'colors'
 
 const loggingIsOn: boolean = process.argv.includes('--log') || process.argv.includes('-l')
 
@@ -22,12 +22,14 @@ export function formatAll(...strings: string[]): string[] {
   return strings.map(format)
 }
 
+colors.setTheme({ code: ['bold', 'white', 'bgBlack'] })
+
 export function format(string: string): string {
   return string.split("`").map((segment, index) => {
     if (index % 2 == 0) {
       return segment
     } else {
-      return colors.bold.white.bgBlack(segment)
+      return colors.code(segment)
     }
   }).join("")
 }

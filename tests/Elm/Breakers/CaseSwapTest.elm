@@ -1,15 +1,15 @@
-module Breakers.CaseSwapTest exposing (..)
+module Elm.Breakers.CaseSwapTest exposing (..)
 
-import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
-import Test exposing (..)
-import Fuzz exposing (int, list)
-import TestHelp
+import Elm.TestHelp as TestHelp
     exposing
         ( expectBreakResult
         , expectBreakResultWithExt
         , expectBreakToOutputOneOf
         , expectBreakWithExtToOutputOneOf
         )
+import Fuzz exposing (int, list)
+import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
+import Test exposing (..)
 
 
 suite : Test

@@ -1,9 +1,6 @@
-module BreakFileTest exposing (..)
+module Elm.BreakFileTest exposing (..)
 
-import Fuzz exposing (int, list)
-import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
-import Test exposing (..)
-import TestHelp
+import Elm.TestHelp as TestHelp
     exposing
         ( expectBreakResult
         , expectBreakResultWithExt
@@ -12,6 +9,9 @@ import TestHelp
         , expectMultiBreakResult
         , expectMultiBreakToOutputOneOf
         )
+import Fuzz exposing (int, list)
+import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
+import Test exposing (..)
 
 
 suite : Test

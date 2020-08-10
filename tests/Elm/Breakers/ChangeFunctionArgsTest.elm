@@ -1,15 +1,15 @@
-module Breakers.ChangeFunctionArgsTest exposing (..)
+module Elm.Breakers.ChangeFunctionArgsTest exposing (..)
 
-import Fuzz exposing (int, list)
-import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
-import Test exposing (..)
-import TestHelp
+import Elm.TestHelp as TestHelp
     exposing
         ( expectBreakResult
         , expectBreakResultWithExt
         , expectBreakToOutputOneOf
         , expectBreakWithExtToOutputOneOf
         )
+import Fuzz exposing (int, list)
+import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
+import Test exposing (..)
 
 
 suite : Test

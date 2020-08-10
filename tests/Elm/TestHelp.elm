@@ -1,4 +1,4 @@
-module TestHelp exposing
+module Elm.TestHelp exposing
     ( expectBreakResult
     , expectBreakResultWithExt
     , expectBreakToOutputOneOf
