@@ -27,7 +27,8 @@
     "debugging"
   ],
   "dependencies": {
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "inquirer": "^7.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
