@@ -6,7 +6,7 @@
   "scripts": {
     "build": "parcel build src/main.ts --target node --bundle-node-modules --out-file debug_trainer.js",
     "dev": "parcel src/main.ts --target node --bundle-node-modules --out-file debug_trainer.js",
-    "test": "elm-test && jest",
+    "test": "npm run build && elm-test && jest",
     "elm-typescript-interop": "elm-typescript-interop"
   },
   "repository": {
