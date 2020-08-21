@@ -1,8 +1,8 @@
 // @ts-ignore
 import colors from 'colors'
 
-// const loggingIsOn: boolean = process.argv.includes('--log') || process.argv.includes('-l')
-const loggingIsOn: boolean = true
+const loggingIsOn: boolean = process.argv.includes('--log') || process.argv.includes('-l')
+// const loggingIsOn: boolean = true
 
 export function devLog(...messages: string[]): void {
   if (loggingIsOn) {
