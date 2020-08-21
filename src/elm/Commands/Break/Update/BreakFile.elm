@@ -2,7 +2,7 @@ module Commands.Break.Update.BreakFile exposing (run)
 
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
-import Model exposing (Command(..), FileSaveStatus, Model)
+import Model exposing (Command(..), Model)
 import Model.SavedData as SavedData exposing (ChangeData)
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)

@@ -3,7 +3,7 @@ module Commands.Break.Update exposing (update)
 import Commands.Break.Actions exposing (Action(..))
 import Commands.Break.Update.BreakFile
 import List.Extra as ListEx
-import Model exposing (BreakData, Command(..), FileSaveStatus, Model)
+import Model exposing (BreakData, Command(..), Model)
 import PluralRules exposing (Cardinal(..), Rules)
 import PluralRules.En
 import Ports
@@ -15,7 +15,7 @@ import Utils.Types.FilePath as FilePath
 
 
 update : BreakData -> Action -> Model -> ( Model, Cmd Action )
-update ({ breakCount, filepath, fileSaveStatus } as breakData) action model =
+update ({ breakCount, filepath } as breakData) action model =
     case action of
         GotTargetFileContent { content } ->
             Commands.Break.Update.BreakFile.run
