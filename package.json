@@ -1,6 +1,6 @@
 {
   "name": "debug_trainer",
-  "version": "6.2.10",
+  "version": "6.3.0",
   "description": "A tool to create errors so that you can practice debugging them",
   "main": "bin/debug_trainer",
   "scripts": {

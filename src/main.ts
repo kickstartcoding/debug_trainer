@@ -23,7 +23,7 @@ export function run(): void {
       dataFilePath: SavedData.dataFilePath,
       workingDirectory: process.cwd(),
       data: data,
-      versionMessage: "6.2.10"
+      versionMessage: "6.3.0"
     }
   })
 
