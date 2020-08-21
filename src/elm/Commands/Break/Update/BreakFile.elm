@@ -3,14 +3,13 @@ module Commands.Break.Update.BreakFile exposing (run)
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
 import Model exposing (Command(..), Model)
-import Model.SavedData as SavedData exposing (ChangeData)
+import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)
 import Parsers.Generic.SegmentList as SegmentList
-import Ports
 import Utils.List
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
-import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.FilePath exposing (FilePath)
 import Utils.Types.FileType as FileType
 
 
@@ -18,56 +17,24 @@ run :
     { breakCount : Int
     , filepath : FilePath
     , fileContent : String
-    , model : Model
+    , randomNumbers : List Int
     }
-    -> ( Model, Cmd Action )
-run ({ filepath, fileContent, model } as config) =
-    let
-        maybeChanges =
-            case GenericParser.run (FileType.fromFilePath filepath) fileContent of
-                Ok segments ->
-                    Just (buildChanges config segments [])
+    -> Maybe { newFileContent : String, changes : List ChangeData }
+run ({ filepath, fileContent } as config) =
+    (case GenericParser.run (FileType.fromFilePath filepath) fileContent of
+        Ok segments ->
+            Just (buildChanges config segments [])
 
-                Err _ ->
-                    Nothing
-    in
-    case maybeChanges of
-        Just ( newSegments, changes ) ->
-            let
-                oldSavedData =
-                    SavedData.savedDataOrInit model.savedDataResult
-
-                newFileContent =
-                    newSegments |> Breakers.Utils.segmentsToContent
-
-                newSavedData =
-                    SavedData.setFileData
-                        { filepath = filepath
-                        , workingDirectory = model.workingDirectory
-                        , fileData =
-                            { originalContent = fileContent
-                            , updatedContent = newFileContent
-                            , changes = changes
-                            }
-                        }
-                        oldSavedData
-            in
-            ( { model | savedDataResult = Ok newSavedData }
-            , Cmd.batch
-                [ Ports.writeFile
-                    { path = FilePath.toString filepath
-                    , content = newFileContent
-                    }
-                , Ports.writeFile
-                    { path = FilePath.toString model.dataFilePath
-                    , content = SavedData.encode newSavedData
-                    }
-                ]
-            )
-
-        Nothing ->
-            ( model
-            , Ports.printAndExitFailure "Error: unable to find a good way to introduce an error into this file."
+        Err _ ->
+            Nothing
+    )
+        |> Maybe.map
+            (\( newSegments, changes ) ->
+                let
+                    newFileContent =
+                        newSegments |> Breakers.Utils.segmentsToContent
+                in
+                { newFileContent = newFileContent, changes = changes }
             )
 
 
@@ -75,7 +42,7 @@ buildChanges :
     { breakCount : Int
     , filepath : FilePath
     , fileContent : String
-    , model : Model
+    , randomNumbers : List Int
     }
     -> List Segment
     -> List ChangeData
@@ -83,7 +50,7 @@ buildChanges :
 buildChanges config segments changes =
     let
         ( breakTypeChoiceSeed, segmentChoiceSeed ) =
-            getSeeds config.breakCount config.model.randomNumbers
+            getSeeds config.breakCount config.randomNumbers
 
         maybeBreakType =
             chooseBreakType segments breakTypeChoiceSeed

@@ -4,6 +4,7 @@ import Commands.Break.Actions exposing (Action(..))
 import Commands.Break.Update.BreakFile
 import List.Extra as ListEx
 import Model exposing (BreakData, Command(..), Model)
+import Model.SavedData as SavedData
 import PluralRules exposing (Cardinal(..), Rules)
 import PluralRules.En
 import Ports
@@ -18,12 +19,50 @@ update : BreakData -> Action -> Model -> ( Model, Cmd Action )
 update ({ breakCount, filepath } as breakData) action model =
     case action of
         GotTargetFileContent { content } ->
-            Commands.Break.Update.BreakFile.run
-                { breakCount = breakCount
-                , filepath = filepath
-                , fileContent = content
-                , model = model
-                }
+            let
+                maybeBreak =
+                    Commands.Break.Update.BreakFile.run
+                        { breakCount = breakCount
+                        , filepath = filepath
+                        , fileContent = content
+                        , randomNumbers = model.randomNumbers
+                        }
+            in
+            case maybeBreak of
+                Just { newFileContent, changes } ->
+                    let
+                        oldSavedData =
+                            SavedData.savedDataOrInit model.savedDataResult
+
+                        newSavedData =
+                            SavedData.setFileData
+                                { filepath = filepath
+                                , workingDirectory = model.workingDirectory
+                                , fileData =
+                                    { originalContent = content
+                                    , updatedContent = newFileContent
+                                    , changes = changes
+                                    }
+                                }
+                                oldSavedData
+                    in
+                    ( { model | savedDataResult = Ok newSavedData }
+                    , Cmd.batch
+                        [ Ports.writeFile
+                            { path = FilePath.toString filepath
+                            , content = newFileContent
+                            }
+                        , Ports.writeFile
+                            { path = FilePath.toString model.dataFilePath
+                            , content = SavedData.encode newSavedData
+                            }
+                        ]
+                    )
+
+                Nothing ->
+                    ( model
+                    , Ports.printAndExitFailure "Error: unable to find a good way to introduce an error into this file."
+                    )
 
         SuccessfullyBrokeTargetFile ->
             confirmTargetFileWrite breakData model
