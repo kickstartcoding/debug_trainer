@@ -2,12 +2,13 @@ module Commands.Break.Update.BreakFile exposing (run)
 
 import Breakers.Utils
 import Commands.Break.Actions exposing (Action(..))
-import Model exposing (Command(..), Model)
+import Model exposing (Command(..))
 import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Parser as GenericParser
 import Parsers.Generic.Segment exposing (Segment)
 import Parsers.Generic.SegmentList as SegmentList
 import Utils.List
+import Utils.Tuple as Tuple
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
 import Utils.Types.FilePath exposing (FilePath)
 import Utils.Types.FileType as FileType
@@ -19,26 +20,34 @@ run :
     , fileContent : String
     , randomNumbers : List Int
     }
-    -> Maybe { newFileContent : String, changes : List ChangeData }
+    -> Maybe BreakResult
 run ({ filepath, fileContent } as config) =
-    (case GenericParser.run (FileType.fromFilePath filepath) fileContent of
-        Ok segments ->
-            Just (buildChanges config segments [])
-
-        Err _ ->
-            Nothing
-    )
-        |> Maybe.map
-            (\( newSegments, changes ) ->
-                let
-                    newFileContent =
-                        newSegments |> Breakers.Utils.segmentsToContent
-                in
-                { newFileContent = newFileContent, changes = changes }
-            )
+    GenericParser.run (FileType.fromFilePath filepath) fileContent
+        |> Result.map (randomlySelectFileChangesFromParsedSegments config)
+        |> Result.toMaybe
 
 
-buildChanges :
+type alias BreakResult =
+    { newFileContent : String
+    , changes : List ChangeData
+    }
+
+
+randomlySelectFileChangesFromParsedSegments :
+    { breakCount : Int
+    , filepath : FilePath
+    , fileContent : String
+    , randomNumbers : List Int
+    }
+    -> List Segment
+    -> BreakResult
+randomlySelectFileChangesFromParsedSegments config segments =
+    selectFileChangesHelper config segments []
+        |> Tuple.mapFirst Breakers.Utils.segmentsToContent
+        |> Tuple.map2 BreakResult
+
+
+selectFileChangesHelper :
     { breakCount : Int
     , filepath : FilePath
     , fileContent : String
@@ -47,7 +56,7 @@ buildChanges :
     -> List Segment
     -> List ChangeData
     -> ( List Segment, List ChangeData )
-buildChanges config segments changes =
+selectFileChangesHelper config segments changes =
     let
         ( breakTypeChoiceSeed, segmentChoiceSeed ) =
             getSeeds config.breakCount config.randomNumbers
@@ -71,7 +80,7 @@ buildChanges config segments changes =
                 ( newSegments, change :: changes )
 
             else
-                buildChanges { config | breakCount = config.breakCount - 1 }
+                selectFileChangesHelper { config | breakCount = config.breakCount - 1 }
                     newSegments
                     (change :: changes)
 
