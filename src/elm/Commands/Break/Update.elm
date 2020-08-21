@@ -25,12 +25,11 @@ update ({ breakCount, filepath } as breakData) action model =
                 , model = model
                 }
 
-        SuccessfullyBrokeTargetFile { path } ->
-            if FilePath.fromString path == filepath then
-                confirmTargetFileWrite breakData model
+        SuccessfullyBrokeTargetFile ->
+            confirmTargetFileWrite breakData model
 
-            else
-                confirmSaveDataFileWrite breakData model
+        SuccessfullyUpdatedSavedDataFile ->
+            confirmSaveDataFileWrite breakData model
 
 
 confirmTargetFileWrite : BreakData -> Model -> ( Model, Cmd Action )
