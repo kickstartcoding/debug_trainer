@@ -61,6 +61,7 @@ programConfig =
                 |> OptionsParser.with (Option.requiredPositionalArg "filepath")
                 |> OptionsParser.with (Option.flag "log")
                 |> OptionsParser.with (Option.flag "test")
+                |> OptionsParser.withDoc "Pass just a filepath and debug_trainer will run in interactive mode."
             )
 
 

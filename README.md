@@ -8,7 +8,7 @@ Randomly break your code and then use your debugging skills to fix it!
 
 `debug_trainer` is a terminal program that helps you practice debugging by breaking your code in random ways, so that you can practice tracking down and fixing the errors.
 
-NEW: Running `debug_trainer` with just a filename (for example: `debug_trainer myFile.js`) will run it in "interactive mode". Instead of having to run each command individually, it will ask you what to do in the console.
+***NEW:*** Running `debug_trainer` with just a filename (for example: `debug_trainer myFile.js`) will run it in "interactive mode". Instead of having to run each command individually, it will ask you what to do in the console.
 
 `break` command will introduce an error to a file of your choosing.
 The `break` command will introduce an error to a file of your choosing.
