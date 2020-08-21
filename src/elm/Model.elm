@@ -10,7 +10,6 @@ module Model exposing
     , allSavesComplete
     , breakInit
     , explainInit
-    , filePathStringFromCommand
     , hintInit
     , initFileSaveStatus
     , interactiveInit
@@ -41,7 +40,7 @@ type alias Model =
 
 
 type Command
-    = Interactive FilePath InteractionPhase
+    = Interactive InteractionPhase
     | Break BreakData
     | Hint FilePath HintType
     | Explain FilePath
@@ -49,10 +48,11 @@ type Command
 
 
 type InteractionPhase
-    = Start
+    = SelectingTargetFile
+    | ReadingTargetFile FilePath
     | BreakingFile FileData
     | Solving FileData
-    | Solved
+    | Solved FilePath
     | ResettingAndExiting
 
 
@@ -93,11 +93,17 @@ type alias Flags =
         }
 
 
-interactiveInit : String -> Bool -> Bool -> CliOptions
-interactiveInit filepathString loggingIsOn isInTestMode =
-    { command = Interactive (FilePath.fromString filepathString) Start
-    , loggingStatus = LoggingStatus.fromBool loggingIsOn
-    , isInTestMode = isInTestMode
+interactiveInit : Maybe String -> List String -> CliOptions
+interactiveInit maybeFilepathString _ =
+    { command =
+        case maybeFilepathString of
+            Just filepathString ->
+                Interactive (ReadingTargetFile (FilePath.fromString filepathString))
+
+            Nothing ->
+                Interactive SelectingTargetFile
+    , loggingStatus = LoggingStatus.fromBool False
+    , isInTestMode = False
     }
 
 
@@ -152,22 +158,3 @@ resetInit filepathString loggingIsOn isInTestMode =
     , loggingStatus = LoggingStatus.fromBool loggingIsOn
     , isInTestMode = isInTestMode
     }
-
-
-filePathStringFromCommand : Command -> String
-filePathStringFromCommand command =
-    case command of
-        Interactive filepath _ ->
-            FilePath.toString filepath
-
-        Break { filepath } ->
-            FilePath.toString filepath
-
-        Hint filepath _ ->
-            FilePath.toString filepath
-
-        Explain filepath ->
-            FilePath.toString filepath
-
-        Reset filepath _ ->
-            FilePath.toString filepath

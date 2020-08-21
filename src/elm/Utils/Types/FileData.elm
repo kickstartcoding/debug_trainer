@@ -2,12 +2,14 @@ module Utils.Types.FileData exposing (ChangeData, FileData, codec)
 
 import Codec exposing (Codec)
 import Utils.Types.BreakType as BreakType exposing (BreakType(..))
+import Utils.Types.FilePath as FilePath exposing (FilePath)
 
 
 type alias FileData =
     { originalContent : String
     , updatedContent : String
     , changes : List ChangeData
+    , path : FilePath
     }
 
 
@@ -24,6 +26,7 @@ codec =
         |> Codec.field "originalContent" .originalContent Codec.string
         |> Codec.field "updatedContent" .updatedContent Codec.string
         |> Codec.field "changes" .changes (Codec.list changeDataCodec)
+        |> Codec.field "path" .path (Codec.map FilePath.fromString FilePath.toString Codec.string)
         |> Codec.buildObject
 
 

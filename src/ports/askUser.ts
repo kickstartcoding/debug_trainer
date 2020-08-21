@@ -2,7 +2,6 @@ import * as inquirer from 'inquirer'
 import { devLog, formattedErrorLog } from '../utils'
 
 export default function (program): void {
-  devLog("ports:", JSON.stringify(program.ports))
   program.ports.askUser.subscribe(({ question, options }: { question: string, options: string[] }): void => {
     inquirer
       .prompt([

@@ -3,26 +3,33 @@ module Commands.Interactive.Update exposing (update)
 import Commands.Break.Update.BreakFile
 import Commands.Hint.Actions exposing (Action(..))
 import Commands.Interactive.Actions exposing (Action(..))
-import Commands.Interactive.Cmd as Cmd
+import Commands.Interactive.Cmd as Cmd exposing (readTargetFile)
 import Commands.Interactive.QuestionOptions as QuestionOptions
 import Model exposing (Command(..), InteractionPhase(..), Model)
 import Ports
 import Random
 import Utils.Messages as Messages
 import Utils.Types.BreakType exposing (BreakType(..))
-import Utils.Types.FilePath as FilePath exposing (FilePath)
+import Utils.Types.FilePath as FilePath
 
 
-update : FilePath -> Action -> Model -> ( Model, Cmd Action )
-update filepath action model =
+update : Action -> Model -> ( Model, Cmd Action )
+update action model =
     case action of
-        GotTargetFileContent { content } ->
+        GotTargetFileChoice filepath ->
+            ( { model | command = Interactive (ReadingTargetFile filepath) }
+            , readTargetFile filepath
+            )
+
+        GotTargetFileContent { path, content } ->
             let
                 maybeBroken =
                     Commands.Break.Update.BreakFile.run
                         { breakCount = 1
-                        , filepath = filepath
+                        , filepath = FilePath.fromString path
                         , fileContent = content
+
+                        -- , fileContent = Debug.log "GotTargetFileContent content" content
                         , randomNumbers = model.randomNumbers
                         }
             in
@@ -30,16 +37,17 @@ update filepath action model =
                 Just { newFileContent, changes } ->
                     ( { model
                         | command =
-                            Interactive filepath
+                            Interactive
                                 (BreakingFile
                                     { originalContent = content
                                     , updatedContent = newFileContent
                                     , changes = changes
+                                    , path = FilePath.fromString path
                                     }
                                 )
                       }
                     , Ports.writeFile
-                        { path = FilePath.toString filepath
+                        { path = path
                         , content = newFileContent
                         }
                     )
@@ -50,7 +58,7 @@ update filepath action model =
                     )
 
         PresentSolveMenu fileData ->
-            ( { model | command = Interactive filepath (Solving fileData) }
+            ( { model | command = Interactive (Solving fileData) }
             , Ports.askUser
                 { question = "Options"
                 , options =
@@ -63,13 +71,13 @@ update filepath action model =
                 }
             )
 
-        ReceivedUserSolveMenuChoice ({ originalContent } as fileData) choice ->
+        ReceivedUserSolveMenuChoice ({ originalContent, path } as fileData) choice ->
             if choice == QuestionOptions.solved then
-                ( { model | command = Interactive filepath Solved }
+                ( { model | command = Interactive (Solved path) }
                 , Cmd.batch
                     [ Ports.printAndReturn (Messages.withNewlineBuffers "Congratulations; nice work!")
                     , Ports.writeFile
-                        { path = FilePath.toString filepath
+                        { path = FilePath.toString path
                         , content = originalContent
                         }
                     ]
@@ -91,9 +99,9 @@ update filepath action model =
                 )
 
             else if choice == QuestionOptions.resetAndExit then
-                ( { model | command = Interactive filepath ResettingAndExiting }
+                ( { model | command = Interactive ResettingAndExiting }
                 , Ports.writeFile
-                    { path = FilePath.toString filepath
+                    { path = FilePath.toString path
                     , content = originalContent
                     }
                 )
@@ -109,18 +117,27 @@ update filepath action model =
                 { question = "Options"
                 , options =
                     [ QuestionOptions.tryAgain
+                    , QuestionOptions.breakADifferentFile
                     , QuestionOptions.exit
                     ]
                 }
             )
 
-        ReceivedUserRestartMenuChoice choice ->
+        ReceivedUserRestartMenuChoice filepath choice ->
             if choice == QuestionOptions.tryAgain then
                 ( { model
-                    | command = Interactive filepath Start
+                    | command = Interactive (ReadingTargetFile filepath)
                     , randomNumbers = rerandomizeAll model.randomNumbers
                   }
-                , Cmd.init filepath model
+                , Cmd.init (ReadingTargetFile filepath)
+                )
+
+            else if choice == QuestionOptions.breakADifferentFile then
+                ( { model
+                    | command = Interactive SelectingTargetFile
+                    , randomNumbers = rerandomizeAll model.randomNumbers
+                  }
+                , Cmd.init SelectingTargetFile
                 )
 
             else if choice == QuestionOptions.exit then

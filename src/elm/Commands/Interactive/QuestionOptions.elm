@@ -3,11 +3,16 @@ module Commands.Interactive.QuestionOptions exposing
     , exit
     , explanation
     , lineHint
+    , breakADifferentFile
     , resetAndExit
     , solved
     , tryAgain
     )
 
+
+breakADifferentFile : String
+breakADifferentFile =
+    "Break a different file."
 
 tryAgain : String
 tryAgain =

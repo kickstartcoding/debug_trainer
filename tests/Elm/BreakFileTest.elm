@@ -1,6 +1,6 @@
 module Elm.BreakFileTest exposing (..)
 
-import Elm.TestHelp as TestHelp
+import Elm.TestHelp
     exposing
         ( expectBreakResult
         , expectBreakResultWithExt
@@ -60,15 +60,15 @@ suite =
                 \randomNumbers ->
                     expectBreakResult
                         { randomNumbers = randomNumbers
-                        , input = "\"word word word\""
-                        , output = "\"word word word\""
+                        , input = "word \"word word word\""
+                        , output = "Word \"word word word\""
                         }
             , fuzz (list int) "ignores single-quoted strings" <|
                 \randomNumbers ->
                     expectBreakResult
                         { randomNumbers = randomNumbers
-                        , input = "'word word word'"
-                        , output = "'word word word'"
+                        , input = "word 'word word word'"
+                        , output = "Word 'word word word'"
                         }
             ]
         , describe "multi-breaking"

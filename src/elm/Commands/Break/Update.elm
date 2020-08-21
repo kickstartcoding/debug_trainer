@@ -42,6 +42,7 @@ update ({ breakCount, filepath } as breakData) action model =
                                     { originalContent = content
                                     , updatedContent = newFileContent
                                     , changes = changes
+                                    , path = filepath
                                     }
                                 }
                                 oldSavedData

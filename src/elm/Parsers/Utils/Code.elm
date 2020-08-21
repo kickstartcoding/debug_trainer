@@ -1,9 +1,11 @@
 module Parsers.Utils.Code exposing
-    ( otherCharacter
+    ( doubleQuoteString
+    , otherCharacter
     , parenthesisOrBracket
     , returnStatement
-    , word
+    , singleQuoteString
     , string
+    , word
     )
 
 import Parser exposing (..)
@@ -53,7 +55,10 @@ otherCharacter =
 
 isOtherCharacter : Char -> Bool
 isOtherCharacter char =
-    not (isWordCharacter char) && not (Whitespace.isValidWhiteSpace char)
+    (char /= '"')
+        && (char /= '\'')
+        && not (isWordCharacter char)
+        && not (Whitespace.isValidWhiteSpace char)
 
 
 string : Parser ()
@@ -67,19 +72,24 @@ string =
 doubleQuoteString : Parser ()
 doubleQuoteString =
     succeed ()
+        |. multiComment "\"" "\"" NotNestable
         |. token "\""
-        |. Repeat.zeroOrMore
-            (oneOf
-                [ token "\\\""
-                , chompIf (\char -> char /= '"')
-                ]
-            )
-        |. token "\""
+
+
+
+-- succeed ()
+--     |. token "\""
+--     |. Repeat.zeroOrMore
+--         (oneOf
+--             [ token "\\\""
+--             , chompIf (\char -> char /= '"')
+--             ]
+--         )
+--     |. token "\""
 
 
 singleQuoteString : Parser ()
 singleQuoteString =
     succeed ()
-        |. token "'"
-        |. Repeat.zeroOrMore (chompIf (\char -> char /= '\''))
+        |. multiComment "'" "'" NotNestable
         |. token "'"

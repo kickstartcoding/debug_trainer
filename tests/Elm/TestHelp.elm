@@ -1,6 +1,7 @@
 module Elm.TestHelp exposing
     ( expectBreakResult
     , expectBreakResultWithExt
+    , expectBreakToFail
     , expectBreakToOutputOneOf
     , expectBreakWithExtToOutputOneOf
     , expectMultiBreakResult
@@ -64,7 +65,7 @@ expectBreakResultWithExt { extension, input, output, randomNumbers } =
 expectMultiBreakResultWithExt : { extension : String, input : String, output : String, breakCount : Int, randomNumbers : List Int } -> Expect.Expectation
 expectMultiBreakResultWithExt { extension, input, output, breakCount, randomNumbers } =
     breakContent { filename = "filepath." ++ extension, content = input, breakCount = breakCount, randomNumbers = randomNumbers }
-        |> Expect.equal output
+        |> Expect.equal (Just output)
 
 
 expectBreakToOutputOneOf : { input : String, outputPossibilities : List String, randomNumbers : List Int } -> Expect.Expectation
@@ -102,21 +103,41 @@ expectBreakWithExtToOutputOneOf { extension, input, outputPossibilities, randomN
 expectMultiBreakWithExtToOutputOneOf : { extension : String, input : String, outputPossibilities : List String, breakCount : Int, randomNumbers : List Int } -> Expect.Expectation
 expectMultiBreakWithExtToOutputOneOf { extension, input, outputPossibilities, breakCount, randomNumbers } =
     breakContent { filename = "filepath." ++ extension, content = input, breakCount = breakCount, randomNumbers = randomNumbers }
-        |> (\content ->
-                if List.member content outputPossibilities then
-                    True
+        |> (\maybeContent ->
+                case maybeContent of
+                    Just content ->
+                        if List.member content outputPossibilities then
+                            True
 
-                else
-                    let
-                        _ =
-                            Debug.log "Bad updated content" content
-                    in
-                    False
+                        else
+                            let
+                                _ =
+                                    Debug.log "Bad updated content" content
+                            in
+                            False
+
+                    Nothing ->
+                        let
+                            _ =
+                                Debug.log "Unable to break file" ""
+                        in
+                        False
            )
         |> Expect.equal True
 
 
-breakContent : { filename : String, content : String, breakCount : Int, randomNumbers : List Int } -> String
+expectBreakToFail : { filename : String, content : String, breakCount : Int, randomNumbers : List Int } -> Expect.Expectation
+expectBreakToFail { filename, content, breakCount, randomNumbers } =
+    BreakFile.run
+        { breakCount = breakCount
+        , filepath = FilePath.fromString filename
+        , fileContent = content
+        , randomNumbers = randomNumbers
+        }
+        |> Expect.equal Nothing
+
+
+breakContent : { filename : String, content : String, breakCount : Int, randomNumbers : List Int } -> Maybe String
 breakContent { filename, content, breakCount, randomNumbers } =
     BreakFile.run
         { breakCount = breakCount
@@ -124,8 +145,4 @@ breakContent { filename, content, breakCount, randomNumbers } =
         , fileContent = content
         , randomNumbers = randomNumbers
         }
-        |> Maybe.withDefault
-            { newFileContent = "file breaking failed"
-            , changes = []
-            }
-        |> .newFileContent
+        |> Maybe.map .newFileContent

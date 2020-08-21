@@ -24,7 +24,9 @@ run fileType string =
 
 segments : FileType -> Parser (List Segment)
 segments fileType =
-    Repeat.oneOrMore (segment fileType)
+    succeed identity
+        |= Repeat.oneOrMore (segment fileType)
+        |. end
 
 
 segment : FileType -> Parser Segment
@@ -109,7 +111,7 @@ segment fileType =
                                 |> mapStringToSegment offset Whitespace
                            , chompIf (\char -> char == '\n')
                                 |> mapStringToSegment offset Whitespace
-                           , Repeat.oneOrMore Code.otherCharacter
+                           , Code.otherCharacter
                                 |> mapStringToSegment offset Other
                            ]
                     )
@@ -120,7 +122,11 @@ mapStringToSegment : Int -> SegmentType -> Parser data -> Parser Segment
 mapStringToSegment offset segmentType parser =
     parser
         |> getChompedString
-        |> Parser.map (\content -> Segment offset content segmentType)
+        |> Parser.map
+            (\content ->
+                Segment offset content segmentType
+             -- |> Debug.log "segment mapped"
+            )
 
 
 mapFunctionDeclarationToSegment : Int -> Parser NamedFunctionDeclaration -> Parser Segment

@@ -13,10 +13,10 @@ import Ports
 update : CliOptions -> Action -> Model -> ( Model, Cmd Action )
 update _ action ({ command } as model) =
     case ( command, action ) of
-        ( Interactive filepath _, InteractiveAction subAction ) ->
+        ( Interactive _, InteractiveAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Interactive.Update.update filepath subAction model
+                    Commands.Interactive.Update.update subAction model
             in
             ( newModel, Cmd.map InteractiveAction cmd )
 

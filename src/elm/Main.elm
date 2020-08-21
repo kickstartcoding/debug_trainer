@@ -58,9 +58,8 @@ programConfig =
             )
         |> Program.add
             (OptionsParser.build Model.interactiveInit
-                |> OptionsParser.with (Option.requiredPositionalArg "filepath")
-                |> OptionsParser.with (Option.flag "log")
-                |> OptionsParser.with (Option.flag "test")
+                |> OptionsParser.withOptionalPositionalArg (Option.optionalPositionalArg "filepath")
+                |> OptionsParser.withRestArgs (Option.restArgs "flags")
                 |> OptionsParser.withDoc "Pass just a filepath and debug_trainer will run in interactive mode."
             )
 
@@ -83,8 +82,8 @@ init { randomNumbers, workingDirectory, data, dataFilePath } { command } =
     in
     ( model
     , case command of
-        Interactive filepath _ ->
-            Commands.Interactive.Cmd.init filepath model
+        Interactive phase ->
+            Commands.Interactive.Cmd.init phase
 
         Break breakData ->
             Commands.Break.Cmd.init breakData model

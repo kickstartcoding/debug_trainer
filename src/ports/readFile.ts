@@ -14,6 +14,7 @@ export default function (program): void {
         process.exit(1)
       }
 
+      // devLog(`Content of \`${filepath}\`: ${content}`)
       program.ports.successfulFileRead.send({ path: filepath, content: content })
     });
 

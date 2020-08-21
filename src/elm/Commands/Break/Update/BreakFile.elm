@@ -23,6 +23,8 @@ run :
     -> Maybe BreakResult
 run ({ filepath, fileContent } as config) =
     GenericParser.run (FileType.fromFilePath filepath) fileContent
+        -- |> Result.map (Debug.log "segments")
+        -- |> Result.mapError (Debug.log "error")
         |> Result.map (randomlySelectFileChangesFromParsedSegments config)
         |> Result.toMaybe
 

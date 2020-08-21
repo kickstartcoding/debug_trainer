@@ -17,7 +17,7 @@ export default function (program): void {
       }
 
       devLog('New file content written!');
-      devLog("fileData:", JSON.stringify(fileData));
+      // devLog("fileData:", JSON.stringify(fileData));
 
       program.ports.successfulFileWrite.send(fileData)
     })

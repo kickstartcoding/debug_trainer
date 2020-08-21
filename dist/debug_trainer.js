@@ -3282,9 +3282,9 @@ var $miniBill$elm_codec$Codec$buildObject = function (_v0) {
 			}
 		});
 };
-var $author$project$Utils$Types$FileData$FileData = F3(
-	function (originalContent, updatedContent, changes) {
-		return {changes: changes, originalContent: originalContent, updatedContent: updatedContent};
+var $author$project$Utils$Types$FileData$FileData = F4(
+	function (originalContent, updatedContent, changes, path) {
+		return {changes: changes, originalContent: originalContent, path: path, updatedContent: updatedContent};
 	});
 var $author$project$Utils$Types$FileData$ChangeData = F3(
 	function (lineNumber, breakType, changeDescription) {
@@ -3619,6 +3619,12 @@ var $author$project$Utils$Types$FileData$changeDataCodec = $miniBill$elm_codec$C
 				},
 				$miniBill$elm_codec$Codec$int,
 				$miniBill$elm_codec$Codec$object($author$project$Utils$Types$FileData$ChangeData)))));
+var $author$project$Utils$Types$FilePath$FilePath = function (a) {
+	return {$: 'FilePath', a: a};
+};
+var $author$project$Utils$Types$FilePath$fromString = function (string) {
+	return $author$project$Utils$Types$FilePath$FilePath(string);
+};
 var $miniBill$elm_codec$Codec$composite = F3(
 	function (enc, dec, _v0) {
 		var codec = _v0.a;
@@ -3630,29 +3636,57 @@ var $miniBill$elm_codec$Codec$composite = F3(
 	});
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $miniBill$elm_codec$Codec$list = A2($miniBill$elm_codec$Codec$composite, $elm$json$Json$Encode$list, $elm$json$Json$Decode$list);
+var $elm$json$Json$Decode$map = _Json_map1;
+var $miniBill$elm_codec$Codec$map = F3(
+	function (go, back, codec) {
+		return $miniBill$elm_codec$Codec$Codec(
+			{
+				decoder: A2(
+					$elm$json$Json$Decode$map,
+					go,
+					$miniBill$elm_codec$Codec$decoder(codec)),
+				encoder: function (v) {
+					return A2(
+						$miniBill$elm_codec$Codec$encoder,
+						codec,
+						back(v));
+				}
+			});
+	});
+var $author$project$Utils$Types$FilePath$toString = function (_v0) {
+	var string = _v0.a;
+	return string;
+};
 var $author$project$Utils$Types$FileData$codec = $miniBill$elm_codec$Codec$buildObject(
 	A4(
 		$miniBill$elm_codec$Codec$field,
-		'changes',
+		'path',
 		function ($) {
-			return $.changes;
+			return $.path;
 		},
-		$miniBill$elm_codec$Codec$list($author$project$Utils$Types$FileData$changeDataCodec),
+		A3($miniBill$elm_codec$Codec$map, $author$project$Utils$Types$FilePath$fromString, $author$project$Utils$Types$FilePath$toString, $miniBill$elm_codec$Codec$string),
 		A4(
 			$miniBill$elm_codec$Codec$field,
-			'updatedContent',
+			'changes',
 			function ($) {
-				return $.updatedContent;
+				return $.changes;
 			},
-			$miniBill$elm_codec$Codec$string,
+			$miniBill$elm_codec$Codec$list($author$project$Utils$Types$FileData$changeDataCodec),
 			A4(
 				$miniBill$elm_codec$Codec$field,
-				'originalContent',
+				'updatedContent',
 				function ($) {
-					return $.originalContent;
+					return $.updatedContent;
 				},
 				$miniBill$elm_codec$Codec$string,
-				$miniBill$elm_codec$Codec$object($author$project$Utils$Types$FileData$FileData)))));
+				A4(
+					$miniBill$elm_codec$Codec$field,
+					'originalContent',
+					function ($) {
+						return $.originalContent;
+					},
+					$miniBill$elm_codec$Codec$string,
+					$miniBill$elm_codec$Codec$object($author$project$Utils$Types$FileData$FileData))))));
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -3671,7 +3705,6 @@ var $elm$core$Dict$fromList = function (assocs) {
 		assocs);
 };
 var $elm$json$Json$Decode$keyValuePairs = _Json_decodeKeyValuePairs;
-var $elm$json$Json$Decode$map = _Json_map1;
 var $elm$json$Json$Decode$dict = function (decoder) {
 	return A2(
 		$elm$json$Json$Decode$map,
@@ -3740,17 +3773,7 @@ var $author$project$Model$SavedData$fromFlag = function (maybeDataString) {
 		return $elm$core$Result$Err($author$project$Model$SavedData$FileMissing);
 	}
 };
-var $author$project$Utils$Types$FilePath$FilePath = function (a) {
-	return {$: 'FilePath', a: a};
-};
-var $author$project$Utils$Types$FilePath$fromString = function (string) {
-	return $author$project$Utils$Types$FilePath$FilePath(string);
-};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $author$project$Utils$Types$FilePath$toString = function (_v0) {
-	var string = _v0.a;
-	return string;
-};
 var $author$project$Model$SavedData$errorMessage = F2(
 	function (dataFilePath, error) {
 		if (error.$ === 'FileMissing') {
@@ -4262,18 +4285,41 @@ var $author$project$Commands$Hint$Cmd$init = F3(
 				model: model
 			});
 	});
-var $author$project$Commands$Interactive$Cmd$init = F2(
-	function (filepath, model) {
-		return $elm$core$Platform$Cmd$batch(
-			_List_fromArray(
-				[
-					$author$project$Ports$print(
-					$author$project$Utils$Messages$withNewlineBuffers(
-						'Breaking `' + ($author$project$Utils$Types$FilePath$toString(filepath) + '`...'))),
-					$author$project$Ports$readFile(
-					$author$project$Utils$Types$FilePath$toString(filepath))
-				]));
+var $elm$json$Json$Encode$null = _Json_encodeNull;
+var $author$project$Ports$chooseRandomFile = _Platform_outgoingPort(
+	'chooseRandomFile',
+	function ($) {
+		return $elm$json$Json$Encode$null;
 	});
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Commands$Interactive$Cmd$readTargetFile = function (filepath) {
+	return $elm$core$Platform$Cmd$batch(
+		_List_fromArray(
+			[
+				$author$project$Ports$print(
+				$author$project$Utils$Messages$withNewlineBuffers(
+					'Breaking `' + ($author$project$Utils$Types$FilePath$toString(filepath) + '`...'))),
+				$author$project$Ports$readFile(
+				$author$project$Utils$Types$FilePath$toString(filepath))
+			]));
+};
+var $author$project$Commands$Interactive$Cmd$init = function (phase) {
+	switch (phase.$) {
+		case 'SelectingTargetFile':
+			return $author$project$Ports$chooseRandomFile(_Utils_Tuple0);
+		case 'ReadingTargetFile':
+			var filepath = phase.a;
+			return $author$project$Commands$Interactive$Cmd$readTargetFile(filepath);
+		case 'BreakingFile':
+			return $elm$core$Platform$Cmd$none;
+		case 'Solving':
+			return $elm$core$Platform$Cmd$none;
+		case 'Solved':
+			return $elm$core$Platform$Cmd$none;
+		default:
+			return $elm$core$Platform$Cmd$none;
+	}
+};
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -4731,8 +4777,8 @@ var $author$project$Main$init = F2(
 			function () {
 				switch (command.$) {
 					case 'Interactive':
-						var filepath = command.a;
-						return A2($author$project$Commands$Interactive$Cmd$init, filepath, model);
+						var phase = command.a;
+						return $author$project$Commands$Interactive$Cmd$init(phase);
 					case 'Break':
 						var breakData = command.a;
 						return A2($author$project$Commands$Break$Cmd$init, breakData, model);
@@ -4957,20 +5003,28 @@ var $author$project$Model$hintInit = F4(
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
-var $author$project$Model$Interactive = F2(
-	function (a, b) {
-		return {$: 'Interactive', a: a, b: b};
-	});
-var $author$project$Model$Start = {$: 'Start'};
-var $author$project$Model$interactiveInit = F3(
-	function (filepathString, loggingIsOn, isInTestMode) {
+var $author$project$Model$Interactive = function (a) {
+	return {$: 'Interactive', a: a};
+};
+var $author$project$Model$ReadingTargetFile = function (a) {
+	return {$: 'ReadingTargetFile', a: a};
+};
+var $author$project$Model$SelectingTargetFile = {$: 'SelectingTargetFile'};
+var $author$project$Model$interactiveInit = F2(
+	function (maybeFilepathString, _v0) {
 		return {
-			command: A2(
-				$author$project$Model$Interactive,
-				$author$project$Utils$Types$FilePath$fromString(filepathString),
-				$author$project$Model$Start),
-			isInTestMode: isInTestMode,
-			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
+			command: function () {
+				if (maybeFilepathString.$ === 'Just') {
+					var filepathString = maybeFilepathString.a;
+					return $author$project$Model$Interactive(
+						$author$project$Model$ReadingTargetFile(
+							$author$project$Utils$Types$FilePath$fromString(filepathString)));
+				} else {
+					return $author$project$Model$Interactive($author$project$Model$SelectingTargetFile);
+				}
+			}(),
+			isInTestMode: false,
+			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(false)
 		};
 	});
 var $dillonkearns$elm_cli_options_parser$Cli$Decode$MatchError = function (a) {
@@ -5052,6 +5106,60 @@ var $elm_community$list_extra$List$Extra$getAt = F2(
 		return (idx < 0) ? $elm$core$Maybe$Nothing : $elm$core$List$head(
 			A2($elm$core$List$drop, idx, xs));
 	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$operandCount = function (usageSpecs) {
+	return $elm$core$List$length(
+		A2(
+			$elm$core$List$filterMap,
+			function (spec) {
+				switch (spec.$) {
+					case 'FlagOrKeywordArg':
+						return $elm$core$Maybe$Nothing;
+					case 'Operand':
+						var operandName = spec.a;
+						var mutuallyExclusiveValues = spec.b;
+						var occurences = spec.c;
+						return $elm$core$Maybe$Just(operandName);
+					default:
+						return $elm$core$Maybe$Nothing;
+				}
+			},
+			usageSpecs));
+};
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$Operand = F3(
+	function (a, b, c) {
+		return {$: 'Operand', a: a, b: b, c: c};
+	});
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$optionalPositionalArg = function (positionalArgName) {
+	return A3($dillonkearns$elm_cli_options_parser$Cli$UsageSpec$Operand, positionalArgName, $elm$core$Maybe$Nothing, $dillonkearns$elm_cli_options_parser$Occurences$Optional);
+};
+var $dillonkearns$elm_cli_options_parser$Cli$Option$optionalPositionalArg = function (operandDescription) {
+	return A2(
+		$dillonkearns$elm_cli_options_parser$Cli$Option$buildOption,
+		function (flagsAndOperands) {
+			var operandsSoFar = $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$operandCount(flagsAndOperands.usageSpecs) - 1;
+			var maybeArg = A2($elm_community$list_extra$List$Extra$getAt, operandsSoFar, flagsAndOperands.operands);
+			return $elm$core$Result$Ok(maybeArg);
+		},
+		$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$optionalPositionalArg(operandDescription));
+};
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
@@ -5064,10 +5172,6 @@ var $dillonkearns$elm_cli_options_parser$Cli$Option$listToString = function (lis
 				']'
 			]));
 };
-var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$Operand = F3(
-	function (a, b, c) {
-		return {$: 'Operand', a: a, b: b, c: c};
-	});
 var $dillonkearns$elm_cli_options_parser$Occurences$Required = {$: 'Required'};
 var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$operand = function (operandName) {
 	return A3($dillonkearns$elm_cli_options_parser$Cli$UsageSpec$Operand, operandName, $elm$core$Maybe$Nothing, $dillonkearns$elm_cli_options_parser$Occurences$Required);
@@ -5106,6 +5210,26 @@ var $author$project$Model$resetInit = F3(
 			loggingStatus: $author$project$Utils$Types$LoggingStatus$fromBool(loggingIsOn)
 		};
 	});
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$RestArgs = function (a) {
+	return {$: 'RestArgs', a: a};
+};
+var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$restArgs = function (restArgsName) {
+	return $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$RestArgs(restArgsName);
+};
+var $dillonkearns$elm_cli_options_parser$Cli$Option$restArgs = function (restArgsDescription) {
+	return A2(
+		$dillonkearns$elm_cli_options_parser$Cli$Option$buildOption,
+		function (_v0) {
+			var operands = _v0.operands;
+			var usageSpecs = _v0.usageSpecs;
+			return $elm$core$Result$Ok(
+				A2(
+					$elm$core$List$drop,
+					$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$operandCount(usageSpecs),
+					operands));
+		},
+		$dillonkearns$elm_cli_options_parser$Cli$UsageSpec$restArgs(restArgsDescription));
+};
 var $elm$core$Result$andThen = F2(
 	function (callback, result) {
 		if (result.$ === 'Ok') {
@@ -5119,43 +5243,6 @@ var $elm$core$Result$andThen = F2(
 var $dillonkearns$elm_cli_options_parser$Cli$Decode$decodeFunction = function (_v0) {
 	var decodeFn = _v0.a;
 	return decodeFn;
-};
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $dillonkearns$elm_cli_options_parser$Cli$UsageSpec$operandCount = function (usageSpecs) {
-	return $elm$core$List$length(
-		A2(
-			$elm$core$List$filterMap,
-			function (spec) {
-				switch (spec.$) {
-					case 'FlagOrKeywordArg':
-						return $elm$core$Maybe$Nothing;
-					case 'Operand':
-						var operandName = spec.a;
-						var mutuallyExclusiveValues = spec.b;
-						var occurences = spec.c;
-						return $elm$core$Maybe$Just(operandName);
-					default:
-						return $elm$core$Maybe$Nothing;
-				}
-			},
-			usageSpecs));
 };
 var $elm$core$Result$map = F2(
 	function (func, ra) {
@@ -5256,21 +5343,20 @@ var $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withDoc = F2(
 					description: $elm$core$Maybe$Just(docString)
 				}));
 	});
+var $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withOptionalPositionalArg = $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withCommon;
+var $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withRestArgs = $dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withCommon;
 var $author$project$Main$programConfig = A2(
 	$dillonkearns$elm_cli_options_parser$Cli$Program$add,
 	A2(
 		$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withDoc,
 		'Pass just a filepath and debug_trainer will run in interactive mode.',
 		A2(
-			$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-			$dillonkearns$elm_cli_options_parser$Cli$Option$flag('test'),
+			$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withRestArgs,
+			$dillonkearns$elm_cli_options_parser$Cli$Option$restArgs('flags'),
 			A2(
-				$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-				$dillonkearns$elm_cli_options_parser$Cli$Option$flag('log'),
-				A2(
-					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$with,
-					$dillonkearns$elm_cli_options_parser$Cli$Option$requiredPositionalArg('filepath'),
-					$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$build($author$project$Model$interactiveInit))))),
+				$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$withOptionalPositionalArg,
+				$dillonkearns$elm_cli_options_parser$Cli$Option$optionalPositionalArg('filepath'),
+				$dillonkearns$elm_cli_options_parser$Cli$OptionsParser$build($author$project$Model$interactiveInit)))),
 	A2(
 		$dillonkearns$elm_cli_options_parser$Cli$Program$add,
 		A2(
@@ -5361,7 +5447,6 @@ var $dillonkearns$elm_cli_options_parser$Cli$Program$UserModel = F2(
 	function (a, b) {
 		return {$: 'UserModel', a: a, b: b};
 	});
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $dillonkearns$elm_cli_options_parser$Cli$Program$CustomMatch = function (a) {
@@ -6908,6 +6993,9 @@ var $author$project$Commands$Break$Subscriptions$subscriptions = function (model
 			]));
 };
 var $author$project$Commands$Interactive$Actions$Exit = {$: 'Exit'};
+var $author$project$Commands$Interactive$Actions$GotTargetFileChoice = function (a) {
+	return {$: 'GotTargetFileChoice', a: a};
+};
 var $author$project$Commands$Interactive$Actions$GotTargetFileContent = function (a) {
 	return {$: 'GotTargetFileContent', a: a};
 };
@@ -6915,65 +7003,78 @@ var $author$project$Commands$Interactive$Actions$PresentRestartMenu = {$: 'Prese
 var $author$project$Commands$Interactive$Actions$PresentSolveMenu = function (a) {
 	return {$: 'PresentSolveMenu', a: a};
 };
-var $author$project$Commands$Interactive$Actions$ReceivedUserRestartMenuChoice = function (a) {
-	return {$: 'ReceivedUserRestartMenuChoice', a: a};
-};
+var $author$project$Commands$Interactive$Actions$ReceivedUserRestartMenuChoice = F2(
+	function (a, b) {
+		return {$: 'ReceivedUserRestartMenuChoice', a: a, b: b};
+	});
 var $author$project$Commands$Interactive$Actions$ReceivedUserSolveMenuChoice = F2(
 	function (a, b) {
 		return {$: 'ReceivedUserSolveMenuChoice', a: a, b: b};
 	});
 var $author$project$Ports$finishedPrinting = _Platform_incomingPort('finishedPrinting', $elm$json$Json$Decode$string);
+var $author$project$Ports$receiveFileChoice = _Platform_incomingPort('receiveFileChoice', $elm$json$Json$Decode$string);
 var $author$project$Ports$receiveUserAnswer = _Platform_incomingPort('receiveUserAnswer', $elm$json$Json$Decode$string);
 var $author$project$Commands$Interactive$Subscriptions$subscriptions = function (model) {
-	var _v0 = model.command;
-	if (_v0.$ === 'Interactive') {
-		switch (_v0.b.$) {
-			case 'Start':
-				var _v1 = _v0.b;
-				return $author$project$Ports$successfulFileRead($author$project$Commands$Interactive$Actions$GotTargetFileContent);
-			case 'BreakingFile':
-				var data = _v0.b.a;
-				return $author$project$Ports$successfulFileWrite(
-					function (_v2) {
-						return $author$project$Commands$Interactive$Actions$PresentSolveMenu(data);
-					});
-			case 'Solving':
-				var data = _v0.b.a;
-				return $elm$core$Platform$Sub$batch(
-					_List_fromArray(
-						[
-							$author$project$Ports$receiveUserAnswer(
-							$author$project$Commands$Interactive$Actions$ReceivedUserSolveMenuChoice(data)),
-							$author$project$Ports$finishedPrinting(
-							function (_v3) {
-								return $author$project$Commands$Interactive$Actions$PresentSolveMenu(data);
-							})
-						]));
-			case 'Solved':
-				var _v4 = _v0.b;
-				return $elm$core$Platform$Sub$batch(
-					_List_fromArray(
-						[
-							$author$project$Ports$receiveUserAnswer($author$project$Commands$Interactive$Actions$ReceivedUserRestartMenuChoice),
-							$author$project$Ports$finishedPrinting(
-							function (_v5) {
-								return $author$project$Commands$Interactive$Actions$PresentRestartMenu;
-							})
-						]));
-			default:
-				var _v6 = _v0.b;
-				return $elm$core$Platform$Sub$batch(
-					_List_fromArray(
-						[
-							$author$project$Ports$successfulFileWrite(
-							function (_v7) {
-								return $author$project$Commands$Interactive$Actions$Exit;
-							})
-						]));
-		}
-	} else {
-		return $elm$core$Platform$Sub$none;
-	}
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$author$project$Ports$receiveFileChoice(
+				A2($elm$core$Basics$composeR, $author$project$Utils$Types$FilePath$fromString, $author$project$Commands$Interactive$Actions$GotTargetFileChoice)),
+				function () {
+				var _v0 = model.command;
+				if (_v0.$ === 'Interactive') {
+					switch (_v0.a.$) {
+						case 'SelectingTargetFile':
+							var _v1 = _v0.a;
+							return $elm$core$Platform$Sub$none;
+						case 'ReadingTargetFile':
+							return $author$project$Ports$successfulFileRead($author$project$Commands$Interactive$Actions$GotTargetFileContent);
+						case 'BreakingFile':
+							var data = _v0.a.a;
+							return $author$project$Ports$successfulFileWrite(
+								function (_v2) {
+									return $author$project$Commands$Interactive$Actions$PresentSolveMenu(data);
+								});
+						case 'Solving':
+							var data = _v0.a.a;
+							return $elm$core$Platform$Sub$batch(
+								_List_fromArray(
+									[
+										$author$project$Ports$receiveUserAnswer(
+										$author$project$Commands$Interactive$Actions$ReceivedUserSolveMenuChoice(data)),
+										$author$project$Ports$finishedPrinting(
+										function (_v3) {
+											return $author$project$Commands$Interactive$Actions$PresentSolveMenu(data);
+										})
+									]));
+						case 'Solved':
+							var filepath = _v0.a.a;
+							return $elm$core$Platform$Sub$batch(
+								_List_fromArray(
+									[
+										$author$project$Ports$receiveUserAnswer(
+										$author$project$Commands$Interactive$Actions$ReceivedUserRestartMenuChoice(filepath)),
+										$author$project$Ports$finishedPrinting(
+										function (_v4) {
+											return $author$project$Commands$Interactive$Actions$PresentRestartMenu;
+										})
+									]));
+						default:
+							var _v5 = _v0.a;
+							return $elm$core$Platform$Sub$batch(
+								_List_fromArray(
+									[
+										$author$project$Ports$successfulFileWrite(
+										function (_v6) {
+											return $author$project$Commands$Interactive$Actions$Exit;
+										})
+									]));
+					}
+				} else {
+					return $elm$core$Platform$Sub$none;
+				}
+			}()
+			]));
 };
 var $author$project$Commands$Reset$Actions$SuccessfulFileWrite = function (a) {
 	return {$: 'SuccessfulFileWrite', a: a};
@@ -7256,7 +7357,7 @@ var $author$project$Utils$Types$FileType$Unknown = {$: 'Unknown'};
 var $elm$core$String$endsWith = _String_endsWith;
 var $author$project$Utils$Types$FileType$fromFilePath = function (filepath) {
 	var filepathString = $author$project$Utils$Types$FilePath$toString(filepath);
-	return A2($elm$core$String$endsWith, '.js', filepathString) ? $author$project$Utils$Types$FileType$JavaScript : (A2($elm$core$String$endsWith, '.py', filepathString) ? $author$project$Utils$Types$FileType$Python : (A2($elm$core$String$endsWith, '.rb', filepathString) ? $author$project$Utils$Types$FileType$Ruby : (A2($elm$core$String$endsWith, '.elm', filepathString) ? $author$project$Utils$Types$FileType$Elm : (A2($elm$core$String$endsWith, '.ex', filepathString) ? $author$project$Utils$Types$FileType$Elixir : (A2($elm$core$String$endsWith, '.exs', filepathString) ? $author$project$Utils$Types$FileType$Elixir : (A2($elm$core$String$endsWith, '.rs', filepathString) ? $author$project$Utils$Types$FileType$Rust : $author$project$Utils$Types$FileType$Unknown))))));
+	return A2($elm$core$String$endsWith, '.js', filepathString) ? $author$project$Utils$Types$FileType$JavaScript : (A2($elm$core$String$endsWith, '.ts', filepathString) ? $author$project$Utils$Types$FileType$JavaScript : (A2($elm$core$String$endsWith, '.py', filepathString) ? $author$project$Utils$Types$FileType$Python : (A2($elm$core$String$endsWith, '.rb', filepathString) ? $author$project$Utils$Types$FileType$Ruby : (A2($elm$core$String$endsWith, '.elm', filepathString) ? $author$project$Utils$Types$FileType$Elm : (A2($elm$core$String$endsWith, '.ex', filepathString) ? $author$project$Utils$Types$FileType$Elixir : (A2($elm$core$String$endsWith, '.exs', filepathString) ? $author$project$Utils$Types$FileType$Elixir : (A2($elm$core$String$endsWith, '.rs', filepathString) ? $author$project$Utils$Types$FileType$Rust : $author$project$Utils$Types$FileType$Unknown)))))));
 };
 var $author$project$Commands$Break$Update$BreakFile$BreakResult = F2(
 	function (newFileContent, changes) {
@@ -8010,6 +8111,7 @@ var $elm$parser$Parser$run = F2(
 				A2($elm$core$List$map, $elm$parser$Parser$problemToDeadEnd, problems));
 		}
 	});
+var $elm$parser$Parser$ExpectingEnd = {$: 'ExpectingEnd'};
 var $elm$parser$Parser$Advanced$Bad = F2(
 	function (a, b) {
 		return {$: 'Bad', a: a, b: b};
@@ -8021,6 +8123,77 @@ var $elm$parser$Parser$Advanced$Good = F3(
 var $elm$parser$Parser$Advanced$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
+var $elm$parser$Parser$Advanced$AddRight = F2(
+	function (a, b) {
+		return {$: 'AddRight', a: a, b: b};
+	});
+var $elm$parser$Parser$Advanced$DeadEnd = F4(
+	function (row, col, problem, contextStack) {
+		return {col: col, contextStack: contextStack, problem: problem, row: row};
+	});
+var $elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
+var $elm$parser$Parser$Advanced$fromState = F2(
+	function (s, x) {
+		return A2(
+			$elm$parser$Parser$Advanced$AddRight,
+			$elm$parser$Parser$Advanced$Empty,
+			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
+	});
+var $elm$parser$Parser$Advanced$end = function (x) {
+	return $elm$parser$Parser$Advanced$Parser(
+		function (s) {
+			return _Utils_eq(
+				$elm$core$String$length(s.src),
+				s.offset) ? A3($elm$parser$Parser$Advanced$Good, false, _Utils_Tuple0, s) : A2(
+				$elm$parser$Parser$Advanced$Bad,
+				false,
+				A2($elm$parser$Parser$Advanced$fromState, s, x));
+		});
+};
+var $elm$parser$Parser$end = $elm$parser$Parser$Advanced$end($elm$parser$Parser$ExpectingEnd);
+var $elm$parser$Parser$Advanced$map2 = F3(
+	function (func, _v0, _v1) {
+		var parseA = _v0.a;
+		var parseB = _v1.a;
+		return $elm$parser$Parser$Advanced$Parser(
+			function (s0) {
+				var _v2 = parseA(s0);
+				if (_v2.$ === 'Bad') {
+					var p = _v2.a;
+					var x = _v2.b;
+					return A2($elm$parser$Parser$Advanced$Bad, p, x);
+				} else {
+					var p1 = _v2.a;
+					var a = _v2.b;
+					var s1 = _v2.c;
+					var _v3 = parseB(s1);
+					if (_v3.$ === 'Bad') {
+						var p2 = _v3.a;
+						var x = _v3.b;
+						return A2($elm$parser$Parser$Advanced$Bad, p1 || p2, x);
+					} else {
+						var p2 = _v3.a;
+						var b = _v3.b;
+						var s2 = _v3.c;
+						return A3(
+							$elm$parser$Parser$Advanced$Good,
+							p1 || p2,
+							A2(func, a, b),
+							s2);
+					}
+				}
+			});
+	});
+var $elm$parser$Parser$Advanced$ignorer = F2(
+	function (keepParser, ignoreParser) {
+		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$always, keepParser, ignoreParser);
+	});
+var $elm$parser$Parser$ignorer = $elm$parser$Parser$Advanced$ignorer;
+var $elm$parser$Parser$Advanced$keeper = F2(
+	function (parseFunc, parseArg) {
+		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$apL, parseFunc, parseArg);
+	});
+var $elm$parser$Parser$keeper = $elm$parser$Parser$Advanced$keeper;
 var $elm$parser$Parser$Advanced$andThen = F2(
 	function (callback, _v0) {
 		var parseA = _v0.a;
@@ -8148,45 +8321,6 @@ var $elm$parser$Parser$Done = function (a) {
 var $elm$parser$Parser$Loop = function (a) {
 	return {$: 'Loop', a: a};
 };
-var $elm$parser$Parser$Advanced$map2 = F3(
-	function (func, _v0, _v1) {
-		var parseA = _v0.a;
-		var parseB = _v1.a;
-		return $elm$parser$Parser$Advanced$Parser(
-			function (s0) {
-				var _v2 = parseA(s0);
-				if (_v2.$ === 'Bad') {
-					var p = _v2.a;
-					var x = _v2.b;
-					return A2($elm$parser$Parser$Advanced$Bad, p, x);
-				} else {
-					var p1 = _v2.a;
-					var a = _v2.b;
-					var s1 = _v2.c;
-					var _v3 = parseB(s1);
-					if (_v3.$ === 'Bad') {
-						var p2 = _v3.a;
-						var x = _v3.b;
-						return A2($elm$parser$Parser$Advanced$Bad, p1 || p2, x);
-					} else {
-						var p2 = _v3.a;
-						var b = _v3.b;
-						var s2 = _v3.c;
-						return A3(
-							$elm$parser$Parser$Advanced$Good,
-							p1 || p2,
-							A2(func, a, b),
-							s2);
-					}
-				}
-			});
-	});
-var $elm$parser$Parser$Advanced$keeper = F2(
-	function (parseFunc, parseArg) {
-		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$apL, parseFunc, parseArg);
-	});
-var $elm$parser$Parser$keeper = $elm$parser$Parser$Advanced$keeper;
-var $elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
 var $elm$parser$Parser$Advanced$Append = F2(
 	function (a, b) {
 		return {$: 'Append', a: a, b: b};
@@ -8274,20 +8408,7 @@ var $author$project$Parsers$Generic$Segment$Other = {$: 'Other'};
 var $author$project$Parsers$Generic$Segment$String = {$: 'String'};
 var $author$project$Parsers$Generic$Segment$Whitespace = {$: 'Whitespace'};
 var $elm$parser$Parser$NotNestable = {$: 'NotNestable'};
-var $elm$parser$Parser$Advanced$ignorer = F2(
-	function (keepParser, ignoreParser) {
-		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$always, keepParser, ignoreParser);
-	});
-var $elm$parser$Parser$ignorer = $elm$parser$Parser$Advanced$ignorer;
 var $elm$parser$Parser$Advanced$findSubString = _Parser_findSubString;
-var $elm$parser$Parser$Advanced$AddRight = F2(
-	function (a, b) {
-		return {$: 'AddRight', a: a, b: b};
-	});
-var $elm$parser$Parser$Advanced$DeadEnd = F4(
-	function (row, col, problem, contextStack) {
-		return {col: col, contextStack: contextStack, problem: problem, row: row};
-	});
 var $elm$parser$Parser$Advanced$fromInfo = F4(
 	function (row, col, x, context) {
 		return A2(
@@ -8314,13 +8435,6 @@ var $elm$parser$Parser$Advanced$chompUntil = function (_v0) {
 				{col: newCol, context: s.context, indent: s.indent, offset: newOffset, row: newRow, src: s.src});
 		});
 };
-var $elm$parser$Parser$Advanced$fromState = F2(
-	function (s, x) {
-		return A2(
-			$elm$parser$Parser$Advanced$AddRight,
-			$elm$parser$Parser$Advanced$Empty,
-			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
-	});
 var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
 var $elm$parser$Parser$Advanced$chompIf = F2(
 	function (isGood, expecting) {
@@ -9011,7 +9125,11 @@ var $author$project$Parsers$Generic$Parser$mapStringToSegment = F3(
 			$elm$parser$Parser$getChompedString(parser));
 	});
 var $author$project$Parsers$Utils$Code$isOtherCharacter = function (_char) {
-	return (!$author$project$Parsers$Utils$Code$isWordCharacter(_char)) && (!$author$project$Parsers$Utils$Whitespace$isValidWhiteSpace(_char));
+	return (!_Utils_eq(
+		_char,
+		_Utils_chr('\"'))) && ((!_Utils_eq(
+		_char,
+		_Utils_chr('\''))) && ((!$author$project$Parsers$Utils$Code$isWordCharacter(_char)) && (!$author$project$Parsers$Utils$Whitespace$isValidWhiteSpace(_char))));
 };
 var $author$project$Parsers$Utils$Code$otherCharacter = $elm$parser$Parser$chompIf($author$project$Parsers$Utils$Code$isOtherCharacter);
 var $author$project$Parsers$Utils$Code$parenthesisOrBracket = $elm$parser$Parser$oneOf(
@@ -9076,38 +9194,15 @@ var $author$project$Parsers$Utils$Code$doubleQuoteString = A2(
 	$elm$parser$Parser$ignorer,
 	A2(
 		$elm$parser$Parser$ignorer,
-		A2(
-			$elm$parser$Parser$ignorer,
-			$elm$parser$Parser$succeed(_Utils_Tuple0),
-			$elm$parser$Parser$token('\"')),
-		$author$project$Parsers$Utils$Repeat$zeroOrMore(
-			$elm$parser$Parser$oneOf(
-				_List_fromArray(
-					[
-						$elm$parser$Parser$token('\\\"'),
-						$elm$parser$Parser$chompIf(
-						function (_char) {
-							return !_Utils_eq(
-								_char,
-								_Utils_chr('\"'));
-						})
-					])))),
+		$elm$parser$Parser$succeed(_Utils_Tuple0),
+		A3($elm$parser$Parser$multiComment, '\"', '\"', $elm$parser$Parser$NotNestable)),
 	$elm$parser$Parser$token('\"'));
 var $author$project$Parsers$Utils$Code$singleQuoteString = A2(
 	$elm$parser$Parser$ignorer,
 	A2(
 		$elm$parser$Parser$ignorer,
-		A2(
-			$elm$parser$Parser$ignorer,
-			$elm$parser$Parser$succeed(_Utils_Tuple0),
-			$elm$parser$Parser$token('\'')),
-		$author$project$Parsers$Utils$Repeat$zeroOrMore(
-			$elm$parser$Parser$chompIf(
-				function (_char) {
-					return !_Utils_eq(
-						_char,
-						_Utils_chr('\''));
-				}))),
+		$elm$parser$Parser$succeed(_Utils_Tuple0),
+		A3($elm$parser$Parser$multiComment, '\'', '\'', $elm$parser$Parser$NotNestable)),
 	$elm$parser$Parser$token('\''));
 var $author$project$Parsers$Utils$Code$string = $elm$parser$Parser$oneOf(
 	_List_fromArray(
@@ -9209,18 +9304,20 @@ var $author$project$Parsers$Generic$Parser$segment = function (fileType) {
 										_char,
 										_Utils_chr('\n'));
 								})),
-							A3(
-							$author$project$Parsers$Generic$Parser$mapStringToSegment,
-							offset,
-							$author$project$Parsers$Generic$Segment$Other,
-							$author$project$Parsers$Utils$Repeat$oneOrMore($author$project$Parsers$Utils$Code$otherCharacter))
+							A3($author$project$Parsers$Generic$Parser$mapStringToSegment, offset, $author$project$Parsers$Generic$Segment$Other, $author$project$Parsers$Utils$Code$otherCharacter)
 						])));
 		},
 		$elm$parser$Parser$getOffset);
 };
 var $author$project$Parsers$Generic$Parser$segments = function (fileType) {
-	return $author$project$Parsers$Utils$Repeat$oneOrMore(
-		$author$project$Parsers$Generic$Parser$segment(fileType));
+	return A2(
+		$elm$parser$Parser$keeper,
+		$elm$parser$Parser$succeed($elm$core$Basics$identity),
+		A2(
+			$elm$parser$Parser$ignorer,
+			$author$project$Parsers$Utils$Repeat$oneOrMore(
+				$author$project$Parsers$Generic$Parser$segment(fileType)),
+			$elm$parser$Parser$end));
 };
 var $author$project$Parsers$Generic$Parser$run = F2(
 	function (fileType, string) {
@@ -9303,7 +9400,7 @@ var $author$project$Commands$Break$Update$update = F3(
 					var newSavedData = A2(
 						$author$project$Model$SavedData$setFileData,
 						{
-							fileData: {changes: changes, originalContent: content, updatedContent: newFileContent},
+							fileData: {changes: changes, originalContent: content, path: filepath, updatedContent: newFileContent},
 							filepath: filepath,
 							workingDirectory: model.workingDirectory
 						},
@@ -9351,10 +9448,13 @@ var $author$project$Model$BreakingFile = function (a) {
 	return {$: 'BreakingFile', a: a};
 };
 var $author$project$Model$ResettingAndExiting = {$: 'ResettingAndExiting'};
-var $author$project$Model$Solved = {$: 'Solved'};
+var $author$project$Model$Solved = function (a) {
+	return {$: 'Solved', a: a};
+};
 var $author$project$Model$Solving = function (a) {
 	return {$: 'Solving', a: a};
 };
+var $author$project$Commands$Interactive$QuestionOptions$breakADifferentFile = 'Break a different file.';
 var $author$project$Commands$Interactive$QuestionOptions$errorTypeHint = 'Tell me what type of error you added.';
 var $author$project$Commands$Interactive$QuestionOptions$exit = 'Exit.';
 var $author$project$Commands$Interactive$QuestionOptions$explanation = 'Tell me exactly what you did to the file.';
@@ -9440,13 +9540,29 @@ var $author$project$Commands$Interactive$Update$rerandomizeAll = function (rando
 var $author$project$Commands$Interactive$QuestionOptions$resetAndExit = 'Reset the file and exit.';
 var $author$project$Commands$Interactive$QuestionOptions$solved = 'I solved it!';
 var $author$project$Commands$Interactive$QuestionOptions$tryAgain = 'Break the file again a different way.';
-var $author$project$Commands$Interactive$Update$update = F3(
-	function (filepath, action, model) {
+var $author$project$Commands$Interactive$Update$update = F2(
+	function (action, model) {
 		switch (action.$) {
+			case 'GotTargetFileChoice':
+				var filepath = action.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							command: $author$project$Model$Interactive(
+								$author$project$Model$ReadingTargetFile(filepath))
+						}),
+					$author$project$Commands$Interactive$Cmd$readTargetFile(filepath));
 			case 'GotTargetFileContent':
+				var path = action.a.path;
 				var content = action.a.content;
 				var maybeBroken = $author$project$Commands$Break$Update$BreakFile$run(
-					{breakCount: 1, fileContent: content, filepath: filepath, randomNumbers: model.randomNumbers});
+					{
+						breakCount: 1,
+						fileContent: content,
+						filepath: $author$project$Utils$Types$FilePath$fromString(path),
+						randomNumbers: model.randomNumbers
+					});
 				if (maybeBroken.$ === 'Just') {
 					var newFileContent = maybeBroken.a.newFileContent;
 					var changes = maybeBroken.a.changes;
@@ -9454,17 +9570,17 @@ var $author$project$Commands$Interactive$Update$update = F3(
 						_Utils_update(
 							model,
 							{
-								command: A2(
-									$author$project$Model$Interactive,
-									filepath,
+								command: $author$project$Model$Interactive(
 									$author$project$Model$BreakingFile(
-										{changes: changes, originalContent: content, updatedContent: newFileContent}))
+										{
+											changes: changes,
+											originalContent: content,
+											path: $author$project$Utils$Types$FilePath$fromString(path),
+											updatedContent: newFileContent
+										}))
 							}),
 						$author$project$Ports$writeFile(
-							{
-								content: newFileContent,
-								path: $author$project$Utils$Types$FilePath$toString(filepath)
-							}));
+							{content: newFileContent, path: path}));
 				} else {
 					return _Utils_Tuple2(
 						model,
@@ -9476,9 +9592,7 @@ var $author$project$Commands$Interactive$Update$update = F3(
 					_Utils_update(
 						model,
 						{
-							command: A2(
-								$author$project$Model$Interactive,
-								filepath,
+							command: $author$project$Model$Interactive(
 								$author$project$Model$Solving(fileData))
 						}),
 					$author$project$Ports$askUser(
@@ -9490,12 +9604,14 @@ var $author$project$Commands$Interactive$Update$update = F3(
 			case 'ReceivedUserSolveMenuChoice':
 				var fileData = action.a;
 				var originalContent = fileData.originalContent;
+				var path = fileData.path;
 				var choice = action.b;
 				return _Utils_eq(choice, $author$project$Commands$Interactive$QuestionOptions$solved) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							command: A2($author$project$Model$Interactive, filepath, $author$project$Model$Solved)
+							command: $author$project$Model$Interactive(
+								$author$project$Model$Solved(path))
 						}),
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
@@ -9505,7 +9621,7 @@ var $author$project$Commands$Interactive$Update$update = F3(
 								$author$project$Ports$writeFile(
 								{
 									content: originalContent,
-									path: $author$project$Utils$Types$FilePath$toString(filepath)
+									path: $author$project$Utils$Types$FilePath$toString(path)
 								})
 							]))) : (_Utils_eq(choice, $author$project$Commands$Interactive$QuestionOptions$lineHint) ? _Utils_Tuple2(
 					model,
@@ -9520,12 +9636,12 @@ var $author$project$Commands$Interactive$Update$update = F3(
 					_Utils_update(
 						model,
 						{
-							command: A2($author$project$Model$Interactive, filepath, $author$project$Model$ResettingAndExiting)
+							command: $author$project$Model$Interactive($author$project$Model$ResettingAndExiting)
 						}),
 					$author$project$Ports$writeFile(
 						{
 							content: originalContent,
-							path: $author$project$Utils$Types$FilePath$toString(filepath)
+							path: $author$project$Utils$Types$FilePath$toString(path)
 						})) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none)))));
 			case 'PresentRestartMenu':
 				return _Utils_Tuple2(
@@ -9533,25 +9649,35 @@ var $author$project$Commands$Interactive$Update$update = F3(
 					$author$project$Ports$askUser(
 						{
 							options: _List_fromArray(
-								[$author$project$Commands$Interactive$QuestionOptions$tryAgain, $author$project$Commands$Interactive$QuestionOptions$exit]),
+								[$author$project$Commands$Interactive$QuestionOptions$tryAgain, $author$project$Commands$Interactive$QuestionOptions$breakADifferentFile, $author$project$Commands$Interactive$QuestionOptions$exit]),
 							question: 'Options'
 						}));
 			case 'ReceivedUserRestartMenuChoice':
-				var choice = action.a;
+				var filepath = action.a;
+				var choice = action.b;
 				return _Utils_eq(choice, $author$project$Commands$Interactive$QuestionOptions$tryAgain) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							command: A2($author$project$Model$Interactive, filepath, $author$project$Model$Start),
+							command: $author$project$Model$Interactive(
+								$author$project$Model$ReadingTargetFile(filepath)),
 							randomNumbers: $author$project$Commands$Interactive$Update$rerandomizeAll(model.randomNumbers)
 						}),
-					A2($author$project$Commands$Interactive$Cmd$init, filepath, model)) : (_Utils_eq(choice, $author$project$Commands$Interactive$QuestionOptions$exit) ? _Utils_Tuple2(
+					$author$project$Commands$Interactive$Cmd$init(
+						$author$project$Model$ReadingTargetFile(filepath))) : (_Utils_eq(choice, $author$project$Commands$Interactive$QuestionOptions$breakADifferentFile) ? _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							command: $author$project$Model$Interactive($author$project$Model$SelectingTargetFile),
+							randomNumbers: $author$project$Commands$Interactive$Update$rerandomizeAll(model.randomNumbers)
+						}),
+					$author$project$Commands$Interactive$Cmd$init($author$project$Model$SelectingTargetFile)) : (_Utils_eq(choice, $author$project$Commands$Interactive$QuestionOptions$exit) ? _Utils_Tuple2(
 					model,
 					$author$project$Ports$printAndExitSuccess(
 						$author$project$Utils$Messages$withNewlineBuffers('Bye!'))) : _Utils_Tuple2(
 					model,
 					$author$project$Ports$printAndExitSuccess(
-						$author$project$Utils$Messages$withNewlineBuffers('Bye!'))));
+						$author$project$Utils$Messages$withNewlineBuffers('Bye!')))));
 			default:
 				return _Utils_Tuple2(
 					model,
@@ -9617,12 +9743,10 @@ var $author$project$Update$update = F3(
 			switch (_v1.a.$) {
 				case 'Interactive':
 					if (_v1.b.$ === 'InteractiveAction') {
-						var _v2 = _v1.a;
-						var filepath = _v2.a;
 						var subAction = _v1.b.a;
-						var _v3 = A3($author$project$Commands$Interactive$Update$update, filepath, subAction, model);
-						var newModel = _v3.a;
-						var cmd = _v3.b;
+						var _v2 = A2($author$project$Commands$Interactive$Update$update, subAction, model);
+						var newModel = _v2.a;
+						var cmd = _v2.b;
 						return _Utils_Tuple2(
 							newModel,
 							A2($elm$core$Platform$Cmd$map, $author$project$Actions$InteractiveAction, cmd));
@@ -9633,9 +9757,9 @@ var $author$project$Update$update = F3(
 					if (_v1.b.$ === 'BreakAction') {
 						var breakData = _v1.a.a;
 						var subAction = _v1.b.a;
-						var _v4 = A3($author$project$Commands$Break$Update$update, breakData, subAction, model);
-						var newModel = _v4.a;
-						var cmd = _v4.b;
+						var _v3 = A3($author$project$Commands$Break$Update$update, breakData, subAction, model);
+						var newModel = _v3.a;
+						var cmd = _v3.b;
 						return _Utils_Tuple2(
 							newModel,
 							A2($elm$core$Platform$Cmd$map, $author$project$Actions$BreakAction, cmd));
@@ -9644,13 +9768,13 @@ var $author$project$Update$update = F3(
 					}
 				case 'Hint':
 					if (_v1.b.$ === 'HintAction') {
-						var _v5 = _v1.a;
-						var filepath = _v5.a;
-						var hintType = _v5.b;
+						var _v4 = _v1.a;
+						var filepath = _v4.a;
+						var hintType = _v4.b;
 						var subAction = _v1.b.a;
-						var _v6 = A4($author$project$Commands$Hint$Update$update, filepath, hintType, subAction, model);
-						var newModel = _v6.a;
-						var cmd = _v6.b;
+						var _v5 = A4($author$project$Commands$Hint$Update$update, filepath, hintType, subAction, model);
+						var newModel = _v5.a;
+						var cmd = _v5.b;
 						return _Utils_Tuple2(
 							newModel,
 							A2($elm$core$Platform$Cmd$map, $author$project$Actions$HintAction, cmd));
@@ -9661,9 +9785,9 @@ var $author$project$Update$update = F3(
 					if (_v1.b.$ === 'ExplainAction') {
 						var filepath = _v1.a.a;
 						var subAction = _v1.b.a;
-						var _v7 = A3($author$project$Commands$Explain$Update$update, filepath, subAction, model);
-						var newModel = _v7.a;
-						var cmd = _v7.b;
+						var _v6 = A3($author$project$Commands$Explain$Update$update, filepath, subAction, model);
+						var newModel = _v6.a;
+						var cmd = _v6.b;
 						return _Utils_Tuple2(
 							newModel,
 							A2($elm$core$Platform$Cmd$map, $author$project$Actions$ExplainAction, cmd));
@@ -9672,13 +9796,13 @@ var $author$project$Update$update = F3(
 					}
 				default:
 					if (_v1.b.$ === 'ResetAction') {
-						var _v8 = _v1.a;
-						var filepath = _v8.a;
-						var fileSaveStatus = _v8.b;
+						var _v7 = _v1.a;
+						var filepath = _v7.a;
+						var fileSaveStatus = _v7.b;
 						var subAction = _v1.b.a;
-						var _v9 = A4($author$project$Commands$Reset$Update$update, filepath, fileSaveStatus, subAction, model);
-						var newModel = _v9.a;
-						var cmd = _v9.b;
+						var _v8 = A4($author$project$Commands$Reset$Update$update, filepath, fileSaveStatus, subAction, model);
+						var newModel = _v8.a;
+						var cmd = _v8.b;
 						return _Utils_Tuple2(
 							newModel,
 							A2($elm$core$Platform$Cmd$map, $author$project$Actions$ResetAction, cmd));
@@ -9739,7 +9863,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 				},
 				A2($elm$json$Json$Decode$field, 'versionMessage', $elm$json$Json$Decode$string));
 		},
-		A2($elm$json$Json$Decode$field, 'workingDirectory', $elm$json$Json$Decode$string)))({"versions":{"elm":"0.19.1"},"types":{"message":"Actions.Action","aliases":{"Utils.Types.FileData.ChangeData":{"args":[],"type":"{ lineNumber : Basics.Int, breakType : Utils.Types.BreakType.BreakType, changeDescription : String.String }"},"Utils.Types.FileData.FileData":{"args":[],"type":"{ originalContent : String.String, updatedContent : String.String, changes : List.List Utils.Types.FileData.ChangeData }"}},"unions":{"Actions.Action":{"args":[],"tags":{"InteractiveAction":["Commands.Interactive.Actions.Action"],"BreakAction":["Commands.Break.Actions.Action"],"HintAction":["Commands.Hint.Actions.Action"],"ExplainAction":["Commands.Explain.Actions.Action"],"ResetAction":["Commands.Reset.Actions.Action"]}},"Commands.Break.Actions.Action":{"args":[],"tags":{"GotTargetFileContent":["{ path : String.String, content : String.String }"],"SuccessfullyUpdatedSavedDataFile":[],"SuccessfullyBrokeTargetFile":[]}},"Commands.Explain.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Hint.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Interactive.Actions.Action":{"args":[],"tags":{"GotTargetFileContent":["{ path : String.String, content : String.String }"],"PresentSolveMenu":["Utils.Types.FileData.FileData"],"ReceivedUserSolveMenuChoice":["Utils.Types.FileData.FileData","String.String"],"PresentRestartMenu":[],"ReceivedUserRestartMenuChoice":["String.String"],"Exit":[]}},"Commands.Reset.Actions.Action":{"args":[],"tags":{"SuccessfulFileWrite":["{ path : String.String, content : String.String }"]}},"Utils.Types.BreakType.BreakType":{"args":[],"tags":{"CaseSwap":[],"RemoveReturn":[],"RemoveParenthesis":[],"ChangeFunctionArgs":[],"RemoveDotAccess":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"List.List":{"args":["a"],"tags":{}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
+		A2($elm$json$Json$Decode$field, 'workingDirectory', $elm$json$Json$Decode$string)))({"versions":{"elm":"0.19.1"},"types":{"message":"Actions.Action","aliases":{"Utils.Types.FileData.ChangeData":{"args":[],"type":"{ lineNumber : Basics.Int, breakType : Utils.Types.BreakType.BreakType, changeDescription : String.String }"},"Utils.Types.FileData.FileData":{"args":[],"type":"{ originalContent : String.String, updatedContent : String.String, changes : List.List Utils.Types.FileData.ChangeData, path : Utils.Types.FilePath.FilePath }"}},"unions":{"Actions.Action":{"args":[],"tags":{"InteractiveAction":["Commands.Interactive.Actions.Action"],"BreakAction":["Commands.Break.Actions.Action"],"HintAction":["Commands.Hint.Actions.Action"],"ExplainAction":["Commands.Explain.Actions.Action"],"ResetAction":["Commands.Reset.Actions.Action"]}},"Commands.Break.Actions.Action":{"args":[],"tags":{"GotTargetFileContent":["{ path : String.String, content : String.String }"],"SuccessfullyUpdatedSavedDataFile":[],"SuccessfullyBrokeTargetFile":[]}},"Commands.Explain.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Hint.Actions.Action":{"args":[],"tags":{"NoOp":[]}},"Commands.Interactive.Actions.Action":{"args":[],"tags":{"GotTargetFileChoice":["Utils.Types.FilePath.FilePath"],"GotTargetFileContent":["{ path : String.String, content : String.String }"],"PresentSolveMenu":["Utils.Types.FileData.FileData"],"ReceivedUserSolveMenuChoice":["Utils.Types.FileData.FileData","String.String"],"PresentRestartMenu":[],"ReceivedUserRestartMenuChoice":["Utils.Types.FilePath.FilePath","String.String"],"Exit":[]}},"Commands.Reset.Actions.Action":{"args":[],"tags":{"SuccessfulFileWrite":["{ path : String.String, content : String.String }"]}},"Utils.Types.BreakType.BreakType":{"args":[],"tags":{"CaseSwap":[],"RemoveReturn":[],"RemoveParenthesis":[],"ChangeFunctionArgs":[],"RemoveDotAccess":[]}},"Utils.Types.FilePath.FilePath":{"args":[],"tags":{"FilePath":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"List.List":{"args":["a"],"tags":{}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
 },{}],"../node_modules/colors/lib/styles.js":[function(require,module,exports) {
 /*
 The MIT License (MIT)
@@ -10510,9 +10634,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.format = exports.formatAll = exports.formattedErrorLog = exports.formattedLog = exports.devLog = void 0; // @ts-ignore
 
-var colors_1 = __importDefault(require("colors"));
+var colors_1 = __importDefault(require("colors")); // const loggingIsOn: boolean = process.argv.includes('--log') || process.argv.includes('-l')
 
-var loggingIsOn = process.argv.includes('--log') || process.argv.includes('-l');
+
+var loggingIsOn = true;
 
 function devLog() {
   var messages = [];
@@ -10701,7 +10826,8 @@ function default_1(program) {
         }
 
         process.exit(1);
-      }
+      } // devLog(`Content of \`${filepath}\`: ${content}`)
+
 
       program.ports.successfulFileRead.send({
         path: filepath,
@@ -10770,8 +10896,8 @@ function default_1(program) {
         process.exit(1);
       }
 
-      utils_1.devLog('New file content written!');
-      utils_1.devLog("fileData:", JSON.stringify(fileData));
+      utils_1.devLog('New file content written!'); // devLog("fileData:", JSON.stringify(fileData));
+
       program.ports.successfulFileWrite.send(fileData);
     });
   });
@@ -43048,7 +43174,6 @@ var inquirer = __importStar(require("inquirer"));
 var utils_1 = require("../utils");
 
 function default_1(program) {
-  utils_1.devLog("ports:", JSON.stringify(program.ports));
   program.ports.askUser.subscribe(function (_a) {
     var question = _a.question,
         options = _a.options;
@@ -43072,7 +43197,126 @@ function default_1(program) {
 }
 
 exports.default = default_1;
-},{"inquirer":"../node_modules/inquirer/lib/inquirer.js","../utils":"utils.ts"}],"savedData.ts":[function(require,module,exports) {
+},{"inquirer":"../node_modules/inquirer/lib/inquirer.js","../utils":"utils.ts"}],"ports/chooseRandomFile.ts":[function(require,module,exports) {
+"use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function () {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) r[k] = a[j];
+
+  return r;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var utils_1 = require("../utils");
+
+var fs = __importStar(require("fs"));
+
+var path = __importStar(require("path"));
+
+var child_process_1 = require("child_process");
+
+function default_1(program) {
+  utils_1.devLog("Setting up chooseRandomFile port...");
+  program.ports.chooseRandomFile.subscribe(function () {
+    utils_1.devLog("Choosing a random file...");
+    var allFiles = getAllFilesRecursive('.');
+    var filepath = pickRandom(allFiles);
+    utils_1.devLog("Chose " + filepath + "!");
+    program.ports.receiveFileChoice.send(filepath);
+  });
+}
+
+exports.default = default_1;
+
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function getIgnoredItems() {
+  var ignored = child_process_1.execSync("git clean -ndX").toString().split("\n").filter(function (str) {
+    return str;
+  }).map(function (str) {
+    return str.replace('Would remove ', '');
+  });
+  utils_1.devLog("ignored: " + ignored);
+  return ignored;
+}
+
+function getAllFilesRecursive(srcpath) {
+  var ignored = getIgnoredItems();
+  var allDirectories = getDirectoriesRecursive(srcpath, ignored);
+  return allDirectories.map(filesInDirectory).flat();
+}
+
+function filesInDirectory(directory) {
+  return fs.readdirSync(directory).filter(isNotHidden).map(function (file) {
+    return path.join(directory, file);
+  }).filter(function (file) {
+    return fs.statSync(file).isFile();
+  }).filter(function (file) {
+    return ![".md", ".txt", ".map"].includes(path.extname(file));
+  });
+}
+
+function getDirectoriesRecursive(srcpath, ignored) {
+  return __spreadArrays([srcpath], getDirectories(srcpath, ignored).map(function (dir) {
+    return getDirectoriesRecursive(dir, ignored);
+  }).flat());
+}
+
+function getDirectories(srcpath, ignored) {
+  return fs.readdirSync(srcpath).filter(isNotHidden).filter(function (dir) {
+    return !ignored.some(function (ignoredItem) {
+      return dir.startsWith(ignoredItem) || dir + "/" === ignoredItem;
+    });
+  }).map(function (dir) {
+    return path.join(srcpath, dir);
+  }).filter(function (dir) {
+    return fs.statSync(dir).isDirectory();
+  });
+}
+
+function isNotHidden(name) {
+  return !name.startsWith('.');
+}
+},{"../utils":"utils.ts"}],"savedData.ts":[function(require,module,exports) {
 "use strict";
 
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -43202,6 +43446,8 @@ var writeFile_1 = __importDefault(require("./ports/writeFile"));
 
 var askUser_1 = __importDefault(require("./ports/askUser"));
 
+var chooseRandomFile_1 = __importDefault(require("./ports/chooseRandomFile"));
+
 var SavedData = __importStar(require("./savedData"));
 
 var utils_1 = require("./utils");
@@ -43221,7 +43467,7 @@ function run() {
     }
   });
   var portFunctions = [print_1.default, printAndExitFailure_1.default, printAndExitSuccess_1.default, // exitSuccess,
-  askUser_1.default, printAndReturn_1.default, readFile_1.default, writeFile_1.default];
+  askUser_1.default, chooseRandomFile_1.default, printAndReturn_1.default, readFile_1.default, writeFile_1.default];
   portFunctions.forEach(function (portSetupFunction) {
     portSetupFunction(program);
   });
@@ -43238,5 +43484,5 @@ function getRandomInts(max, count) {
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-},{"./elm/Main.elm":"elm/Main.elm","./ports/print":"ports/print.ts","./ports/printAndExitFailure":"ports/printAndExitFailure.ts","./ports/printAndExitSuccess":"ports/printAndExitSuccess.ts","./ports/printAndReturn":"ports/printAndReturn.ts","./ports/readFile":"ports/readFile.ts","./ports/writeFile":"ports/writeFile.ts","./ports/askUser":"ports/askUser.ts","./savedData":"savedData.ts","./utils":"utils.ts"}]},{},["main.ts"], null)
+},{"./elm/Main.elm":"elm/Main.elm","./ports/print":"ports/print.ts","./ports/printAndExitFailure":"ports/printAndExitFailure.ts","./ports/printAndExitSuccess":"ports/printAndExitSuccess.ts","./ports/printAndReturn":"ports/printAndReturn.ts","./ports/readFile":"ports/readFile.ts","./ports/writeFile":"ports/writeFile.ts","./ports/askUser":"ports/askUser.ts","./ports/chooseRandomFile":"ports/chooseRandomFile.ts","./savedData":"savedData.ts","./utils":"utils.ts"}]},{},["main.ts"], null)
 //# sourceMappingURL=/debug_trainer.js.map

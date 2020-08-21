@@ -23,6 +23,9 @@ fromFilePath filepath =
     if String.endsWith ".js" filepathString then
         JavaScript
 
+    else if String.endsWith ".ts" filepathString then
+        JavaScript
+
     else if String.endsWith ".py" filepathString then
         Python
 

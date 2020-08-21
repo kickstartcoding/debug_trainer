@@ -3,33 +3,40 @@ module Commands.Interactive.Subscriptions exposing (subscriptions)
 import Commands.Interactive.Actions exposing (Action(..))
 import Model exposing (Command(..), InteractionPhase(..), Model)
 import Ports
+import Utils.Types.FilePath as FilePath
 
 
 subscriptions : Model -> Sub Action
 subscriptions model =
-    case model.command of
-        Interactive _ Start ->
-            Ports.successfulFileRead GotTargetFileContent
+    Sub.batch
+        [ Ports.receiveFileChoice (FilePath.fromString >> GotTargetFileChoice)
+        , case model.command of
+            Interactive SelectingTargetFile ->
+                Sub.none
 
-        Interactive _ (BreakingFile data) ->
-            Ports.successfulFileWrite (\_ -> PresentSolveMenu data)
+            Interactive (ReadingTargetFile _) ->
+                Ports.successfulFileRead GotTargetFileContent
 
-        Interactive _ (Solving data) ->
-            Sub.batch
-                [ Ports.receiveUserAnswer (ReceivedUserSolveMenuChoice data)
-                , Ports.finishedPrinting (\_ -> PresentSolveMenu data)
-                ]
+            Interactive (BreakingFile data) ->
+                Ports.successfulFileWrite (\_ -> PresentSolveMenu data)
 
-        Interactive _ Solved ->
-            Sub.batch
-                [ Ports.receiveUserAnswer ReceivedUserRestartMenuChoice
-                , Ports.finishedPrinting (\_ -> PresentRestartMenu)
-                ]
+            Interactive (Solving data) ->
+                Sub.batch
+                    [ Ports.receiveUserAnswer (ReceivedUserSolveMenuChoice data)
+                    , Ports.finishedPrinting (\_ -> PresentSolveMenu data)
+                    ]
 
-        Interactive _ ResettingAndExiting ->
-            Sub.batch
-                [ Ports.successfulFileWrite (\_ -> Exit)
-                ]
+            Interactive (Solved filepath) ->
+                Sub.batch
+                    [ Ports.receiveUserAnswer (ReceivedUserRestartMenuChoice filepath)
+                    , Ports.finishedPrinting (\_ -> PresentRestartMenu)
+                    ]
 
-        _ ->
-            Sub.none
+            Interactive ResettingAndExiting ->
+                Sub.batch
+                    [ Ports.successfulFileWrite (\_ -> Exit)
+                    ]
+
+            _ ->
+                Sub.none
+        ]
