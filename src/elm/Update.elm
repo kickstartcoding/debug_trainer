@@ -4,6 +4,7 @@ import Actions exposing (Action(..))
 import Commands.Break.Update
 import Commands.Explain.Update
 import Commands.Hint.Update
+import Commands.Interactive.Update
 import Commands.Reset.Update
 import Model exposing (CliOptions, Command(..), Model)
 import Ports
@@ -12,6 +13,13 @@ import Ports
 update : CliOptions -> Action -> Model -> ( Model, Cmd Action )
 update _ action ({ command } as model) =
     case ( command, action ) of
+        ( Interactive filepath _, InteractiveAction subAction ) ->
+            let
+                ( newModel, cmd ) =
+                    Commands.Interactive.Update.update filepath subAction model
+            in
+            ( newModel, Cmd.map InteractiveAction cmd )
+
         ( Break breakData, BreakAction subAction ) ->
             let
                 ( newModel, cmd ) =

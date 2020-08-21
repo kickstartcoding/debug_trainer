@@ -3,8 +3,10 @@ import { Elm } from './elm/Main.elm'
 import print from './ports/print'
 import printAndExitFailure from './ports/printAndExitFailure'
 import printAndExitSuccess from './ports/printAndExitSuccess'
+import printAndReturn from './ports/printAndReturn'
 import readFile from './ports/readFile'
 import writeFile from './ports/writeFile'
+import askUser from './ports/askUser'
 import exitSuccess from './ports/exitSuccess'
 import * as SavedData from './savedData'
 import { devLog } from './utils'
@@ -30,6 +32,8 @@ export function run(): void {
     printAndExitFailure,
     printAndExitSuccess,
     // exitSuccess,
+    askUser,
+    printAndReturn,
     readFile,
     writeFile
   ]

@@ -1,7 +1,5 @@
 module Model.SavedData exposing
-    ( ChangeData
-    , FileData
-    , SavedData
+    ( SavedData
     , SavedDataError(..)
     , decode
     , encode
@@ -17,26 +15,13 @@ module Model.SavedData exposing
 import Codec exposing (Codec, Decoder)
 import Dict exposing (Dict)
 import Json.Decode
-import Utils.Types.BreakType as BreakType exposing (BreakType(..))
+import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileData as FileData exposing (FileData)
 import Utils.Types.FilePath as FilePath exposing (FilePath, fullPath)
 
 
 type alias SavedData =
     { changedFiles : Dict String FileData
-    }
-
-
-type alias FileData =
-    { originalContent : String
-    , updatedContent : String
-    , changes : List ChangeData
-    }
-
-
-type alias ChangeData =
-    { lineNumber : Int
-    , breakType : BreakType
-    , changeDescription : String
     }
 
 
@@ -86,7 +71,7 @@ setFileData { filepath, workingDirectory, fileData } ({ changedFiles } as model)
     { model
         | changedFiles =
             Dict.update (fullPathString workingDirectory filepath)
-                (\maybeFileData -> Just fileData)
+                (\_ -> Just fileData)
                 changedFiles
     }
 
@@ -150,23 +135,5 @@ decode =
 codec : Codec SavedData
 codec =
     Codec.object SavedData
-        |> Codec.field "changedFiles" .changedFiles (Codec.dict fileDataCodec)
-        |> Codec.buildObject
-
-
-fileDataCodec : Codec FileData
-fileDataCodec =
-    Codec.object FileData
-        |> Codec.field "originalContent" .originalContent Codec.string
-        |> Codec.field "updatedContent" .updatedContent Codec.string
-        |> Codec.field "changes" .changes (Codec.list changeDataCodec)
-        |> Codec.buildObject
-
-
-changeDataCodec : Codec ChangeData
-changeDataCodec =
-    Codec.object ChangeData
-        |> Codec.field "lineNumber" .lineNumber Codec.int
-        |> Codec.field "breakType" .breakType BreakType.codec
-        |> Codec.field "changeDescription" .changeDescription Codec.string
+        |> Codec.field "changedFiles" .changedFiles (Codec.dict FileData.codec)
         |> Codec.buildObject

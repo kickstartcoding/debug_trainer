@@ -6,9 +6,9 @@ import Breakers.RemoveDotAccess as RemoveDotAccess
 import Breakers.RemoveParenthesis as RemoveParenthesis
 import Breakers.RemoveReturn as RemoveReturn
 import Breakers.Utils
-import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Segment exposing (Segment)
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileData exposing (ChangeData)
 import Utils.Types.FileType exposing (FileType(..))
 
 

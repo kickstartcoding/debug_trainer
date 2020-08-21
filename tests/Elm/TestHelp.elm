@@ -11,10 +11,7 @@ module Elm.TestHelp exposing
     )
 
 import Commands.Break.Update.BreakFile as BreakFile
-import Dict
 import Expect
-import Model
-import Model.SavedData as SavedData
 import Utils.Types.FilePath as FilePath
 
 
@@ -121,36 +118,14 @@ expectMultiBreakWithExtToOutputOneOf { extension, input, outputPossibilities, br
 
 breakContent : { filename : String, content : String, breakCount : Int, randomNumbers : List Int } -> String
 breakContent { filename, content, breakCount, randomNumbers } =
-    let
-        filepath =
-            FilePath.fromString filename
-
-        workingDirectory =
-            "/directory/example"
-    in
     BreakFile.run
         { breakCount = breakCount
-        , filepath = filepath
-        , fileSaveStatus = Model.initFileSaveStatus
+        , filepath = FilePath.fromString filename
         , fileContent = content
-        , model =
-            { randomNumbers = randomNumbers
-            , dataFilePath = filepath
-            , workingDirectory = workingDirectory
-            , savedDataResult = Ok SavedData.init
-            , command =
-                Model.breakInit (Just "1") filename False False
-                    |> .command
-            }
+        , randomNumbers = randomNumbers
         }
-        |> Tuple.first
-        |> .savedDataResult
-        |> Result.withDefault { changedFiles = Dict.fromList [] }
-        |> .changedFiles
-        |> Dict.get (workingDirectory ++ "/" ++ filename)
         |> Maybe.withDefault
-            { originalContent = "nothing found in changedFiles dict"
-            , updatedContent = "nothing found in changedFiles dict"
+            { newFileContent = "file breaking failed"
             , changes = []
             }
-        |> .updatedContent
+        |> .newFileContent

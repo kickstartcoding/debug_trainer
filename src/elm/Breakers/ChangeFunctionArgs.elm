@@ -2,7 +2,7 @@ module Breakers.ChangeFunctionArgs exposing (run, validCandidateData)
 
 import Breakers.Utils exposing (BreakRunnerData)
 import List.Extra as ListEx
-import Model.SavedData exposing (ChangeData)
+import Utils.Types.FileData exposing (ChangeData)
 import Parsers.Generic.Segment
     exposing
         ( BreakStatus(..)

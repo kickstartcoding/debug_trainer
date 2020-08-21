@@ -1,28 +1,28 @@
-import * as fs from 'fs'
 import * as inquirer from 'inquirer'
 import { devLog, formattedErrorLog } from '../utils'
 
 export default function (program): void {
-  program.ports.askUser.subscribe((fileData: { question: string, options: string[] }): void => {
-
+  devLog("ports:", JSON.stringify(program.ports))
+  program.ports.askUser.subscribe(({ question, options }: { question: string, options: string[] }): void => {
     inquirer
       .prompt([
         {
           type: "rawlist",
-          message: "stuff",
+          name: question,
           default: "",
-          choices: []
+          choices: options
         }
       ])
-      .then(answers => {
-        // Use user feedback for... whatever!!
-        program.ports.successfulFileWrite.send(fileData)
+      .then((answers) => {
+        program.ports.receiveUserAnswer.send(answers[question])
       })
       .catch(error => {
         if (error.isTtyError) {
-          // Prompt couldn't be rendered in the current environment
+          formattedErrorLog("Prompt couldn't be rendered in the current environment.")
+          process.exit(1)
         } else {
-          // Something else when wrong
+          formattedErrorLog(`Something weird went wrong:\n\n${error}`)
+          process.exit(1)
         }
       });
 

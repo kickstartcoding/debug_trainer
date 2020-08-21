@@ -2,11 +2,11 @@ module Breakers.CaseSwap exposing (run, validCandidateData)
 
 import Breakers.Utils exposing (BreakRunnerData)
 import List.Extra as ListEx
-import Model.SavedData exposing (ChangeData)
 import Parsers.Generic.Segment exposing (BreakStatus(..), Segment, SegmentType(..))
 import Utils.FileContent as FileContent
 import Utils.String as StrUtils
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileData exposing (ChangeData)
 
 
 run : BreakRunnerData -> Maybe ( List Segment, ChangeData )

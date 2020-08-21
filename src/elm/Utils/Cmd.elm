@@ -2,9 +2,10 @@ module Utils.Cmd exposing (exitIfAllSavesAreComplete, fromFileData, printAndExit
 
 import Actions exposing (Action)
 import Model exposing (Command(..), FileSaveStatus, Model)
-import Model.SavedData as SavedData exposing (FileData, SavedData, SavedDataError(..))
+import Model.SavedData as SavedData exposing (SavedData, SavedDataError(..))
 import Ports
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileData exposing (FileData)
 import Utils.Types.FilePath exposing (FilePath)
 
 

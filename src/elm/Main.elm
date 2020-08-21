@@ -7,6 +7,7 @@ import Cli.Program as Program
 import Commands.Break.Cmd
 import Commands.Explain.Cmd
 import Commands.Hint.Cmd
+import Commands.Interactive.Cmd
 import Commands.Reset.Cmd
 import Model as Model exposing (CliOptions, Command(..), Flags, HintType(..), Model)
 import Model.SavedData as SavedData exposing (SavedDataError(..))
@@ -55,11 +56,22 @@ programConfig =
                 |> OptionsParser.with (Option.flag "test")
                 |> OptionsParser.withDoc "Change the specified file back to its original, unbroken state."
             )
+        |> Program.add
+            (OptionsParser.build Model.interactiveInit
+                |> OptionsParser.with (Option.requiredPositionalArg "filepath")
+                |> OptionsParser.with (Option.flag "log")
+                |> OptionsParser.with (Option.flag "test")
+            )
 
 
 init : Flags -> CliOptions -> ( Model, Cmd Action )
 init { randomNumbers, workingDirectory, data, dataFilePath } { command } =
     let
+        -- This line is useless but seems to be able to make the askUser port
+        -- actually exist. No idea why it doesn't exist otherwise
+        _ =
+            Ports.askUser
+
         model =
             { randomNumbers = randomNumbers
             , workingDirectory = workingDirectory
@@ -70,6 +82,9 @@ init { randomNumbers, workingDirectory, data, dataFilePath } { command } =
     in
     ( model
     , case command of
+        Interactive filepath _ ->
+            Commands.Interactive.Cmd.init filepath model
+
         Break breakData ->
             Commands.Break.Cmd.init breakData model
 

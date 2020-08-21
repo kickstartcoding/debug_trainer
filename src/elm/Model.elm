@@ -5,6 +5,7 @@ module Model exposing
     , FileSaveStatus
     , Flags
     , HintType(..)
+    , InteractionPhase(..)
     , Model
     , allSavesComplete
     , breakInit
@@ -12,11 +13,13 @@ module Model exposing
     , filePathStringFromCommand
     , hintInit
     , initFileSaveStatus
+    , interactiveInit
     , resetInit
     )
 
 import Cli.Program as Program
 import Model.SavedData exposing (SavedData, SavedDataError)
+import Utils.Types.FileData exposing (FileData)
 import Utils.Types.FilePath as FilePath exposing (FilePath)
 import Utils.Types.LoggingStatus as LoggingStatus exposing (LoggingStatus)
 
@@ -38,10 +41,19 @@ type alias Model =
 
 
 type Command
-    = Break BreakData
+    = Interactive FilePath InteractionPhase
+    | Break BreakData
     | Hint FilePath HintType
     | Explain FilePath
     | Reset FilePath FileSaveStatus
+
+
+type InteractionPhase
+    = Start
+    | BreakingFile FileData
+    | Solving FileData
+    | Solved
+    | ResettingAndExiting
 
 
 type alias BreakData =
@@ -79,6 +91,14 @@ type alias Flags =
         , dataFilePath : String
         , data : Maybe String
         }
+
+
+interactiveInit : String -> Bool -> Bool -> CliOptions
+interactiveInit filepathString loggingIsOn isInTestMode =
+    { command = Interactive (FilePath.fromString filepathString) Start
+    , loggingStatus = LoggingStatus.fromBool loggingIsOn
+    , isInTestMode = isInTestMode
+    }
 
 
 breakInit : Maybe String -> String -> Bool -> Bool -> CliOptions
@@ -137,6 +157,9 @@ resetInit filepathString loggingIsOn isInTestMode =
 filePathStringFromCommand : Command -> String
 filePathStringFromCommand command =
     case command of
+        Interactive filepath _ ->
+            FilePath.toString filepath
+
         Break { filepath } ->
             FilePath.toString filepath
 

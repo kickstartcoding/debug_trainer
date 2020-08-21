@@ -1,4 +1,4 @@
-module Commands.Explain.Cmd exposing (init)
+module Commands.Explain.Cmd exposing (init, printExplanation)
 
 import Actions exposing (Action)
 import Model exposing (Command(..), Model)
@@ -7,6 +7,7 @@ import Ports
 import Utils.Cmd as Cmd
 import Utils.Messages as Messages
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileData exposing (FileData)
 import Utils.Types.FilePath exposing (FilePath)
 
 
@@ -16,12 +17,16 @@ init filepath model =
         { filepath = filepath
         , model = model
         , dataPresentCmdFunc =
-            \savedData { changes } ->
-                changes
-                    |> List.map (\{ changeDescription, lineNumber } -> changeDescription ++ " on `line " ++ String.fromInt lineNumber ++ "` of the original file")
-                    |> String.join "\n\n"
-                    |> Ports.printAndExitSuccess
+            \savedData fileData ->
+                printExplanation fileData
         , dataAbsentCmd =
             Ports.printAndExitSuccess
                 (Messages.noRecordOfChangeMessage filepath)
         }
+
+
+printExplanation : FileData -> Cmd action
+printExplanation fileData =
+    fileData
+        |> Messages.breakExplanation
+        |> Ports.printAndExitSuccess
