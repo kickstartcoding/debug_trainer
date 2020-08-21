@@ -8,6 +8,6 @@ import Ports
 subscriptions : Model -> Sub Action
 subscriptions _ =
     Sub.batch
-        [ Ports.successfulFileRead SuccessfulFileRead
-        , Ports.successfulFileWrite SuccessfulFileWrite
+        [ Ports.successfulFileRead GotTargetFileContent
+        , Ports.successfulFileWrite SuccessfullyBrokeTargetFile
         ]

@@ -17,7 +17,7 @@ import Utils.Types.FilePath as FilePath
 update : BreakData -> Action -> Model -> ( Model, Cmd Action )
 update ({ breakCount, filepath, fileSaveStatus } as breakData) action model =
     case action of
-        SuccessfulFileRead { content } ->
+        GotTargetFileContent { content } ->
             Commands.Break.Update.BreakFile.run
                 { breakCount = breakCount
                 , filepath = filepath
@@ -26,7 +26,7 @@ update ({ breakCount, filepath, fileSaveStatus } as breakData) action model =
                 , model = model
                 }
 
-        SuccessfulFileWrite { path } ->
+        SuccessfullyBrokeTargetFile { path } ->
             if FilePath.fromString path == filepath then
                 confirmTargetFileWrite breakData model
 

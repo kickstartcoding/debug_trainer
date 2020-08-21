@@ -2,5 +2,5 @@ module Commands.Break.Actions exposing (Action(..))
 
 
 type Action
-    = SuccessfulFileRead { path : String, content : String }
-    | SuccessfulFileWrite { path : String, content : String }
+    = GotTargetFileContent { path : String, content : String }
+    | SuccessfullyBrokeTargetFile { path : String, content : String }
