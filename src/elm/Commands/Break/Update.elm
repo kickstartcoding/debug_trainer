@@ -21,7 +21,6 @@ update ({ breakCount, filepath, fileSaveStatus } as breakData) action model =
             Commands.Break.Update.BreakFile.run
                 { breakCount = breakCount
                 , filepath = filepath
-                , fileSaveStatus = fileSaveStatus
                 , fileContent = content
                 , model = model
                 }

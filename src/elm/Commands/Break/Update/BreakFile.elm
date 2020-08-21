@@ -17,12 +17,11 @@ import Utils.Types.FileType as FileType
 run :
     { breakCount : Int
     , filepath : FilePath
-    , fileSaveStatus : FileSaveStatus
     , fileContent : String
     , model : Model
     }
     -> ( Model, Cmd Action )
-run ({ breakCount, filepath, fileSaveStatus, fileContent, model } as config) =
+run ({ filepath, fileContent, model } as config) =
     let
         maybeChanges =
             case GenericParser.run (FileType.fromFilePath filepath) fileContent of
@@ -53,15 +52,7 @@ run ({ breakCount, filepath, fileSaveStatus, fileContent, model } as config) =
                         }
                         oldSavedData
             in
-            ( { model
-                | command =
-                    Break
-                        { breakCount = breakCount
-                        , filepath = filepath
-                        , fileSaveStatus = fileSaveStatus
-                        }
-                , savedDataResult = Ok newSavedData
-              }
+            ( { model | savedDataResult = Ok newSavedData }
             , Cmd.batch
                 [ Ports.writeFile
                     { path = FilePath.toString filepath
@@ -83,7 +74,6 @@ run ({ breakCount, filepath, fileSaveStatus, fileContent, model } as config) =
 buildChanges :
     { breakCount : Int
     , filepath : FilePath
-    , fileSaveStatus : FileSaveStatus
     , fileContent : String
     , model : Model
     }
