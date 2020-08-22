@@ -1,9 +1,10 @@
 module Commands.Interactive.QuestionOptions exposing
-    ( errorTypeHint
+    ( breakADifferentFile
+    , changeBreakCount
+    , errorTypeHint
     , exit
     , explanation
     , lineHint
-    , breakADifferentFile
     , resetAndExit
     , solved
     , tryAgain
@@ -14,9 +15,15 @@ breakADifferentFile : String
 breakADifferentFile =
     "Break a different file."
 
+
 tryAgain : String
 tryAgain =
-    "Break the file again a different way."
+    "Break the same file again a different way."
+
+
+changeBreakCount : String
+changeBreakCount =
+    "Change the number of changes to make next time."
 
 
 exit : String

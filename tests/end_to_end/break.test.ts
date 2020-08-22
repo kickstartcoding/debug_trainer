@@ -16,6 +16,13 @@ describe("break command", () => {
     expect(readTestFile()).toEqual('test')
   })
 
+  test("breaks a file with a bracket", () => {
+    createTestFileWithContent('\n{')
+    runBreakCommand()
+
+    expect(readTestFile()).toEqual('\n')
+  })
+
   test("will not break same file twice", () => {
     createTestFileWithContent('test')
     runBreakCommand()

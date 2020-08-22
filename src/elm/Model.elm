@@ -40,7 +40,7 @@ type alias Model =
 
 
 type Command
-    = Interactive InteractionPhase
+    = Interactive Int InteractionPhase
     | Break BreakData
     | Hint FilePath HintType
     | Explain FilePath
@@ -48,10 +48,10 @@ type Command
 
 
 type InteractionPhase
-    = SelectingTargetFile Int
+    = SelectingBreakCount (Maybe FilePath)
+    | SelectingTargetFile
     | ReadingTargetFile FilePath
-    | SelectingBreakCount
-    | BreakingFile Int FileData
+    | BreakingFile FileData
     | Solving FileData
     | Solved FilePath
     | ResettingAndExiting
@@ -96,13 +96,7 @@ type alias Flags =
 
 interactiveInit : Maybe String -> List String -> CliOptions
 interactiveInit maybeFilepathString _ =
-    { command =
-        case maybeFilepathString of
-            Just filepathString ->
-                Interactive (ReadingTargetFile (FilePath.fromString filepathString))
-
-            Nothing ->
-                Interactive SelectingTargetFile
+    { command = Interactive 1 (SelectingBreakCount (Maybe.map FilePath.fromString maybeFilepathString))
     , loggingStatus = LoggingStatus.fromBool False
     , isInTestMode = False
     }

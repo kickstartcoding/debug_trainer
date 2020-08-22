@@ -19,7 +19,9 @@ suite =
                     "   abc^&*"
                     [ { content = "   ", offset = 0, segmentType = Whitespace }
                     , { content = "abc", offset = 3, segmentType = Word BreakNotAppliedYet }
-                    , { content = "^&*", offset = 6, segmentType = Other }
+                    , { content = "^", offset = 6, segmentType = Other }
+                    , { content = "&", offset = 7, segmentType = Other }
+                    , { content = "*", offset = 8, segmentType = Other }
                     ]
         , test "detects return statements" <|
             \_ ->

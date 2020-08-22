@@ -13,11 +13,42 @@ import Utils.Types.BreakType exposing (BreakType(..))
 import Utils.Types.FilePath as FilePath
 
 
-update : Action -> Model -> ( Model, Cmd Action )
-update action model =
+update : Int -> Action -> Model -> ( Model, Cmd Action )
+update breakCount action model =
     case action of
+        ReceivedUserBreakCountChoice maybeFilePath newBreakCount ->
+            case model.command of
+                Interactive _ (Solved filepath) ->
+                    ( { model | command = Interactive newBreakCount (Solved filepath) }
+                    , Ports.askUserMultipleChoice
+                        { name = "restart menu"
+                        , message =
+                            "Error count changed to "
+                                ++ String.fromInt newBreakCount
+                                ++ "! What do you want to do now?"
+                        , options =
+                            [ QuestionOptions.tryAgain
+                            , QuestionOptions.breakADifferentFile
+                            , QuestionOptions.changeBreakCount
+                            , QuestionOptions.exit
+                            ]
+                        }
+                    )
+
+                _ ->
+                    let
+                        newPhase =
+                            case maybeFilePath of
+                                Just filepath ->
+                                    ReadingTargetFile filepath
+
+                                Nothing ->
+                                    SelectingTargetFile
+                    in
+                    ( { model | command = Interactive newBreakCount newPhase }, Cmd.init newPhase )
+
         GotTargetFileChoice filepath ->
-            ( { model | command = Interactive (ReadingTargetFile filepath) }
+            ( { model | command = Interactive breakCount (ReadingTargetFile filepath) }
             , readTargetFile filepath
             )
 
@@ -25,7 +56,7 @@ update action model =
             let
                 maybeBroken =
                     Commands.Break.Update.BreakFile.run
-                        { breakCount = 1
+                        { breakCount = breakCount
                         , filepath = FilePath.fromString path
                         , fileContent = content
 
@@ -37,7 +68,7 @@ update action model =
                 Just { newFileContent, changes } ->
                     ( { model
                         | command =
-                            Interactive
+                            Interactive breakCount
                                 (BreakingFile
                                     { originalContent = content
                                     , updatedContent = newFileContent
@@ -57,11 +88,8 @@ update action model =
                     , Ports.printAndExitFailure "Error: unable to find a good way to introduce an error into this file."
                     )
 
-        ReceivedUserBreakCountChoice breakCount filepath ->
-            ( model, Cmd.none )
-
         PresentSolveMenu ({ path } as fileData) ->
-            ( { model | command = Interactive (Solving fileData) }
+            ( { model | command = Interactive breakCount (Solving fileData) }
             , Ports.askUserMultipleChoice
                 { name = "solve menu"
                 , message = "" ++ FilePath.toString path ++ " has been broken. See if you can figure out what I did!\n\nOptions"
@@ -77,7 +105,7 @@ update action model =
 
         ReceivedUserSolveMenuChoice ({ originalContent, path } as fileData) choice ->
             if choice == QuestionOptions.solved then
-                ( { model | command = Interactive (Solved path) }
+                ( { model | command = Interactive breakCount (Solved path) }
                 , Cmd.batch
                     [ Ports.printAndReturn (Messages.withNewlineBuffers "Congratulations; nice work!")
                     , Ports.writeFile
@@ -103,7 +131,7 @@ update action model =
                 )
 
             else if choice == QuestionOptions.resetAndExit then
-                ( { model | command = Interactive ResettingAndExiting }
+                ( { model | command = Interactive breakCount ResettingAndExiting }
                 , Ports.writeFile
                     { path = FilePath.toString path
                     , content = originalContent
@@ -123,6 +151,7 @@ update action model =
                 , options =
                     [ QuestionOptions.tryAgain
                     , QuestionOptions.breakADifferentFile
+                    , QuestionOptions.changeBreakCount
                     , QuestionOptions.exit
                     ]
                 }
@@ -131,7 +160,7 @@ update action model =
         ReceivedUserRestartMenuChoice filepath choice ->
             if choice == QuestionOptions.tryAgain then
                 ( { model
-                    | command = Interactive (ReadingTargetFile filepath)
+                    | command = Interactive breakCount (ReadingTargetFile filepath)
                     , randomNumbers = rerandomizeAll model.randomNumbers
                   }
                 , Cmd.init (ReadingTargetFile filepath)
@@ -139,10 +168,15 @@ update action model =
 
             else if choice == QuestionOptions.breakADifferentFile then
                 ( { model
-                    | command = Interactive SelectingTargetFile
+                    | command = Interactive breakCount SelectingTargetFile
                     , randomNumbers = rerandomizeAll model.randomNumbers
                   }
                 , Cmd.init SelectingTargetFile
+                )
+
+            else if choice == QuestionOptions.changeBreakCount then
+                ( { model | randomNumbers = rerandomizeAll model.randomNumbers }
+                , Cmd.init (SelectingBreakCount (Just filepath))
                 )
 
             else if choice == QuestionOptions.exit then

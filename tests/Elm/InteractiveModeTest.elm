@@ -2,7 +2,7 @@ module Elm.InteractiveModeTest exposing (..)
 
 import Expect
 import Fuzz exposing (int, list)
-import Generic.Segment exposing (BreakStatus(..), SegmentType(..))
+import Parsers.Generic.Segment exposing (BreakStatus(..), SegmentType(..))
 import ProgramTest
 import Test exposing (..)
 

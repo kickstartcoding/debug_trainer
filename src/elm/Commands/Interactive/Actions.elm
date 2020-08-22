@@ -5,8 +5,8 @@ import Utils.Types.FilePath exposing (FilePath)
 
 
 type Action
-    = GotTargetFileChoice FilePath
-    | ReceivedUserBreakCountChoice Int
+    = ReceivedUserBreakCountChoice (Maybe FilePath) Int
+    | GotTargetFileChoice FilePath
     | GotTargetFileContent { path : String, content : String }
     | PresentSolveMenu FileData
     | ReceivedUserSolveMenuChoice FileData String

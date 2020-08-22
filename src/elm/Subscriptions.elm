@@ -10,7 +10,7 @@ import Model exposing (Command(..), Model)
 subscriptions : Model -> Sub Action
 subscriptions ({ command } as model) =
     case command of
-        Interactive _ ->
+        Interactive _ _ ->
             Sub.map InteractiveAction (Commands.Interactive.Subscriptions.subscriptions model)
 
         Break _ ->

@@ -24,9 +24,9 @@ breakExplanation { changes } =
                     ++ String.fromInt lineNumber
                     ++ "` of the original file"
                     |> StrEx.toSentenceCase
-                    |> withNewlineBuffers
             )
         |> String.join "\n\n"
+        |> withNewlineBuffers
 
 
 lineNumberHint : FileData -> String

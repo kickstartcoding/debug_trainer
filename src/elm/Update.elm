@@ -13,10 +13,10 @@ import Ports
 update : CliOptions -> Action -> Model -> ( Model, Cmd Action )
 update _ action ({ command } as model) =
     case ( command, action ) of
-        ( Interactive _, InteractiveAction subAction ) ->
+        ( Interactive breakCount phase, InteractiveAction subAction ) ->
             let
                 ( newModel, cmd ) =
-                    Commands.Interactive.Update.update subAction model
+                    Commands.Interactive.Update.update breakCount subAction model
             in
             ( newModel, Cmd.map InteractiveAction cmd )
 

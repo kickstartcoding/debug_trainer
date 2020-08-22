@@ -11,31 +11,32 @@ subscriptions model =
     Sub.batch
         [ Ports.receiveFileChoice (FilePath.fromString >> GotTargetFileChoice)
         , case model.command of
-            Interactive SelectingBreakCount ->
-                Ports.receiveUserNumberChoice ReceivedUserBreakCountChoice
+            Interactive _ (SelectingBreakCount maybeFilePath) ->
+                Ports.receiveUserNumberChoice (ReceivedUserBreakCountChoice maybeFilePath)
 
-            Interactive SelectingTargetFile ->
+            Interactive _ SelectingTargetFile ->
                 Sub.none
 
-            Interactive (ReadingTargetFile _) ->
+            Interactive _ (ReadingTargetFile _) ->
                 Ports.successfulFileRead GotTargetFileContent
 
-            Interactive (BreakingFile data) ->
+            Interactive _ (BreakingFile data) ->
                 Ports.successfulFileWrite (\_ -> PresentSolveMenu data)
 
-            Interactive (Solving data) ->
+            Interactive _ (Solving data) ->
                 Sub.batch
                     [ Ports.receiveUserAnswer (ReceivedUserSolveMenuChoice data)
                     , Ports.finishedPrinting (\_ -> PresentSolveMenu data)
                     ]
 
-            Interactive (Solved filepath) ->
+            Interactive _ (Solved filepath) ->
                 Sub.batch
                     [ Ports.receiveUserAnswer (ReceivedUserRestartMenuChoice filepath)
                     , Ports.finishedPrinting (\_ -> PresentRestartMenu)
+                    , Ports.receiveUserNumberChoice (ReceivedUserBreakCountChoice (Just filepath))
                     ]
 
-            Interactive ResettingAndExiting ->
+            Interactive _ ResettingAndExiting ->
                 Sub.batch
                     [ Ports.successfulFileWrite (\_ -> Exit)
                     ]

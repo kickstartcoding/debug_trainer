@@ -82,7 +82,7 @@ init { randomNumbers, workingDirectory, data, dataFilePath } { command } =
     in
     ( model
     , case command of
-        Interactive phase ->
+        Interactive _ phase ->
             Commands.Interactive.Cmd.init phase
 
         Break breakData ->

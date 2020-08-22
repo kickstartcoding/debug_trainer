@@ -23,11 +23,11 @@ export default function (program): void {
               }
             })
           },
-          default: "1"
+          default: 1
         }
       ])
       .then((answers) => {
-        program.ports.receiveUserAnswer.send(answers[name])
+        program.ports.receiveUserNumberChoice.send(answers[name])
       })
       .catch(error => {
         if (error.isTtyError) {

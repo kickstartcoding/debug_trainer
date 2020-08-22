@@ -7,6 +7,7 @@ import printAndReturn from './ports/printAndReturn'
 import readFile from './ports/readFile'
 import writeFile from './ports/writeFile'
 import askUserMultipleChoice from './ports/askUserMultipleChoice'
+import askUserForANumber from './ports/askUserForANumber'
 import chooseRandomFile from './ports/chooseRandomFile'
 import exitSuccess from './ports/exitSuccess'
 import * as SavedData from './savedData'
@@ -34,6 +35,7 @@ export function run(): void {
     printAndExitSuccess,
     // exitSuccess,
     askUserMultipleChoice,
+    askUserForANumber,
     chooseRandomFile,
     printAndReturn,
     readFile,
