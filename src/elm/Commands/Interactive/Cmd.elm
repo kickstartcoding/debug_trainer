@@ -12,6 +12,14 @@ import Utils.Types.FilePath as FilePath exposing (FilePath)
 init : InteractionPhase -> Cmd action
 init phase =
     case phase of
+        SelectingBreakCount ->
+            Ports.askUserForANumber
+                { name = "break count"
+                , message = "How many errors would you like me to put in your file?"
+                , min = 1
+                , max = 10
+                }
+
         SelectingTargetFile ->
             Ports.chooseRandomFile ()
 

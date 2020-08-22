@@ -1,5 +1,6 @@
 port module Ports exposing
-    ( askUser
+    ( askUserForANumber
+    , askUserMultipleChoice
     , chooseRandomFile
     , exitSuccess
     , finishedPrinting
@@ -10,13 +11,20 @@ port module Ports exposing
     , readFile
     , receiveFileChoice
     , receiveUserAnswer
+    , receiveUserNumberChoice
     , successfulFileRead
     , successfulFileWrite
     , writeFile
     )
 
 
-port askUser : { question : String, options : List String } -> Cmd action
+port askUserMultipleChoice : { name : String, message : String, options : List String } -> Cmd action
+
+
+port askUserForANumber : { name : String, message : String, min : Int, max : Int } -> Cmd action
+
+
+port receiveUserNumberChoice : (Int -> action) -> Sub action
 
 
 port chooseRandomFile : () -> Cmd action

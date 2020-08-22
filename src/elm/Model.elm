@@ -48,9 +48,10 @@ type Command
 
 
 type InteractionPhase
-    = SelectingTargetFile
+    = SelectingTargetFile Int
     | ReadingTargetFile FilePath
-    | BreakingFile FileData
+    | SelectingBreakCount
+    | BreakingFile Int FileData
     | Solving FileData
     | Solved FilePath
     | ResettingAndExiting

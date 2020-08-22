@@ -13,7 +13,7 @@ module Elm.TestHelp exposing
 
 import Commands.Break.Update.BreakFile as BreakFile
 import Expect
-import Utils.Types.FilePath as FilePath
+import Utils.Types.FilePath As FilePath
 
 
 expectResult : (String -> Result errorType dataType) -> String -> dataType -> Expect.Expectation

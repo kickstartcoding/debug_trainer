@@ -67,10 +67,10 @@ programConfig =
 init : Flags -> CliOptions -> ( Model, Cmd Action )
 init { randomNumbers, workingDirectory, data, dataFilePath } { command } =
     let
-        -- This line is useless but seems to be able to make the askUser port
+        -- This line is useless but seems to be able to make the askUserMultipleChoice port
         -- actually exist. No idea why it doesn't exist otherwise
         _ =
-            Ports.askUser
+            Ports.askUserMultipleChoice
 
         model =
             { randomNumbers = randomNumbers

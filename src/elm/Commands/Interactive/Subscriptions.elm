@@ -11,6 +11,9 @@ subscriptions model =
     Sub.batch
         [ Ports.receiveFileChoice (FilePath.fromString >> GotTargetFileChoice)
         , case model.command of
+            Interactive SelectingBreakCount ->
+                Ports.receiveUserNumberChoice ReceivedUserBreakCountChoice
+
             Interactive SelectingTargetFile ->
                 Sub.none
 

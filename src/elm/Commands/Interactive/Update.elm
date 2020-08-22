@@ -57,10 +57,14 @@ update action model =
                     , Ports.printAndExitFailure "Error: unable to find a good way to introduce an error into this file."
                     )
 
-        PresentSolveMenu fileData ->
+        ReceivedUserBreakCountChoice breakCount filepath ->
+            ( model, Cmd.none )
+
+        PresentSolveMenu ({ path } as fileData) ->
             ( { model | command = Interactive (Solving fileData) }
-            , Ports.askUser
-                { question = "Options"
+            , Ports.askUserMultipleChoice
+                { name = "solve menu"
+                , message = "" ++ FilePath.toString path ++ " has been broken. See if you can figure out what I did!\n\nOptions"
                 , options =
                     [ QuestionOptions.solved
                     , QuestionOptions.lineHint
@@ -113,8 +117,9 @@ update action model =
 
         PresentRestartMenu ->
             ( model
-            , Ports.askUser
-                { question = "Options"
+            , Ports.askUserMultipleChoice
+                { name = "restart menu"
+                , message = "Congratulations; you solved it! What do you want to do now?"
                 , options =
                     [ QuestionOptions.tryAgain
                     , QuestionOptions.breakADifferentFile
