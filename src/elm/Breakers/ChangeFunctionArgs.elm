@@ -23,7 +23,6 @@ run { randomNumber, originalFileContent, segments, fileType } =
         |> Maybe.map
             (\( index, { segment, data, newArguments } ) ->
                 let
-                    newFuncData : { name : String, arguments : List arg }
                     newFuncData =
                         { data | arguments = newArguments }
 
