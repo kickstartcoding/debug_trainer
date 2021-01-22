@@ -2,7 +2,6 @@ module Breakers.ChangeFunctionArgs exposing (run, validCandidateData)
 
 import Breakers.Utils exposing (BreakRunnerData)
 import List.Extra as ListEx
-import Utils.Types.FileData exposing (ChangeData)
 import Parsers.Generic.Segment
     exposing
         ( BreakStatus(..)
@@ -12,6 +11,7 @@ import Parsers.Generic.Segment
 import String.Extra
 import Utils.FileContent as FileContent
 import Utils.Types.BreakType exposing (BreakType(..))
+import Utils.Types.FileData exposing (ChangeData)
 import Utils.Types.FileType exposing (FileType(..))
 import Utils.Types.NamedFunctionDeclaration as Function exposing (NamedFunctionDeclaration)
 
@@ -23,6 +23,7 @@ run { randomNumber, originalFileContent, segments, fileType } =
         |> Maybe.map
             (\( index, { segment, data, newArguments } ) ->
                 let
+                    newFuncData : { name : String, arguments : List arg }
                     newFuncData =
                         { data | arguments = newArguments }
 

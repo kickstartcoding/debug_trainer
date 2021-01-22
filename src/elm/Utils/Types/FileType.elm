@@ -11,6 +11,7 @@ type FileType
     | Elm
     | Elixir
     | Rust
+    | Go
     | Unknown
 
 
@@ -43,6 +44,9 @@ fromFilePath filepath =
 
     else if String.endsWith ".rs" filepathString then
         Rust
+
+    else if String.endsWith ".go" filepathString then
+        Go
 
     else
         Unknown

@@ -102,5 +102,31 @@ suite =
                             , randomNumbers = randomNumbers
                             }
                 ]
+            , describe "go"
+                [ fuzz (list int) "one argument" <|
+                    \randomNumbers ->
+                        expectBreakResultWithExt
+                            { extension = "go"
+                            , input = "func name(arg)"
+                            , output = "func name()"
+                            , randomNumbers = randomNumbers
+                            }
+                , fuzz (list int) "two arguments" <|
+                    \randomNumbers ->
+                        expectBreakResultWithExt
+                            { extension = "go"
+                            , input = "func name(arg1, arg2)"
+                            , output = "func name(arg2, arg1)"
+                            , randomNumbers = randomNumbers
+                            }
+                , fuzz (list int) "two arguments and type specifications" <|
+                    \randomNumbers ->
+                        expectBreakResultWithExt
+                            { extension = "go"
+                            , input = "func name(arg1 int, arg2 string)"
+                            , output = "func name(arg2 string, arg1 int)"
+                            , randomNumbers = randomNumbers
+                            }
+                ]
             ]
         ]

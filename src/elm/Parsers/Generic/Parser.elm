@@ -8,6 +8,7 @@ import Parsers.JavaScript as JavaScript
 import Parsers.Python as Python
 import Parsers.Ruby as Ruby
 import Parsers.Rust as Rust
+import Parsers.Go as Go
 import Parsers.UnknownLanguage as UnknownLanguage
 import Parsers.Utils
 import Parsers.Utils.Code as Code
@@ -89,6 +90,15 @@ segment fileType =
                             , Rust.blockComment
                                 |> mapStringToSegment offset Comment
                             , Rust.functionDeclaration
+                                |> mapFunctionDeclarationToSegment offset
+                            ]
+
+                        Go ->
+                            [ Go.comment
+                                |> mapStringToSegment offset Comment
+                            , Go.blockComment
+                                |> mapStringToSegment offset Comment
+                            , Go.functionDeclaration
                                 |> mapFunctionDeclarationToSegment offset
                             ]
 
