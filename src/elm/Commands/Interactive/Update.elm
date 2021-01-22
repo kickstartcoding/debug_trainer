@@ -92,7 +92,14 @@ update breakCount action model =
             ( { model | command = Interactive breakCount (Solving fileData) }
             , Ports.askUserMultipleChoice
                 { name = "solve menu"
-                , message = "" ++ FilePath.toString path ++ " has been broken. See if you can figure out what I did!\n\nOptions"
+                , message =
+                    ""
+                        ++ FilePath.toString path
+                        ++ " has been broken. See if you can figure out what I did!\n\n"
+                        ++ "IMPORTANT: be careful not to use control+c to exit "
+                        ++ "debug_trainer without fixing the file — I can't reset "
+                        ++ "the file(s) I broke if you exit that way."
+                        ++ "\n\nOptions"
                 , options =
                     [ QuestionOptions.solved
                     , QuestionOptions.lineHint
