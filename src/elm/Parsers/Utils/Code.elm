@@ -1,5 +1,6 @@
 module Parsers.Utils.Code exposing
-    ( doubleQuoteString
+    ( anythingButCommasOrParens
+    , doubleQuoteString
     , otherCharacter
     , parenthesisOrBracket
     , returnStatement
@@ -31,6 +32,22 @@ parenthesisOrBracket =
         , token "["
         , token "]"
         ]
+
+
+anythingButCommasOrParens : Parser String
+anythingButCommasOrParens =
+    getChompedString <|
+        Repeat.oneOrMore
+            (chompIf
+                (\char ->
+                    char
+                        /= ','
+                        && char
+                        /= '('
+                        && char
+                        /= ')'
+                )
+            )
 
 
 word : Parser String

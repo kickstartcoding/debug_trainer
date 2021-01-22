@@ -17,7 +17,7 @@ functionDeclaration =
             |. token "("
             |= Repeat.zeroOrMoreWithSeparator
                 Repeat.commaSeparator
-                Code.word
+                Code.anythingButCommasOrParens
             |. token ")"
 
 

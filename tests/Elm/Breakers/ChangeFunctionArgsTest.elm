@@ -127,6 +127,24 @@ suite =
                             , output = "func name(arg2 string, arg1 int)"
                             , randomNumbers = randomNumbers
                             }
+                , fuzz (list int) "weird argument type specifications" <|
+                    \randomNumbers ->
+                        expectBreakResultWithExt
+                            { extension = "go"
+                            , input = "func name(arg1 *string, arg2 <-chan int, arg3 []byte, arg4 ...string)"
+                            , output = "func name(arg2 <-chan int, arg1 *string, arg3 []byte, arg4 ...string)"
+                            , randomNumbers = randomNumbers
+                            }
+
+-- func (m *Mutex)
+-- func (*T2) M2()
+-- func (tv  T)
+-- func (tp *T)
+-- func Split(s string, pos int) 
+-- func Greeting(prefix string, who ...string)
+-- func panic(interface{})
+-- func filter(src <-chan int, dst chan<- int, prime int)
+-- func Read(f *File, b []byte)
                 ]
             ]
         ]
