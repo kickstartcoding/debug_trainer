@@ -14,7 +14,7 @@ Running `debug_trainer` with no other arguments will run it in "interactive mode
 
 ## Commands
 
-### Note: ignoring these commands and using interactive mode instead is probably the easier way to go
+### Note: if you use the new interactive mode, you don't need to know these commands anymore
 
 The `break` command will introduce an error to a file of your choosing.
 
@@ -33,6 +33,20 @@ npm install -g debug_trainer
 ```
 
 ## Usage
+
+### Interactive mode usage
+
+Randomly introduce an error into a file called `myFile.js`:
+```bash
+debug_trainer myFile.js
+```
+
+Randomly introduce an error into a randomly chosen file in your current working directory:
+```bash
+debug_trainer
+```
+
+### Old non-interactive-mode usage
 
 Replace `myFile.js` in any of these examples with one of the files in a project of yours (it does not have to be a JavaScript file).
 
@@ -68,7 +82,25 @@ debug_trainer reset myFile.js
 
 ## Development
 
+To build the program:
+```bash
+npm run build
+```
 
+To run in development mode:
+```bash
+npm run dev
+```
+
+To run all tests:
+```bash
+npm run test
+```
+
+To run the compiled program:
+```bash
+node bin/debug_trainer
+```
 
 ## Possible future features
 
